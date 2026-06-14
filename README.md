@@ -93,6 +93,21 @@ Both are future-ready slots on each product. They default to `null` and render a
 
 No component changes needed — the `MediaSlot` in `ProductShowcase.tsx` picks the right surface.
 
+## Docs (`/docs`)
+
+The documentation at [`valoir.space/docs`](https://valoir.space/docs) is content-driven and
+statically generated.
+
+- **Add or edit a page = one edit:** append a `DocPage` object to `src/content/docs/pages.ts`
+  (`slug`, `title`, `description`, `order`, `blocks`). It auto-appears in the sidebar, the sitemap,
+  and as a static `/docs/<slug>` route — no other files to touch.
+- **Block types:** `p`, `h` (optional `status: "now" | "m3" | "planned"`), `code`, `ul`, `table`,
+  `callout`. Inline markup inside text: `` `code` ``, `**bold**`, `[text](url)`, and the status
+  tokens `[now]` / `[m3]` / `[planned]` (rendered as badges).
+- **Honesty:** mark anything not in the current build as `m3`/`planned` — never present planned
+  features as shipped. The early-build banner shows on every docs page.
+- The read/sort/select logic lives in `src/lib/docs.ts`; rendering in `src/components/docs/`.
+
 ## Design tokens & theming
 
 All colors are CSS variables in `src/app/globals.css`. Dark is default; a warm light variant is
