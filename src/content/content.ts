@@ -9,7 +9,7 @@ export const site = {
   tagline: "AI harnesses & dev tools.",
   description:
     "Valoir builds developer tools — AI harnesses and dev tooling, open-source and premium. Built by a developer, for developers.",
-  url: "https://valoir.com", // production domain (owned; registered at Hover)
+  url: "https://valoir.space", // production domain (owned; registered at Namecheap, 2026-06-14)
   github: "https://github.com/Lokesh-4946",
   socials: [
     { label: "GitHub", href: "https://github.com/Lokesh-4946" },
