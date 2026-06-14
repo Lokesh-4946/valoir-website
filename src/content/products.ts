@@ -95,7 +95,7 @@ export const products: Product[] = [
       "pnpm install",
       "pnpm check        # lint · type-check · test · eval · footprint",
     ].join("\n"),
-    docsUrl: "https://docs.valoir.com",
+    docsUrl: "https://docs.valoir.space",
     // Repo is private during build, so there is no public star count to read yet.
     stars: null,
     language: "TypeScript",
