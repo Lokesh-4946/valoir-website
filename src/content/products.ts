@@ -80,20 +80,24 @@ export const products: Product[] = [
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: true,
-    // Public distribution channel (Homebrew / PyPI / npm) is an open decision in the briefs.
-    installCommand: "[NEEDS INPUT] — public install channel TBD (Homebrew / npm / PyPI)",
+    // Public distribution channel: Valoir Homebrew tap (decided 2026-06-14).
+    installCommand: "brew install valoir/tap/rizz",
     usageSnippet: [
-      "# dev install (monorepo, until the public channel is locked)",
-      "pnpm install",
-      "pnpm check        # lint · type-check · test · eval · footprint",
+      "# install",
+      "brew install valoir/tap/rizz",
       "",
       "# run the agent",
       "rizz              # interactive TUI — Simple mode by default",
       "/model            # switch provider (subscription or BYOK), no restart",
       "/workspace        # opt-in: parallel worktree agents + greploop gate",
+      "",
+      "# or build from source (contributors)",
+      "pnpm install",
+      "pnpm check        # lint · type-check · test · eval · footprint",
     ].join("\n"),
-    docsUrl: null, // [NEEDS INPUT] — public docs site not yet published
-    stars: null, // [NEEDS INPUT] — repo private during build
+    docsUrl: "https://docs.valoir.dev",
+    // Repo is private during build, so there is no public star count to read yet.
+    stars: null,
     language: "TypeScript",
     demoVideoUrl: null,
     tryItUrl: null,

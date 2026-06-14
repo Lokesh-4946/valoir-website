@@ -9,11 +9,11 @@ export const site = {
   tagline: "AI harnesses & dev tools.",
   description:
     "Valoir builds developer tools — AI harnesses and dev tooling, open-source and premium. Built by a developer, for developers.",
-  url: "https://valoir.dev", // [NEEDS INPUT] — production domain not confirmed in files
+  url: "https://valoir.dev", // production domain (confirmed 2026-06-14)
   github: "https://github.com/Lokesh-4946",
   socials: [
     { label: "GitHub", href: "https://github.com/Lokesh-4946" },
-    { label: "X", href: "#" }, // [NEEDS INPUT]
+    // No public X/other social yet — intentionally omitted so we never ship a dead "#" link.
   ],
 };
 

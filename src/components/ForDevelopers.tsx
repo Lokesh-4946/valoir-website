@@ -70,7 +70,7 @@ export default function ForDevelopers() {
                   )}
               </div>
               <p className="mt-4 max-w-sm font-mono text-xs leading-relaxed text-muted">
-                Public install channel (Homebrew · npm · PyPI) is being locked for v1. Until then, build from the monorepo on the right.
+                Ships via the Valoir Homebrew tap at v1. Prefer source today? Build from the monorepo on the right.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
