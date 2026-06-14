@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { docHref, getAllDocs } from "@/lib/docs";
+import { docsBreadcrumb } from "@/lib/structuredData";
+import JsonLd from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: "Rizz documentation",
@@ -14,6 +16,7 @@ export default function DocsIndex() {
 
   return (
     <div>
+      <JsonLd data={docsBreadcrumb()} />
       <p className="eyebrow mb-4">Documentation</p>
       <h1 className="display text-[clamp(2rem,5vw,3.4rem)] font-semibold text-fg">Rizz docs</h1>
       <p className="mt-5 max-w-xl font-mono text-base leading-relaxed text-muted">

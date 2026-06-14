@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { site } from "@/content/content";
 import { docHref, getAllDocs, getDoc } from "@/lib/docs";
+import { docsBreadcrumb } from "@/lib/structuredData";
 import DocContent from "@/components/docs/DocContent";
+import JsonLd from "@/components/JsonLd";
 
 type Params = { slug: string };
 
@@ -34,6 +37,7 @@ export default function DocPage({ params }: { params: Params }) {
 
   return (
     <div>
+      <JsonLd data={docsBreadcrumb({ name: doc.title, url: `${site.url}${docHref(doc.slug)}` })} />
       <h1 className="display text-[clamp(1.8rem,4.5vw,3rem)] font-semibold text-fg">{doc.title}</h1>
       <DocContent blocks={doc.blocks} />
 
