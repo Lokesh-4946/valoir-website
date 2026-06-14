@@ -1,9 +1,16 @@
 import { ImageResponse } from "next/og";
-import { site } from "@/content/content";
+import { hero, manifesto, site } from "@/content/content";
+import { flagship } from "@/content/products";
 
 // Shared social-card renderer used by both the Open Graph and Twitter image
 // routes. On-brand: Valoir gold on deep warm ink, mono voice, the gold orb motif.
+// Copy is data-driven from the same content as the page, so the card never
+// drifts from the hero.
 export const ogAlt = `${site.name} — ${site.tagline}`;
+
+const headline = hero.headline.join(" ");
+const productLine = `${flagship.name} — ${flagship.tagline}`;
+const closingLine = manifesto.lines[manifesto.lines.length - 1];
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = "image/png";
 
@@ -48,16 +55,12 @@ export function renderOgImage(): ImageResponse {
               maxWidth: 900,
             }}
           >
-            Tools for people who build with agents.
+            {headline}
           </div>
-          <div style={{ fontSize: 28, color: GOLD }}>
-            Rizz — the lightest, most connectable coding agent harness.
-          </div>
+          <div style={{ fontSize: 28, color: GOLD }}>{productLine}</div>
         </div>
 
-        <div style={{ fontSize: 22, color: MUTED }}>
-          Open-source core. Premium where the work earns it.
-        </div>
+        <div style={{ fontSize: 22, color: MUTED }}>{closingLine}</div>
       </div>
     ),
     { ...ogSize },
