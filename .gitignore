@@ -28,3 +28,6 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# local-only Claude Code config (shared skills + launch.json stay tracked)
+.claude/settings.local.json
