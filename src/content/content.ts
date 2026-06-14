@@ -18,12 +18,13 @@ export const site = {
 };
 
 export const nav = {
+  // Absolute paths so the nav works from any route (e.g. /docs), not just home.
   links: [
-    { label: "Products", href: "#products" },
-    { label: "Open Source", href: "#open-source" },
-    { label: "Docs", href: "#developers" },
+    { label: "Products", href: "/#products" },
+    { label: "Open Source", href: "/#open-source" },
+    { label: "Docs", href: "/docs" },
   ],
-  cta: { label: "Get Rizz", href: "#developers" },
+  cta: { label: "Get Rizz", href: "/#developers" },
 };
 
 export const hero = {
