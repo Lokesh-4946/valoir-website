@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { display, mono } from "@/lib/fonts";
 import { site } from "@/content/content";
+import { siteGraph } from "@/lib/structuredData";
+import JsonLd from "@/components/JsonLd";
 import "./globals.css";
 
 const pageTitle = `${site.name} — ${site.tagline}`;
@@ -13,10 +15,12 @@ export const metadata: Metadata = {
   keywords: [
     "Valoir",
     "Rizz",
-    "coding agent",
-    "agent harness",
+    "coding agent harness",
+    "lightweight coding agent",
+    "CLI coding agent loop",
+    "provider-agnostic AI agent",
+    "open-source coding agent",
     "developer tools",
-    "AI tooling",
     "open-core",
   ],
   alternates: { canonical: "/" },
@@ -52,6 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>
       <body>
+        <JsonLd data={siteGraph()} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[80] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-[var(--accent-ink)]"
