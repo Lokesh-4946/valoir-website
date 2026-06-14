@@ -44,6 +44,7 @@ export default function ForDevelopers() {
           <p className="eyebrow">{sections.developers.label}</p>
         </Reveal>
         <MaskReveal
+          as="h2"
           lines={[sections.developers.title]}
           className="display max-w-3xl text-[clamp(2.2rem,6vw,4.4rem)] font-semibold text-fg"
         />

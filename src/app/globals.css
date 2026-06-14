@@ -16,7 +16,7 @@
   --fg: #f2f2f0;          /* primary text */
   --bone: #ede6d6;        /* warm primary (product) */
   --muted: #8a8a85;       /* secondary text */
-  --faint: #5e594e;       /* tertiary */
+  --faint: #8d887a;       /* tertiary — AA-legible (≥4.5:1 on panels), still below --muted */
   --accent: #e3b341;      /* Valoir gold — the one restrained accent */
   --accent-ink: #241c05;  /* text on accent */
   --teal: #5fb3a1;        /* tools / system */

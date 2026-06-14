@@ -183,6 +183,7 @@ export default function ProductShowcase() {
         <p className="eyebrow">{sections.products.label}</p>
       </Reveal>
       <MaskReveal
+        as="h2"
         lines={[sections.products.title]}
         className="display text-[clamp(2.4rem,7vw,5rem)] font-semibold text-fg"
       />

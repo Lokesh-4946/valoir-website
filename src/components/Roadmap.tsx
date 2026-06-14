@@ -12,6 +12,7 @@ export default function Roadmap() {
           <p className="eyebrow">{roadmap.label}</p>
         </Reveal>
         <MaskReveal
+          as="h2"
           lines={[roadmap.title]}
           className="display max-w-3xl text-[clamp(2rem,5.5vw,4rem)] font-semibold text-fg"
         />

@@ -2,11 +2,12 @@ import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 
 // Display: a strong grotesque, in the Neue Montreal / General Sans family of feel.
 // Loaded via next/font for zero layout shift.
+// Weights limited to those actually used (400/500/600) to trim font payload.
 export const display = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 });
 
 // Mono: labels, eyebrows, code, the terminal voice of the product.

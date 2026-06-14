@@ -21,6 +21,7 @@ export default function OpenSource() {
           <p className="eyebrow">{sections.openSource.label}</p>
         </Reveal>
         <MaskReveal
+          as="h2"
           lines={[sections.openSource.title]}
           className="display max-w-3xl text-[clamp(2.2rem,6vw,4.4rem)] font-semibold text-fg"
         />

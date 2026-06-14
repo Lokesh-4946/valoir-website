@@ -17,7 +17,7 @@ export default function Home() {
       <ScrollProgress />
       <Cursor />
       <Nav />
-      <main>
+      <main id="main" tabIndex={-1} className="outline-none">
         <Hero />
         <Manifesto />
         <ProductShowcase />

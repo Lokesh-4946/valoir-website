@@ -9,6 +9,7 @@ export default function Manifesto() {
       <p className="eyebrow mb-12">{manifesto.label}</p>
 
       <MaskReveal
+        as="h2"
         lines={manifesto.lines}
         className="display max-w-5xl text-[clamp(1.8rem,4.4vw,3.4rem)] font-medium leading-[1.08] text-fg"
         lineClassName="py-1"
