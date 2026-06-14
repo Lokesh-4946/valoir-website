@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Valoir design tokens
+   Dark by default (deep warm ink). Warm light variant ready
+   under [data-theme="light"] — structure never depends on color.
+   Palette locked from rizz_ui_ux_spec.md / rizz_experience.html.
+   ============================================================ */
+:root {
+  --bg: #0b0b0c;          /* deep near-black canvas */
+  --bg-warm: #14130f;     /* warm ink (product surface) */
+  --bg-2: #1c1a15;        /* panel */
+  --bg-3: #22201a;        /* raised panel */
+  --fg: #f2f2f0;          /* primary text */
+  --bone: #ede6d6;        /* warm primary (product) */
+  --muted: #8a8a85;       /* secondary text */
+  --faint: #5e594e;       /* tertiary */
+  --accent: #e3b341;      /* Valoir gold — the one restrained accent */
+  --accent-ink: #241c05;  /* text on accent */
+  --teal: #5fb3a1;        /* tools / system */
+  --rose: #d98a7a;        /* alerts / conflicts */
+  --line: rgba(242, 242, 240, 0.08);
+  --line-2: rgba(242, 242, 240, 0.05);
+
+  --shell: 1280px;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f7f5f1;
+  --bg-warm: #f7f5f1;
+  --bg-2: #efece4;
+  --bg-3: #e7e3d8;
+  --fg: #14130f;
+  --bone: #14130f;
+  --muted: #6b665b;
+  --faint: #9a9384;
+  --accent: #b07d12;
+  --accent-ink: #fbf7ec;
+  --teal: #2f7c6c;
+  --rose: #b1503c;
+  --line: rgba(20, 19, 15, 0.12);
+  --line-2: rgba(20, 19, 15, 0.07);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 72% -10%, rgba(227, 179, 65, 0.06), transparent 60%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: "ss01", "cv01";
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---- shared utilities ---- */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 5vw, 64px);
+}
+
+.eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hairline {
+  border-top: 1px solid var(--line);
+}
+
+/* Translucent surfaces (theme-safe; works regardless of token format) */
+.glass {
+  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+.glass-strong {
+  background-color: color-mix(in srgb, var(--bg) 94%, transparent);
+}
+
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+/* Wipe-in underline for links */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Clip-reveal mask used by headlines */
+.clip-line {
+  display: block;
+  overflow: hidden;
+}
+
+/* Focus visibility (a11y) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Custom cursor: hide native only when our cursor is active (pointer devices) */
+body.has-cursor {
+  cursor: none;
+}
+@media (hover: none) {
+  body.has-cursor {
+    cursor: auto;
+  }
+}
+
+/* selection */
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Reduced motion: strip transforms/animations, keep everything readable */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  body.has-cursor {
+    cursor: auto;
+  }
+  /* Safety: never leave reveal-initial content hidden for reduced-motion users.
+     !important in the stylesheet overrides the inline initial-hidden states. */
+  [data-reveal],
+  [data-h-fade] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-line-inner],
+  [data-h-line] {
+    transform: none !important;
+  }
+}
+
+/* thin scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-3);
+  border-radius: 99px;
+}
