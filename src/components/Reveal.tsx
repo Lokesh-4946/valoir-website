@@ -61,14 +61,19 @@ export function Reveal({
 /**
  * Mask-reveal headline. Pass an array of lines; each rises out of an
  * overflow-hidden mask, staggered, on scroll into view.
+ *
+ * Polymorphic via `as` so section titles render as real headings (e.g. `h2`)
+ * for a correct document outline — the visual effect is identical.
  */
 export function MaskReveal({
   lines,
+  as: Tag = "div",
   className = "",
   lineClassName = "",
   start = "top 80%",
 }: {
   lines: string[];
+  as?: ElementType;
   className?: string;
   lineClassName?: string;
   start?: string;
@@ -105,7 +110,7 @@ export function MaskReveal({
   }, [start]);
 
   return (
-    <div ref={ref} className={className}>
+    <Tag ref={ref as never} className={className}>
       {lines.map((line, i) => (
         <span key={i} className="clip-line">
           <span
@@ -116,6 +121,6 @@ export function MaskReveal({
           </span>
         </span>
       ))}
-    </div>
+    </Tag>
   );
 }

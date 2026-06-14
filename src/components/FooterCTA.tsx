@@ -9,6 +9,7 @@ export default function FooterCTA() {
     <footer id="contact" className="border-t border-line">
       <div className="shell py-28 sm:py-40">
         <MaskReveal
+          as="h2"
           lines={footer.bigLine.split("\n")}
           className="display text-[clamp(2.6rem,9vw,7rem)] font-semibold text-fg"
         />

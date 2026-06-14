@@ -6,9 +6,15 @@ import { gsap } from "gsap";
 import { hero } from "@/content/content";
 import MagneticButton from "./MagneticButton";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 
 // 3D scene is client-only and lazy — never blocks first paint.
 const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
+
+// Only mount the WebGL scene where it pays off: a wide enough viewport with a
+// fine pointer and motion allowed. On phones/touch we render the static orb and
+// never even download the Three.js chunk — a big mobile-performance win.
+const SCENE_QUERY = "(min-width: 768px) and (hover: hover) and (pointer: fine)";
 
 function ArrowOut() {
   return (
@@ -21,6 +27,7 @@ function ArrowOut() {
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const sceneAllowed = useMediaQuery(SCENE_QUERY);
 
   useEffect(() => {
     const el = root.current;
@@ -48,19 +55,18 @@ export default function Hero() {
       ref={root}
       className="relative flex min-h-[100svh] items-center overflow-hidden"
     >
-      {/* 3D object (or reduced-motion fallback) */}
-      <div className="absolute inset-0 -z-0">
-        {reduced ? (
+      {/* Decorative visual: WebGL scene on capable viewports, static orb otherwise. */}
+      <div aria-hidden className="absolute inset-0 -z-0">
+        {sceneAllowed && !reduced ? (
+          <HeroScene />
+        ) : (
           <div
-            aria-hidden
             className="absolute right-[8%] top-1/2 h-[46vmin] w-[46vmin] -translate-y-1/2 rounded-full opacity-70 blur-[2px]"
             style={{
               background:
                 "radial-gradient(circle at 35% 30%, #E3B341, #7a5a12 45%, transparent 72%)",
             }}
           />
-        ) : (
-          <HeroScene />
         )}
         {/* readability scrim */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-bg via-bg to-transparent" />
