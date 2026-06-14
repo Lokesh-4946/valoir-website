@@ -3,14 +3,35 @@ import { display, mono } from "@/lib/fonts";
 import { site } from "@/content/content";
 import "./globals.css";
 
+const pageTitle = `${site.name} — ${site.tagline}`;
+
 export const metadata: Metadata = {
-  title: `${site.name} — ${site.tagline}`,
+  title: pageTitle,
   description: site.description,
   metadataBase: new URL(site.url),
+  applicationName: site.name,
+  keywords: [
+    "Valoir",
+    "Rizz",
+    "coding agent",
+    "agent harness",
+    "developer tools",
+    "AI tooling",
+    "open-core",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: `${site.name} — ${site.tagline}`,
+    title: pageTitle,
     description: site.description,
+    url: site.url,
+    siteName: site.name,
     type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: pageTitle,
+    description: site.description,
   },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
