@@ -37,9 +37,6 @@ export default function Nav() {
           className="font-display text-lg font-semibold tracking-tightest text-fg"
         >
           {site.wordmark}
-          <span className="ml-2 align-middle font-mono text-[10px] uppercase tracking-eyebrow text-faint">
-            dev tools
-          </span>
         </a>
 
         <div className="hidden items-center gap-8 md:flex">

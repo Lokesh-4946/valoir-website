@@ -75,10 +75,6 @@ export default function Hero() {
       </div>
 
       <div className="shell relative z-10 w-full">
-        <p data-h-fade className="eyebrow mb-6 opacity-0">
-          00 — {hero.eyebrow}
-        </p>
-
         <h1 className="display max-w-4xl text-[clamp(2.6rem,8vw,6.4rem)] font-semibold text-fg">
           {hero.headline.map((line, i) => (
             <span key={i} className="clip-line">
@@ -88,13 +84,6 @@ export default function Hero() {
             </span>
           ))}
         </h1>
-
-        <p
-          data-h-fade
-          className="mt-8 max-w-xl font-mono text-base leading-relaxed text-muted opacity-0 sm:text-lg"
-        >
-          {hero.sub}
-        </p>
 
         <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4 opacity-0">
           <MagneticButton href={hero.primary.href} variant="accent">

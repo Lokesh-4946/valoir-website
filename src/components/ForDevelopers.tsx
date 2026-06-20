@@ -71,18 +71,10 @@ export default function ForDevelopers() {
                   )}
               </div>
               <p className="mt-4 max-w-sm font-mono text-xs leading-relaxed text-muted">
-                Ships via the Valoir Homebrew tap at v1. Prefer source today? Build from the monorepo on the right.
+                Public installer lands when the setup path is ready. The source workflow is shown for contributors.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
-                <a
-                  href={flagship.repoUrl ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link-underline font-mono text-sm text-fg"
-                >
-                  {flagship.repoPrivate ? "Repo (private) ↗" : "GitHub ↗"}
-                </a>
                 <a
                   href={flagship.docsUrl ?? "#"}
                   className="link-underline font-mono text-sm text-muted"

@@ -140,6 +140,123 @@ html.lenis body {
   overflow: hidden;
 }
 
+/* Rizz demo loop: a native 4s product animation, not a recorded video. */
+.rizz-demo-field {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 13%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--teal) 8%, transparent), transparent 58%);
+}
+
+.rizz-demo-scan {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
+  animation: rizz-demo-scan 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.rizz-demo-row {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: rizz-demo-row 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.rizz-demo-row-1 {
+  animation-delay: 0.1s;
+}
+
+.rizz-demo-row-2 {
+  animation-delay: 0.55s;
+}
+
+.rizz-demo-row-3 {
+  animation-delay: 1s;
+}
+
+.rizz-demo-row-4 {
+  animation-delay: 2.45s;
+}
+
+.rizz-demo-progress {
+  animation: rizz-demo-progress 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  transform: scaleX(0);
+}
+
+.rizz-demo-node {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--teal);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-2) 86%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--teal) 40%, transparent);
+  animation: rizz-demo-node 4s ease-in-out infinite;
+}
+
+.rizz-demo-node-2 {
+  animation-delay: 0.7s;
+}
+
+.rizz-demo-node-3 {
+  animation-delay: 1.4s;
+}
+
+@keyframes rizz-demo-scan {
+  0%,
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  16%,
+  74% {
+    opacity: 1;
+  }
+  88% {
+    transform: translateY(330%);
+    opacity: 0;
+  }
+}
+
+@keyframes rizz-demo-row {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  22%,
+  78% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes rizz-demo-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  72%,
+  88% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes rizz-demo-node {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.55;
+  }
+  45% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
 /* Focus visibility (a11y) */
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -186,6 +303,17 @@ body.has-cursor {
   [data-line-inner],
   [data-h-line] {
     transform: none !important;
+  }
+  .rizz-demo-scan,
+  .rizz-demo-row,
+  .rizz-demo-progress,
+  .rizz-demo-node {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .rizz-demo-progress {
+    transform: scaleX(1) !important;
   }
 }
 
