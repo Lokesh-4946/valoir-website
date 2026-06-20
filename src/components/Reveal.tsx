@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useRef, type ElementType, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ElementType, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+function rootMarginFromStart(start: string): string {
+  const match = /^top\s+(\d+(?:\.\d+)?)%$/.exec(start.trim());
+  if (!match) return "0px 0px -20% 0px";
+
+  const viewportPercent = Number.parseFloat(match[1] ?? "80");
+  const bottomMargin = Math.min(100, Math.max(0, 100 - viewportPercent));
+  return `0px 0px -${bottomMargin}% 0px`;
+}
 
 /**
  * Generic on-scroll reveal. Under reduced-motion the element is simply shown
@@ -80,11 +89,9 @@ export function MaskReveal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = ref.current;
     if (!root) return;
-    gsap.registerPlugin(ScrollTrigger);
-
     const targets = root.querySelectorAll<HTMLElement>("[data-line-inner]");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -93,30 +100,43 @@ export function MaskReveal({
       return;
     }
 
+    let tween: gsap.core.Tween | undefined;
+    let observer: IntersectionObserver | undefined;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        targets,
-        { yPercent: 110 },
-        {
-          yPercent: 0,
-          duration: 1,
-          ease: "power4.out",
-          stagger: 0.09,
-          scrollTrigger: { trigger: root, start },
-        },
-      );
+      gsap.set(targets, { yPercent: 110 });
     }, root);
-    return () => ctx.revert();
+
+    const play = () => {
+      if (tween) return;
+      tween = gsap.to(targets, {
+        yPercent: 0,
+        duration: 1,
+        ease: "power4.out",
+        stagger: 0.09,
+      });
+      observer?.disconnect();
+    };
+
+    observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) play();
+      },
+      { rootMargin: rootMarginFromStart(start), threshold: 0 },
+    );
+    observer.observe(root);
+
+    return () => {
+      observer?.disconnect();
+      tween?.kill();
+      ctx.revert();
+    };
   }, [start]);
 
   return (
     <Tag ref={ref as never} className={className}>
       {lines.map((line, i) => (
         <span key={i} className="clip-line">
-          <span
-            data-line-inner
-            className={`block translate-y-[110%] ${lineClassName}`}
-          >
+          <span data-line-inner className={`block ${lineClassName}`}>
             {line}
           </span>
         </span>

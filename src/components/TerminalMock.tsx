@@ -25,7 +25,7 @@ export default function TerminalMock() {
         </div>
         <div className="ml-auto flex items-center gap-2 rounded-md border border-line bg-[var(--bg-3)] px-2.5 py-1">
           <span className="h-1.5 w-1.5 rounded-full bg-teal shadow-[0_0_8px_var(--teal)]" />
-          <span className="font-mono text-[11px] text-bone">claude-opus-4.8</span>
+          <span className="font-mono text-[11px] text-bone">profile: deep</span>
           <span className="font-mono text-[11px] text-faint">⌃L</span>
         </div>
       </div>
@@ -54,12 +54,12 @@ export default function TerminalMock() {
       {/* status bar */}
       <div className="flex flex-wrap items-center gap-3 border-t border-line px-4 py-2 font-mono text-[11px] text-muted">
         <span>
-          <span className="text-accent">claude-opus-4.8</span> · subscription
+          <span className="text-accent">deep profile</span> · connected
         </span>
         <span className="text-faint">│</span>
         <span>ctx 12%</span>
         <span className="ml-auto">
-          1,840 tok · <span className="text-accent">$0.00</span> (sub)
+          1,840 tok · <span className="text-accent">budget ok</span>
         </span>
         <span className="text-faint">│</span>
         <span>⎇ main</span>

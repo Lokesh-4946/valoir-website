@@ -5,7 +5,7 @@
  * Future-ready slots:
  *   - demoVideoUrl: set a URL to auto-render a video player in the showcase.
  *   - tryItUrl:     set a URL to auto-render a "Try it yourself" live embed/CTA.
- * Both default to null and show a tasteful "Demo coming soon" empty state.
+ * Both default to null and show the animated Rizz demo loop.
  *
  * Facts sourced from: rizz_cowork_brief.md, rizz_cowork_brief_5.md,
  * rizz_ui_ux_spec.md, rizz_experience.html, and the rizz repo
@@ -53,7 +53,7 @@ export const products: Product[] = [
     by: "by Valoir",
     tagline: "The lightest, most connectable coding agent harness.",
     description:
-      "Rizz is a CLI-installable coding agent loop — model-call, tool-dispatch, tool-result, repeat, with interrupt, compression, budget, and fallback. Single-agent and minimal by default. Hermes-class power on demand behind an opt-in /workspace switch.",
+      "Rizz is a local coding-agent harness for model turns, tool calls, verified edits, visible budget, fallback, and resumable sessions. It starts as a single-agent TUI and grows into opt-in workspace power only when you ask.",
     license: "open-core",
     licenseLabel: "Open-core · MIT at v1",
     capabilities: [
@@ -65,34 +65,34 @@ export const products: Product[] = [
       {
         title: "Provider-agnostic",
         detail:
-          "Subscription /login, BYOK, or cloud creds across a curated catalog — Claude, Codex, OpenRouter, Bedrock, Ollama. Hot-swap models with no restart and no code changes.",
+          "Bring account auth, API key, cloud credential, or a local model when that route is available. Switch profiles without changing code or restarting the session.",
       },
       {
         title: "A hub, not an island",
         detail:
-          "Callable by any tool — print/JSON, RPC, SDK, MCP/ACP — and connects to Cursor, Claude, and Codex rather than replacing them.",
+          "Callable by tools and scripts through print, JSON, RPC, SDK, and protocol surfaces, so Rizz can fit into the workflow you already use.",
       },
       {
         title: "Power on demand",
         detail:
-          "Plan mode, parallel git-worktree agents, shared memory, and the greploop PR gate ship as opt-in /workspace power — never default bloat.",
+          "Planning, worktree agents, shared memory, and reviewed merge gates stay behind explicit workspace power — never default bloat.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: true,
-    // Public distribution channel: Valoir Homebrew tap (decided 2026-06-14).
-    installCommand: "brew install valoir/tap/rizz",
+    // Public installers are deferred; contributors dogfood from the repo for now.
+    installCommand: "pnpm link:local",
     usageSnippet: [
-      "# install",
-      "brew install valoir/tap/rizz",
+      "# from the rizz checkout",
+      "pnpm install",
+      "pnpm link:local     # build and link the local shim",
       "",
       "# run the agent",
-      "rizz              # interactive TUI — Simple mode by default",
-      "/model            # switch provider (subscription or BYOK), no restart",
-      "/workspace        # opt-in: parallel worktree agents + greploop gate",
+      "rizz                # interactive TUI — demo mode until connected",
+      "rizz setup --dry-run",
+      "/model              # switch provider/profile, no restart",
+      "/workspace          # opt-in workspace power when it ships",
       "",
-      "# or build from source (contributors)",
-      "pnpm install",
       "pnpm check        # lint · type-check · test · eval · footprint",
     ].join("\n"),
     docsUrl: "https://valoir.space/docs",
@@ -102,7 +102,7 @@ export const products: Product[] = [
     demoVideoUrl: null,
     tryItUrl: null,
     flagship: true,
-    status: "Early build · M2 walking skeleton",
+    status: "Local harness dogfood",
   },
 ];
 

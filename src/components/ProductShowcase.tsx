@@ -6,20 +6,7 @@ import { MaskReveal, Reveal } from "./Reveal";
 import TerminalMock from "./TerminalMock";
 import CopyButton from "./CopyButton";
 import MagneticButton from "./MagneticButton";
-
-function LicenseBadge({ product }: { product: Product }) {
-  const tone =
-    product.license === "premium"
-      ? "border-accent text-accent"
-      : "border-teal text-teal";
-  return (
-    <span
-      className={`rounded-full border px-3 py-1 font-mono text-[11px] uppercase tracking-eyebrow ${tone}`}
-    >
-      {product.licenseLabel}
-    </span>
-  );
-}
+import RizzDemoLoop from "./RizzDemoLoop";
 
 function NeedsInput({ children }: { children: React.ReactNode }) {
   // Renders a value or a clearly-flagged placeholder when a fact was absent.
@@ -58,11 +45,7 @@ function MediaSlot({ product }: { product: Product }) {
     );
   }
   return (
-    <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-line bg-[var(--bg-2)]">
-      <span className="font-mono text-xs uppercase tracking-eyebrow text-faint">
-        Demo coming soon
-      </span>
-    </div>
+    <RizzDemoLoop />
   );
 }
 
@@ -72,7 +55,7 @@ function ActionRow({ product }: { product: Product }) {
   if (isPremium) {
     return (
       <div className="flex flex-wrap items-center gap-4">
-        <MagneticButton href={product.docsUrl ?? "#developers"} variant="accent">
+        <MagneticButton href={product.docsUrl ?? "#products"} variant="accent">
           Request access
         </MagneticButton>
         <span className="font-mono text-xs text-muted">Premium · pricing on request</span>
@@ -80,41 +63,18 @@ function ActionRow({ product }: { product: Product }) {
     );
   }
 
-  // open-source / open-core action row
+  if (!product.installCommand) return null;
+
   return (
     <div className="space-y-4">
-      {product.installCommand && (
-        <div className="flex items-center gap-3 rounded-lg border border-line bg-[var(--bg-2)] px-4 py-3">
-          <span className="select-none font-mono text-sm text-faint">$</span>
-          <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm text-bone">
-            <NeedsInput>{product.installCommand}</NeedsInput>
-          </code>
-          {!product.installCommand.includes("[NEEDS INPUT]") && (
-            <CopyButton text={product.installCommand} />
-          )}
-        </div>
-      )}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        {product.repoUrl && (
-          <a
-            href={product.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-underline font-mono text-sm text-fg"
-          >
-            {product.repoPrivate ? "Repo (private during build) ↗" : "View on GitHub ↗"}
-          </a>
+      <div className="flex items-center gap-3 rounded-lg border border-line bg-[var(--bg-2)] px-4 py-3">
+        <span className="select-none font-mono text-sm text-faint">$</span>
+        <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm text-bone">
+          <NeedsInput>{product.installCommand}</NeedsInput>
+        </code>
+        {!product.installCommand.includes("[NEEDS INPUT]") && (
+          <CopyButton text={product.installCommand} />
         )}
-        <span className="font-mono text-sm text-muted">
-          {product.stars != null ? `★ ${product.stars.toLocaleString()}` : "★ —"}
-        </span>
-        <span className="font-mono text-sm text-muted">{product.language}</span>
-        <a
-          href={product.docsUrl ?? "#developers"}
-          className="link-underline font-mono text-sm text-muted"
-        >
-          {product.docsUrl ? "Docs" : "Docs (soon)"}
-        </a>
       </div>
     </div>
   );
@@ -142,7 +102,6 @@ function ProductPanel({ product, index }: { product: Product; index: number }) {
               Flagship
             </span>
           )}
-          <LicenseBadge product={product} />
         </div>
 
         <h3 className="display text-[clamp(2.2rem,5vw,3.6rem)] font-semibold text-fg">
@@ -151,10 +110,6 @@ function ProductPanel({ product, index }: { product: Product; index: number }) {
         <p className="mt-3 font-mono text-lg text-accent">{product.tagline}</p>
         <p className="mt-6 max-w-xl font-mono text-base leading-relaxed text-muted">
           {product.description}
-        </p>
-
-        <p className="mt-3 font-mono text-xs uppercase tracking-eyebrow text-faint">
-          {product.status}
         </p>
 
         <ul className="mt-10 space-y-6">
@@ -187,11 +142,6 @@ export default function ProductShowcase() {
         lines={[sections.products.title]}
         className="display text-[clamp(2.4rem,7vw,5rem)] font-semibold text-fg"
       />
-      <Reveal delay={0.05} className="mt-6 max-w-xl">
-        <p className="font-mono text-base text-muted">
-          One flagship today, architected so the next is one config edit. Each product carries its own license, install path, and — when ready — a live demo.
-        </p>
-      </Reveal>
 
       <div className="mt-10">
         {products.map((p, i) => (
