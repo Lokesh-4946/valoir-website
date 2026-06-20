@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { hero } from "@/content/content";
 import MagneticButton from "./MagneticButton";
@@ -29,7 +29,7 @@ export default function Hero() {
   const reduced = useReducedMotion();
   const sceneAllowed = useMediaQuery(SCENE_QUERY);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
     const lines = el.querySelectorAll<HTMLElement>("[data-h-line]");
@@ -43,8 +43,10 @@ export default function Hero() {
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-      tl.fromTo(lines, { yPercent: 115 }, { yPercent: 0, duration: 1.1, stagger: 0.1 }, 0.15)
-        .fromTo(rest, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08 }, 0.6);
+      gsap.set(lines, { yPercent: 115 });
+      gsap.set(rest, { opacity: 0, y: 18 });
+      tl.to(lines, { yPercent: 0, duration: 1.1, stagger: 0.1 }, 0.15)
+        .to(rest, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08 }, 0.6);
     }, el);
     return () => ctx.revert();
   }, [reduced]);
@@ -80,7 +82,7 @@ export default function Hero() {
         <h1 className="display max-w-4xl text-[clamp(2.6rem,8vw,6.4rem)] font-semibold text-fg">
           {hero.headline.map((line, i) => (
             <span key={i} className="clip-line">
-              <span data-h-line className="block translate-y-[115%]">
+              <span data-h-line className="block">
                 {line}
               </span>
             </span>
