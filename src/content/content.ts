@@ -24,7 +24,7 @@ export const nav = {
     { label: "Open Source", href: "/#open-source" },
     { label: "Docs", href: "/docs" },
   ],
-  cta: { label: "Get Rizz", href: "/#developers" },
+  cta: { label: "Get Rizz", href: "/#products" },
 };
 
 export const hero = {
@@ -66,26 +66,4 @@ export const sections = {
     title: "Open at the core.",
     body: "Code lives in Git, not in slideware. The Rizz core flips to open-source at v1, with any paid layer kept separate — classic open-core.",
   },
-  developers: {
-    label: "04 — For developers",
-    title: "Install. Run. Connect.",
-    body: "One command to run setup, one command to start the harness, and a provider path you choose explicitly. The loop gets out of the way.",
-  },
-  roadmap: {
-    label: "05 — Roadmap",
-    title: "Rizz is the first, not the last.",
-    body: "The product config is built so the next tool is one object edit. Demos and live 'try it yourself' embeds slot in when they ship.",
-    items: [
-      { tag: "Now", text: "Rizz — setup, TUI, safe single-agent loop, and local dogfood install." },
-      { tag: "Next", text: "Production provider/model setup, headless JSON/RPC, and the eval harness." },
-      { tag: "Then", text: "/workspace: parallel worktree agents, shared memory, and reviewed merge gates." },
-      { tag: "Later", text: "v1: core flips to open (MIT). More Valoir tools. Live demos on this site." },
-    ],
-  },
-};
-
-export const footer = {
-  bigLine: "Build with agents.\nKeep your tools light.",
-  cta: { label: "Get Rizz", href: "#developers" },
-  legal: `© ${new Date().getFullYear()} Valoir. Built by a developer, for developers.`,
 };

@@ -55,7 +55,7 @@ function ActionRow({ product }: { product: Product }) {
   if (isPremium) {
     return (
       <div className="flex flex-wrap items-center gap-4">
-        <MagneticButton href={product.docsUrl ?? "#developers"} variant="accent">
+        <MagneticButton href={product.docsUrl ?? "#products"} variant="accent">
           Request access
         </MagneticButton>
         <span className="font-mono text-xs text-muted">Premium · pricing on request</span>
