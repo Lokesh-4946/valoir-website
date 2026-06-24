@@ -31,7 +31,7 @@ export const nav = {
 };
 
 export const hero = {
-  headline: ["Tools for people", "who build", "with agents."],
+  headline: ["Valoir builds", "open-core agent", "infrastructure."],
   primary: { label: "Explore Rizz", href: "#products" },
   secondary: { label: "View on GitHub", href: "https://github.com/Lokesh-4946/rizz" },
 };
@@ -43,7 +43,7 @@ export const manifesto = {
     "Rizz is the first product.",
     "Power stays opt-in.",
   ],
-  body: "Valoir builds infrastructure for teams and developers who want agent power without hiding the harness. Rizz Core stays light, inspectable, and open-core; larger workflow power lives outside the default path.",
+  body: "Valoir builds open-core agent infrastructure. Rizz is the first product. Rizz Core stays light, inspectable, and open-core; larger workflow power lives outside the default path.",
 };
 
 /**
