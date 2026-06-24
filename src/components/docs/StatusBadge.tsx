@@ -2,7 +2,7 @@ import type { DocStatus } from "@/content/docs/types";
 
 const LABELS: Record<DocStatus, string> = {
   now: "now",
-  m3: "m3",
+  alpha: "alpha",
   planned: "planned",
 };
 
@@ -10,13 +10,13 @@ const LABELS: Record<DocStatus, string> = {
 // meaning too, so we never rely on color alone.
 const TONES: Record<DocStatus, string> = {
   now: "border-teal text-teal",
-  m3: "border-accent text-accent",
+  alpha: "border-accent text-accent",
   planned: "border-rose text-rose",
 };
 
 const TITLES: Record<DocStatus, string> = {
   now: "Available in the current build",
-  m3: "Planned for the M3 milestone",
+  alpha: "Available in the private alpha",
   planned: "Planned — not shipped yet",
 };
 

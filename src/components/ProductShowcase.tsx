@@ -65,14 +65,16 @@ function ActionRow({ product }: { product: Product }) {
 
   if (!product.installCommand) return null;
 
+  const isPrivateAlpha = product.installCommand === "Private alpha from source checkout";
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 rounded-lg border border-line bg-[var(--bg-2)] px-4 py-3">
-        <span className="select-none font-mono text-sm text-faint">$</span>
+        {!isPrivateAlpha && <span className="select-none font-mono text-sm text-faint">$</span>}
         <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm text-bone">
           <NeedsInput>{product.installCommand}</NeedsInput>
         </code>
-        {!product.installCommand.includes("[NEEDS INPUT]") && (
+        {!isPrivateAlpha && !product.installCommand.includes("[NEEDS INPUT]") && (
           <CopyButton text={product.installCommand} />
         )}
       </div>
@@ -108,6 +110,9 @@ function ProductPanel({ product, index }: { product: Product; index: number }) {
           {product.name}
         </h3>
         <p className="mt-3 font-mono text-lg text-accent">{product.tagline}</p>
+        <p className="mt-3 font-mono text-xs uppercase tracking-eyebrow text-faint">
+          {product.status}
+        </p>
         <p className="mt-6 max-w-xl font-mono text-base leading-relaxed text-muted">
           {product.description}
         </p>

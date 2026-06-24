@@ -41,7 +41,7 @@ export function renderOgImage(): ImageResponse {
             {site.wordmark}
           </span>
           <span style={{ fontSize: 18, letterSpacing: 6, color: MUTED }}>
-            DEV TOOLS
+            AGENT INFRA
           </span>
         </div>
 
