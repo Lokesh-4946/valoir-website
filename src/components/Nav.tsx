@@ -39,7 +39,7 @@ export default function Nav() {
           {site.wordmark}
         </a>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 xl:flex">
           {nav.links.map((l) => (
             <a
               key={l.label}
@@ -71,7 +71,7 @@ export default function Nav() {
           aria-label="Menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center md:hidden"
+          className="flex h-10 w-10 items-center justify-center xl:hidden"
         >
           <div className="space-y-1.5">
             <span
@@ -95,7 +95,7 @@ export default function Nav() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-t border-line glass-strong backdrop-blur-md md:hidden"
+            className="overflow-hidden border-t border-line glass-strong backdrop-blur-md xl:hidden"
           >
             <div className="shell flex flex-col gap-1 py-4">
               {nav.links.map((l) => (

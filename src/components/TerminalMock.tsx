@@ -25,7 +25,7 @@ export default function TerminalMock() {
         </div>
         <div className="ml-auto flex items-center gap-2 rounded-md border border-line bg-[var(--bg-3)] px-2.5 py-1">
           <span className="h-1.5 w-1.5 rounded-full bg-teal shadow-[0_0_8px_var(--teal)]" />
-          <span className="font-mono text-[11px] text-bone">profile: deep</span>
+          <span className="font-mono text-[11px] text-bone">OpenRouter BYOK</span>
           <span className="font-mono text-[11px] text-faint">⌃L</span>
         </div>
       </div>
@@ -33,20 +33,22 @@ export default function TerminalMock() {
       {/* transcript */}
       <div className="space-y-1 p-5 font-mono text-[12.5px] leading-relaxed">
         <Line who="you" whoClass="text-accent">
-          add a <span className="text-accent">/theme</span> command that hot-swaps at runtime
+          rizz setup
         </Line>
         <Line who="rizz" whoClass="text-teal">
-          <span className="text-muted">thinking · planning the change</span>
+          <span className="text-muted">doctor passed · choose a model route</span>
         </Line>
-        <Tool verb="read" path="src/commands/index.ts" meta="12 lines" />
-        <Tool verb="edit" path="src/commands/theme.ts" meta="+28 −0" />
-        <Tool verb="bash" path="npm test -- theme" meta="✓ 6 passed" ok />
+        <Tool verb="setup" path="OpenRouter direct" meta="BYOK primary" ok />
+        <Tool verb="setup" path="Codex local CLI" meta="secondary" />
         <Line who="rizz" whoClass="text-teal">
-          Added <span className="text-accent">/theme</span>. Hot-swaps at runtime, no restart.
+          OpenRouter key stored in the keychain. Launching Agent Light.
         </Line>
+        <Tool verb="/status" path="route openrouter · cost visible" meta="ready" ok />
+        <Tool verb="/model" path="switch route/profile" meta="no restart" />
+        <Tool verb="/workspace" path="future Workspace Mode" meta="stub" />
         <div className="flex items-center gap-2 pt-2">
           <span className="text-accent">›</span>
-          <span className="text-bone">/model</span>
+          <span className="text-bone">/status</span>
           <span className="inline-block h-3.5 w-2 animate-blink bg-accent align-middle" />
         </div>
       </div>
@@ -54,12 +56,12 @@ export default function TerminalMock() {
       {/* status bar */}
       <div className="flex flex-wrap items-center gap-3 border-t border-line px-4 py-2 font-mono text-[11px] text-muted">
         <span>
-          <span className="text-accent">deep profile</span> · connected
+          <span className="text-accent">Agent Light</span> · private alpha
         </span>
         <span className="text-faint">│</span>
-        <span>ctx 12%</span>
+        <span>Codex secondary</span>
         <span className="ml-auto">
-          1,840 tok · <span className="text-accent">budget ok</span>
+          cost visible · <span className="text-accent">approvals on</span>
         </span>
         <span className="text-faint">│</span>
         <span>⎇ main</span>

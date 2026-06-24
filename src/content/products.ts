@@ -32,7 +32,7 @@ export type Product = {
   licenseLabel: string;
   capabilities: Capability[];
   repoUrl: string | null;
-  /** currently private during build → true hides/contextualizes the repo link */
+  /** private alpha repo access → true hides/contextualizes the repo link */
   repoPrivate: boolean;
   installCommand: string | null;
   /** a minimal usage snippet for the For Developers section */
@@ -53,56 +53,60 @@ export const products: Product[] = [
     by: "by Valoir",
     tagline: "The lightest, most connectable coding agent harness.",
     description:
-      "Rizz is a local coding-agent harness for model turns, tool calls, verified edits, visible budget, fallback, and resumable sessions. It starts as a single-agent TUI and grows into opt-in workspace power only when you ask.",
+      "Rizz is Valoir's first product: a private-alpha local agent harness for setup, provider routing, visible status, and an inspectable CLI/TUI loop.",
     license: "open-core",
-    licenseLabel: "Open-core · MIT at v1",
+    licenseLabel: "Open-core Rizz Core",
     capabilities: [
       {
         title: "Extremely lightweight",
         detail:
-          "Minimal dependencies, fast cold start, small footprint — enforced by a CI footprint budget, not by good intentions.",
+          "Agent Light keeps the current surface local and focused: one CLI, one TUI, and a small harness around the model route.",
       },
       {
         title: "Provider-agnostic",
         detail:
-          "Bring account auth, API key, cloud credential, or a local model when that route is available. Switch profiles without changing code or restarting the session.",
+          "OpenRouter BYOK is the alpha fast path. Codex is available as a secondary local route through the signed-in Codex CLI/app.",
       },
       {
-        title: "A hub, not an island",
+        title: "Visible control loop",
         detail:
-          "Callable by tools and scripts through print, JSON, RPC, SDK, and protocol surfaces, so Rizz can fit into the workflow you already use.",
+          "`/status`, `/model`, `/workspace`, and setup checks keep routing, readiness, and limits visible.",
       },
       {
-        title: "Power on demand",
+        title: "Local review-loop",
         detail:
-          "Planning, worktree agents, shared memory, and reviewed merge gates stay behind explicit workspace power — never default bloat.",
+          "The current discipline is local verification and review-loop dogfood. Custom QA/eval pipelines belong to the later Valoir layer.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: true,
-    // Public installers are deferred; contributors dogfood from the repo for now.
-    installCommand: "pnpm link:local",
+    // Public installers are deferred; private alpha runs from a source checkout for now.
+    installCommand: "Private alpha from source checkout",
     usageSnippet: [
-      "# from the rizz checkout",
+      "# private alpha from the rizz checkout",
+      "cd /Users/lokesh/Downloads/rizz",
       "pnpm install",
-      "pnpm link:local     # build and link the local shim",
+      "pnpm link:local",
       "",
-      "# run the agent",
-      "rizz                # interactive TUI — demo mode until connected",
+      "# setup and route",
       "rizz setup --dry-run",
-      "/model              # switch provider/profile, no restart",
-      "/workspace          # opt-in workspace power when it ships",
+      "rizz setup          # choose OpenRouter BYOK or Codex",
       "",
-      "pnpm check        # lint · type-check · test · eval · footprint",
+      "# inside the TUI",
+      "/status             # readiness, route, and cost signals",
+      "/model              # switch route/profile",
+      "/workspace          # visible stub; future Workspace Mode",
+      "",
+      "pnpm check          # local review-loop gate",
     ].join("\n"),
     docsUrl: "https://valoir.space/docs",
-    // Repo is private during build, so there is no public star count to read yet.
+    // Repo is in private alpha, so there is no public star count to read yet.
     stars: null,
     language: "TypeScript",
     demoVideoUrl: null,
     tryItUrl: null,
     flagship: true,
-    status: "Local harness dogfood",
+    status: "Private Alpha · Agent Light",
   },
 ];
 

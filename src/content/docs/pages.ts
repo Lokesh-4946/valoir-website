@@ -2,7 +2,7 @@ import type { DocPage } from "./types";
 
 /**
  * The Rizz documentation, authored from `knowledge/docs-content.md`.
- * Honesty rule: Rizz is an early build — features carry [now] / [m3] / [planned]
+ * Honesty rule: Rizz is a private alpha — features carry [now] / [alpha] / [planned]
  * status; never present planned features as shipped.
  */
 export const docsPages: DocPage[] = [
@@ -10,25 +10,25 @@ export const docsPages: DocPage[] = [
     slug: "introduction",
     title: "Introduction",
     description:
-      "Rizz is the lightest, most connectable coding agent harness — a CLI agent loop that's minimal by default with power on demand.",
+      "Rizz is Valoir's first product: a private-alpha Agent Light CLI with OpenRouter BYOK and a Codex route.",
     order: 1,
     blocks: [
       {
         type: "p",
-        text: "**Rizz is the lightest, most connectable coding agent harness.** It's a CLI-installable coding agent loop — model-call → tool-dispatch → tool-result → repeat — with interrupt, compression, budget, and fallback. Single-agent and minimal by default (the “Pi-class front door”); Hermes-class power on demand behind an opt-in `/workspace` switch.",
+        text: "**Rizz is Valoir's first product.** Agent Light is the current private alpha: a local CLI/TUI harness with `rizz setup`, OpenRouter BYOK as the fast path, Codex as a secondary local route, visible approvals/costs, and opt-in power that stays out of the default path.",
       },
       { type: "h", level: 2, text: "Three principles" },
       {
         type: "ul",
         items: [
-          "**Extremely lightweight** — minimal dependencies, fast cold start, small footprint, enforced by a CI footprint budget (the build fails if size/cold-start regress).",
-          "**Provider-agnostic** — subscription `/login`, bring-your-own-key, or cloud creds across a curated catalog. No model lock-in; switching never touches your code or sessions.",
-          "**A hub, not an island** — callable by any tool (print/JSON, RPC, SDK; MCP/ACP) and connects *to* Cursor / Claude / Codex rather than replacing them.",
+          "**Lightweight harness** — local CLI, small TUI, visible setup checks, and a footprint budget.",
+          "**Provider choice** — OpenRouter BYOK now; Codex local route as the secondary path.",
+          "**Opt-in power** — `/workspace` is visible in Agent Light, but Workspace Mode is not shipped yet.",
         ],
       },
       {
         type: "p",
-        text: "Open-core: the core flips to open source (MIT) at v1; any paid layer stays separate.",
+        text: "Open-core: Rizz Core is separate from Valoir's hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, and custom QA/eval pipelines.",
       },
     ],
   },
@@ -36,31 +36,31 @@ export const docsPages: DocPage[] = [
     slug: "quickstart",
     title: "Quickstart",
     description:
-      "Install Rizz from source today (Homebrew tap planned for v1), launch the TUI, and connect a model provider.",
+      "Run the Rizz private alpha from a source checkout, choose OpenRouter BYOK or Codex, and launch Agent Light.",
     order: 2,
     blocks: [
-      { type: "h", level: 2, text: "Install", status: "m3" },
+      { type: "h", level: 2, text: "Install", status: "now" },
       {
         type: "p",
-        text: "The Homebrew tap ships at v1. Today, during the early build, install from source.",
+        text: "Public packaging is not available yet. The private alpha runs from a source checkout.",
       },
       {
         type: "code",
         lang: "bash",
-        code: "# At v1 (planned): one command via the Valoir Homebrew tap\nbrew install valoir/tap/rizz\n\n# Today (early build) — from source:\ngit clone https://github.com/Lokesh-4946/rizz\ncd rizz\npnpm install\npnpm build        # or: scripts/install.sh  → links `rizz` onto PATH",
+        code: "# private alpha from source checkout\ncd /Users/lokesh/Downloads/rizz\npnpm install\npnpm link:local\nrizz --help",
       },
       { type: "p", text: "Requires Node ≥ 22 (CI pins 24 LTS) and pnpm." },
-      { type: "h", level: 2, text: "First run" },
-      { type: "code", lang: "bash", code: "rizz              # launches the interactive TUI (Simple mode)" },
+      { type: "h", level: 2, text: "Setup" },
+      { type: "code", lang: "bash", code: "rizz setup --dry-run\nrizz setup          # choose OpenRouter BYOK or Codex\nrizz                # launches Agent Light" },
       {
         type: "p",
-        text: "On first launch you pick a model provider and a theme — no Rizz account required. Press `esc` to explore in demo mode with a canned transcript.",
+        text: "OpenRouter BYOK is the recommended private-alpha route. Codex is secondary and uses the locally signed-in Codex CLI/app; Rizz does not read Codex tokens directly.",
       },
-      { type: "h", level: 2, text: "Connect a model", status: "m3" },
+      { type: "h", level: 2, text: "Inside the TUI", status: "now" },
       {
         type: "code",
         lang: "text",
-        code: "/login            # sign in to a subscription (Claude / Codex / …) or paste an API key\n/model            # or ⌃L — pick provider + model; hot-swaps with no restart",
+        code: "/status           # readiness, route, and cost signals\n/model            # switch route/profile\n/workspace        # visible stub; future Workspace Mode\n/help",
       },
     ],
   },
@@ -68,7 +68,7 @@ export const docsPages: DocPage[] = [
     slug: "core-concepts",
     title: "Core concepts",
     description:
-      "The Rizz loop, the reliability guarantees built into it, and the two run modes — Simple and Workspace.",
+      "The Rizz loop, visible control surfaces, and the difference between Agent Light and future Workspace Mode.",
     order: 3,
     blocks: [
       { type: "h", level: 2, text: "The loop" },
@@ -80,7 +80,7 @@ export const docsPages: DocPage[] = [
         type: "ul",
         items: [
           "**Interrupt** [now] — `esc` (or Ctrl+C) stops a running turn; typing mid-stream queues a redirect (the loop finishes the current tool, then takes the new instruction).",
-          "**Budget** [now] — per-session turn/token caps; exceeding returns `BUDGET_EXCEEDED`. Cost is always visible (shows `$0.00 (sub)` on subscriptions).",
+          "**Visible cost** [now] — the active route and cost/budget signals are visible in the TUI.",
           "**Compression** [planned] — auxiliary-model summarization that protects head & tail context; never silently drops critical info.",
           "**Fallback** [planned] — on rate-limit / outage, fall to the next model in the chain, shown to you, with a manual override.",
         ],
@@ -90,10 +90,10 @@ export const docsPages: DocPage[] = [
         tone: "note",
         text: "**Reliability rule (binding):** every edit is verified after write — the apply path re-reads and confirms the change landed byte-for-byte before reporting success. A write that can't be verified is a failure, not a warning.",
       },
-      { type: "h", level: 2, text: "Two modes" },
+      { type: "h", level: 2, text: "Agent Light now, Workspace later" },
       {
         type: "p",
-        text: "Simple (default): one agent, four tools (read / write / edit / bash), the loop. Workspace (opt-in via `/workspace`): parallel git-worktree agents + coordination — see Workspace mode.",
+        text: "Agent Light is the current private-alpha surface. `/workspace` is visible but not connected; Workspace Mode, Repo Brain, and OS/Jarvis connectors are later tracks.",
       },
     ],
   },
@@ -101,27 +101,27 @@ export const docsPages: DocPage[] = [
     slug: "model-providers",
     title: "Model providers",
     description:
-      "Rizz is provider-agnostic: use a subscription, bring your own key, or cloud creds across a curated catalog. Credentials live in the OS keychain.",
+      "Rizz Agent Light uses OpenRouter BYOK as the primary private-alpha route and Codex as the secondary local route.",
     order: 4,
     blocks: [
-      { type: "p", text: "Rizz is provider-agnostic. Auth paths per provider:" },
+      { type: "p", text: "Rizz is provider-choice first. Current private-alpha routes:" },
       {
         type: "ul",
         items: [
-          "**Use a subscription** — browser OAuth / device-code; token stored in the OS keychain.",
-          "**Paste an API key (BYOK)** — masked field, validated with a 1-line test call, stored in the keychain (never the repo).",
-          "**Cloud creds** — e.g. Amazon Bedrock via AWS profile/role + region (“governed”).",
-          "**Custom** — any OpenAI-compatible or Anthropic-messages base URL.",
+          "**OpenRouter BYOK** [now] — `rizz setup` collects a masked key and stores it under the `openrouter` provider account.",
+          "**Codex route** [now] — uses the local signed-in Codex CLI/app when available; Codex owns its own auth.",
+          "**Enterprise providers** [planned] — governed setup belongs to the later Valoir offering.",
+          "**Custom routes** [planned] — custom QA/eval and provider pipelines come after Agent Light.",
         ],
       },
       {
         type: "p",
-        text: "Curated catalog (subscription and/or key): Claude, Codex, GitHub Copilot, OpenRouter, Nvidia NIM, Amazon Bedrock, Anthropic, OpenAI, Google, Groq, Mistral, xAI, and Ollama (local/offline). After auth, a searchable model sub-list appears (tool-capable filtered in, recents pinned, default starred). Selecting a model hot-swaps with **no restart**. Credentials live in the OS keychain by default; env vars are honored; nothing is written to the repo or vault.",
+        text: "The alpha keeps provider claims narrow: OpenRouter direct for BYOK, Codex local as secondary. OpenAI and Anthropic direct setup entries exist, but are not full first-run credential flows yet.",
       },
       {
         type: "callout",
-        tone: "m3",
-        text: "The catalog is the product intent; live provider adapters land in M3.",
+        tone: "note",
+        text: "Never paste provider keys into chat, screenshots, shell history, GitHub, or logs.",
       },
     ],
   },
@@ -137,13 +137,14 @@ export const docsPages: DocPage[] = [
         type: "table",
         head: ["Command", "Does", "Status"],
         rows: [
-          ["`/login`", "Provider auth (subscription or key)", "[m3]"],
-          ["`/model`, `⌃L`", "Model picker", "[m3]"],
+          ["`/login`", "Provider auth path", "[planned]"],
+          ["`/status`", "Readiness, route, and cost signals", "[now]"],
+          ["`/model`, `⌃L`", "Model route/profile picker", "[now]"],
           ["`/theme`", "List / set themes", "[now]"],
           ["`/workspace`", "Enter multi-agent Workspace mode", "[planned]"],
           ["`/plan`", "Plan-mode: draft a step list before editing", "[planned]"],
           ["`/session`, `/resume`", "List / switch / resume sessions (tree-structured)", "[planned]"],
-          ["`/cost`", "Usage + budget this session", "[now]"],
+          ["`/cost`", "Usage + budget signals", "[now]"],
           ["`/skills`, `/mcp`", "Manage installed skills / MCP servers", "[planned]"],
           ["`/account`", "Optional Rizz account (sync, evals, team)", "[planned]"],
           ["`/help`, `/exit`", "Keys + commands; quit", "[now]"],
@@ -160,7 +161,7 @@ export const docsPages: DocPage[] = [
     slug: "workspace-mode",
     title: "Workspace mode",
     description:
-      "Workspace mode (planned): opt-in parallel git-worktree agents, shared memory, and a per-branch greploop merge gate. Power summoned, not shipped.",
+      "Workspace Mode is planned opt-in power. It is not part of Agent Light.",
     order: 6,
     blocks: [
       { type: "h", level: 2, text: "Workspace mode", status: "planned" },
@@ -171,7 +172,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "p",
-        text: "Opt-in via `/workspace`. Parallel **git-worktree agents** (isolated, so they never collide), a shared decision/warning memory, conflict status, a per-branch **greploop** merge gate, and a shared budget meter. `rizz workspace finish` merges greploop-passed branches and collapses back to Simple. None of this loads in the default path — power is summoned, not shipped.",
+        text: "`/workspace` is visible today as an honest stub. Later tracks include Workspace Mode, Repo Brain, OS/Jarvis connectors, and enterprise providers. None of this loads in Agent Light.",
       },
     ],
   },
@@ -207,7 +208,7 @@ export const docsPages: DocPage[] = [
           "**Loading** [now] — a thinking line + quiet spinner.",
           "**Offline** [planned] — banner offering a local model.",
           "**Rate-limited** [planned] — fallback shown.",
-          "**Auth-expired** [m3] — inline re-login, turn preserved.",
+          "**Auth-expired** [planned] — inline re-login, turn preserved.",
           "**Bad edit** [now] — rejected diff + reason + retry.",
         ],
       },
@@ -226,7 +227,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "callout",
-        tone: "m3",
+        tone: "alpha",
         text: "TUI + print-mode are seeded now; RPC and SDK are planned.",
       },
     ],
@@ -235,12 +236,12 @@ export const docsPages: DocPage[] = [
     slug: "contributing",
     title: "Contributing",
     description:
-      "Rizz dogfoods the discipline it ships: a worktree-per-task dev loop, strict TypeScript, a footprint budget, and greploop to 5/5 before merge.",
+      "Rizz dogfoods the discipline it ships: strict TypeScript, a footprint budget, and a local review-loop before merge.",
     order: 10,
     blocks: [
       {
         type: "p",
-        text: "Rizz dogfoods the discipline it ships. Dev loop per change: **plan → git worktree per task → build → `pnpm check` → code-simplifier pass → PR via `gh` → greploop to 5/5 → merge to `develop`**.",
+        text: "Rizz dogfoods the discipline it ships. Dev loop per change: **plan → git worktree per task → build → `pnpm check` → code-simplifier pass → PR via `gh` → local review-loop → merge to `develop`**.",
       },
       {
         type: "p",
@@ -256,26 +257,26 @@ export const docsPages: DocPage[] = [
     slug: "status-and-roadmap",
     title: "Status & roadmap",
     description:
-      "Where Rizz is today (M2 walking skeleton) and the milestone path to v1, when the core flips to MIT.",
+      "Where Rizz is today: Private Alpha · Agent Light, with public package and opt-in power still ahead.",
     order: 11,
     blocks: [
       {
         type: "callout",
         tone: "note",
-        text: "Rizz is an early build. The milestones below show what's done and what's ahead — features tied to later milestones are not shipped yet.",
+        text: "Rizz is Private Alpha · Agent Light. The lanes below separate what exists now from private-alpha release work and later opt-in power.",
       },
       {
         type: "ul",
         items: [
-          "**M0** ✅ repo + standards (monorepo, CI: lint · type-check · test · eval · footprint).",
-          "**M2** walking skeleton — one-command install, TUI, empty loop on a stub provider.",
-          "**M3** single-agent core — the loop + 4 tools + provider layer (`/login`, `/model`, themes).",
-          "**M4** connectivity · **M5** eval harness · **M6** `/workspace` · **M7** v1 (core → MIT).",
+          "**Now** — Agent Light, local CLI, OpenRouter BYOK, Codex route.",
+          "**Next** — private alpha dogfood, release tag, public package.",
+          "**Later** — Workspace Mode, Repo Brain, OS/Jarvis connectors, enterprise providers.",
+          "**Valoir offering** — hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, custom QA/eval pipelines.",
         ],
       },
       {
         type: "p",
-        text: "Repo: [github.com/Lokesh-4946/rizz](https://github.com/Lokesh-4946/rizz) (private during build; MIT at v1).",
+        text: "Repo: [github.com/Lokesh-4946/rizz](https://github.com/Lokesh-4946/rizz) (private alpha from source checkout).",
       },
     ],
   },

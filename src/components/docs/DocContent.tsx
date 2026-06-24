@@ -7,7 +7,7 @@ import { renderInline } from "./inline";
 const CALLOUT_TONES = {
   note: "border-line text-muted",
   now: "border-teal text-muted",
-  m3: "border-accent text-muted",
+  alpha: "border-accent text-muted",
   planned: "border-rose text-muted",
 } as const;
 
