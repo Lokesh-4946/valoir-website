@@ -65,7 +65,8 @@ function ActionRow({ product }: { product: Product }) {
 
   if (!product.installCommand) return null;
 
-  const isPrivateAlpha = product.installCommand === "Private alpha from source checkout";
+  const installLabel = product.installCommand.toLowerCase();
+  const isPrivateAlpha = product.repoPrivate && installLabel.includes("source checkout");
 
   return (
     <div className="space-y-4">

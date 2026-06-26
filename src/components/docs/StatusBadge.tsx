@@ -16,7 +16,7 @@ const TONES: Record<DocStatus, string> = {
 
 const TITLES: Record<DocStatus, string> = {
   now: "Available in the current build",
-  alpha: "Available in the private alpha",
+  alpha: "Available in alpha",
   planned: "Planned — not shipped yet",
 };
 
