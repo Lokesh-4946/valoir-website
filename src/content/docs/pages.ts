@@ -2,59 +2,57 @@ import type { DocPage } from "./types";
 
 /**
  * The Rizz documentation, authored from `knowledge/docs-content.md`.
- * Honesty rule: Rizz is a private alpha — features carry [now] / [alpha] / [planned]
+ * Honesty rule: Rizz is alpha software — features carry [now] / [alpha] / [planned]
  * status; never present planned features as shipped.
  */
 export const docsPages: DocPage[] = [
   {
     slug: "introduction",
     title: "Introduction",
-    description:
-      "Rizz is Valoir's first product: a private-alpha Agent Light CLI with OpenRouter BYOK and a Codex route.",
+    description: "The canonical definition and principles behind Rizz.",
     order: 1,
     blocks: [
       {
         type: "p",
-        text: "**Rizz is Valoir's first product.** Agent Light is the current private alpha: a local CLI/TUI harness with `rizz setup`, OpenRouter BYOK as the fast path, Codex as a secondary local route, visible approvals/costs, and opt-in power that stays out of the default path.",
+        text: "**Rizz is a local coding-agent harness.** It wraps setup, model routing, tool calls, visible status, and an inspectable CLI/TUI loop.",
       },
       { type: "h", level: 2, text: "Three principles" },
       {
         type: "ul",
         items: [
-          "**Lightweight harness** — local CLI, small TUI, visible setup checks, and a footprint budget.",
-          "**Provider choice** — OpenRouter BYOK now; Codex local route as the secondary path.",
-          "**Opt-in power** — `/workspace` is visible in Agent Light, but Workspace Mode is not shipped yet.",
+          "**Small harness** — local CLI, small TUI, visible setup checks, and a footprint budget.",
+          "**Visible routing** — the active route and cost signals stay inspectable.",
+          "**Opt-in power** — larger workspace features stay out of the default path.",
         ],
       },
       {
         type: "p",
-        text: "Open-core: Rizz Core is separate from Valoir's hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, and custom QA/eval pipelines.",
+        text: "Open-core: Rizz Core is separate from Valoir's later hosted and enterprise layer.",
       },
     ],
   },
   {
     slug: "quickstart",
     title: "Quickstart",
-    description:
-      "Run the Rizz private alpha from a source checkout, choose OpenRouter BYOK or Codex, and launch Agent Light.",
+    description: "Run Rizz from a source checkout and launch the current alpha.",
     order: 2,
     blocks: [
       { type: "h", level: 2, text: "Install", status: "now" },
       {
         type: "p",
-        text: "Public packaging is not available yet. The private alpha runs from a source checkout.",
+        text: "Public packaging is not available yet. Run the alpha from source.",
       },
       {
         type: "code",
         lang: "bash",
-        code: "# private alpha from source checkout\ncd /Users/lokesh/Downloads/rizz\npnpm install\npnpm link:local\nrizz --help",
+        code: "# source checkout\ncd /Users/lokesh/Downloads/rizz\npnpm install\npnpm link:local\nrizz --help",
       },
       { type: "p", text: "Requires Node ≥ 22 (CI pins 24 LTS) and pnpm." },
       { type: "h", level: 2, text: "Setup" },
-      { type: "code", lang: "bash", code: "rizz setup --dry-run\nrizz setup          # choose OpenRouter BYOK or Codex\nrizz                # launches Agent Light" },
+      { type: "code", lang: "bash", code: "rizz setup --dry-run\nrizz setup          # choose a model route\nrizz                # launches the TUI" },
       {
         type: "p",
-        text: "OpenRouter BYOK is the recommended private-alpha route. Codex is secondary and uses the locally signed-in Codex CLI/app; Rizz does not read Codex tokens directly.",
+        text: "Provider details live in Model providers. Rizz setup keeps credential handling explicit.",
       },
       { type: "h", level: 2, text: "Inside the TUI", status: "now" },
       {
@@ -67,8 +65,7 @@ export const docsPages: DocPage[] = [
   {
     slug: "core-concepts",
     title: "Core concepts",
-    description:
-      "The Rizz loop, visible control surfaces, and the difference between Agent Light and future Workspace Mode.",
+    description: "The Rizz loop, visible controls, and planned workspace power.",
     order: 3,
     blocks: [
       { type: "h", level: 2, text: "The loop" },
@@ -90,33 +87,32 @@ export const docsPages: DocPage[] = [
         tone: "note",
         text: "**Reliability rule (binding):** every edit is verified after write — the apply path re-reads and confirms the change landed byte-for-byte before reporting success. A write that can't be verified is a failure, not a warning.",
       },
-      { type: "h", level: 2, text: "Agent Light now, Workspace later" },
+      { type: "h", level: 2, text: "Current surface now, Workspace later" },
       {
         type: "p",
-        text: "Agent Light is the current private-alpha surface. `/workspace` is visible but not connected; Workspace Mode, Repo Brain, and OS/Jarvis connectors are later tracks.",
+        text: "`/workspace` is visible but not connected. Workspace Mode, Repo Brain, and OS/Jarvis connectors are later tracks.",
       },
     ],
   },
   {
     slug: "model-providers",
     title: "Model providers",
-    description:
-      "Rizz Agent Light uses OpenRouter BYOK as the primary private-alpha route and Codex as the secondary local route.",
+    description: "Current provider routes and credential boundaries.",
     order: 4,
     blocks: [
-      { type: "p", text: "Rizz is provider-choice first. Current private-alpha routes:" },
+      { type: "p", text: "Current routes:" },
       {
         type: "ul",
         items: [
           "**OpenRouter BYOK** [now] — `rizz setup` collects a masked key and stores it under the `openrouter` provider account.",
           "**Codex route** [now] — uses the local signed-in Codex CLI/app when available; Codex owns its own auth.",
           "**Enterprise providers** [planned] — governed setup belongs to the later Valoir offering.",
-          "**Custom routes** [planned] — custom QA/eval and provider pipelines come after Agent Light.",
+          "**Custom routes** [planned] — custom QA/eval and provider pipelines come later.",
         ],
       },
       {
         type: "p",
-        text: "The alpha keeps provider claims narrow: OpenRouter direct for BYOK, Codex local as secondary. OpenAI and Anthropic direct setup entries exist, but are not full first-run credential flows yet.",
+        text: "OpenAI and Anthropic direct setup entries exist, but are not full first-run credential flows yet.",
       },
       {
         type: "callout",
@@ -160,8 +156,7 @@ export const docsPages: DocPage[] = [
   {
     slug: "workspace-mode",
     title: "Workspace mode",
-    description:
-      "Workspace Mode is planned opt-in power. It is not part of Agent Light.",
+    description: "Workspace Mode is planned opt-in power.",
     order: 6,
     blocks: [
       { type: "h", level: 2, text: "Workspace mode", status: "planned" },
@@ -172,7 +167,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "p",
-        text: "`/workspace` is visible today as an honest stub. Later tracks include Workspace Mode, Repo Brain, OS/Jarvis connectors, and enterprise providers. None of this loads in Agent Light.",
+        text: "`/workspace` is visible today as an honest stub. Later tracks include Workspace Mode, Repo Brain, OS/Jarvis connectors, and enterprise providers.",
       },
     ],
   },
@@ -256,27 +251,26 @@ export const docsPages: DocPage[] = [
   {
     slug: "status-and-roadmap",
     title: "Status & roadmap",
-    description:
-      "Where Rizz is today: Private Alpha · Agent Light, with public package and opt-in power still ahead.",
+    description: "Current status, release path, and later tracks.",
     order: 11,
     blocks: [
       {
         type: "callout",
         tone: "note",
-        text: "Rizz is Private Alpha · Agent Light. The lanes below separate what exists now from private-alpha release work and later opt-in power.",
+        text: "The lanes below separate what exists now from release work and later opt-in power.",
       },
       {
         type: "ul",
         items: [
-          "**Now** — Agent Light, local CLI, OpenRouter BYOK, Codex route.",
-          "**Next** — private alpha dogfood, release tag, public package.",
+          "**Now** — Agent Light, local CLI, setup flow, route picker, visible status.",
+          "**Next** — alpha dogfood, release tag, public package.",
           "**Later** — Workspace Mode, Repo Brain, OS/Jarvis connectors, enterprise providers.",
           "**Valoir offering** — hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, custom QA/eval pipelines.",
         ],
       },
       {
         type: "p",
-        text: "Repo: [github.com/Lokesh-4946/rizz](https://github.com/Lokesh-4946/rizz) (private alpha from source checkout).",
+        text: "Repo: [github.com/Lokesh-4946/rizz](https://github.com/Lokesh-4946/rizz) (alpha; source checkout).",
       },
     ],
   },

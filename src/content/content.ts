@@ -7,8 +7,7 @@ export const site = {
   name: "Valoir",
   wordmark: "Valoir",
   tagline: "Open-core agent infrastructure.",
-  description:
-    "Valoir builds open-core agent infrastructure. Rizz is the first product.",
+  description: "Infrastructure for local-first coding agents and the teams that run them.",
   url: "https://valoir.space", // production domain (owned; registered at Namecheap, 2026-06-14)
   github: "https://github.com/Lokesh-4946",
   socials: [
@@ -39,26 +38,25 @@ export const hero = {
 export const manifesto = {
   label: "01 — Manifesto",
   lines: [
-    "Open-core agent infrastructure.",
-    "Rizz is the first product.",
-    "Power stays opt-in.",
+    "Small by default.",
+    "Routes you can see.",
+    "Power only when asked.",
   ],
-  body: "Valoir builds open-core agent infrastructure. Rizz is the first product. Rizz Core stays light, inspectable, and open-core; larger workflow power lives outside the default path.",
+  body: "The default view should stay quiet. Routing, cost, and workspace power stay visible without turning the harness into the product.",
 };
 
 /**
  * Open-source repos. Adding a repo = one line here.
- * stars: null renders "—" (e.g. private alpha).
+ * stars: null renders "—" while the repo has no public count.
  */
 export const repos = [
   {
     name: "rizz",
-    description:
-      "Private alpha Agent Light: local CLI, OpenRouter BYOK, Codex secondary route, visible status/model controls.",
+    description: "Local agent harness for setup, routing, and visible control.",
     language: "TypeScript",
     stars: null as number | null,
     href: "https://github.com/Lokesh-4946/rizz",
-    note: "Private alpha from source checkout",
+    note: "Private alpha; source checkout.",
   },
 ];
 
@@ -66,40 +64,40 @@ export const sections = {
   products: { label: "02 — Products", title: "Products" },
   whyRizz: {
     label: "03 — Why Rizz",
-    title: "A harness you can see.",
-    body: "Rizz is built for developers who want a local agent loop they can inspect, interrupt, and route deliberately.",
+    title: "Built against the usual failure modes.",
+    body: "Rizz starts from the objections developers already have about agent tools.",
     items: [
       {
-        title: "Lightweight harness",
-        text: "Agent Light keeps the default path local, small, and focused on one project.",
+        title: "It will get heavy.",
+        text: "Keep the front door small: one local harness, one current project, no hidden workspace machinery.",
       },
       {
-        title: "Visible approvals and costs",
-        text: "Status, route, and budget signals stay visible instead of disappearing behind a black box.",
+        title: "Costs will hide.",
+        text: "Expose route, approval, and budget signals where the work happens.",
       },
       {
-        title: "Provider choice",
-        text: "OpenRouter BYOK is the alpha fast path; Codex is available as a secondary local route.",
+        title: "The provider will own the workflow.",
+        text: "Make routing a user choice, not a product lock-in.",
       },
       {
-        title: "Opt-in power",
-        text: "Workspace Mode and larger connective tissue stay off until the user asks for them.",
+        title: "Power will sprawl.",
+        text: "Keep larger modes behind an explicit switch.",
       },
     ],
   },
   roadmap: {
     label: "04 — Roadmap",
-    title: "Three lanes, no pretend shipping.",
+    title: "Now, next, later.",
     lanes: [
       {
         label: "Now",
         title: "Agent Light",
-        items: ["Agent Light", "local CLI", "OpenRouter BYOK", "Codex route"],
+        items: ["local CLI", "setup flow", "route picker", "visible status"],
       },
       {
         label: "Next",
-        title: "Private alpha",
-        items: ["private alpha dogfood", "release tag", "public package"],
+        title: "Release path",
+        items: ["alpha dogfood", "release tag", "public package"],
       },
       {
         label: "Later",
@@ -110,8 +108,8 @@ export const sections = {
   },
   offering: {
     label: "05 — Valoir offering",
-    title: "Separate from open-source Rizz Core.",
-    body: "Rizz Core is the local harness. Valoir's commercial layer is the connective tissue around it for teams that need managed approvals, routing, and auditability.",
+    title: "Team layer, not Rizz Core.",
+    body: "Rizz Core stays local. Valoir's paid layer is for teams that need managed routing, approvals, and auditability.",
     items: [
       "hosted relay",
       "approval inbox",
@@ -123,7 +121,7 @@ export const sections = {
   },
   openSource: {
     label: "06 — Open Source",
-    title: "Open at the core.",
-    body: "Rizz Core stays distinct from Valoir's hosted and enterprise layer. Today the private alpha runs from a source checkout; public packaging comes after the release tag.",
+    title: "Source first, package later.",
+    body: "The repo stays private while the alpha hardens. Public packaging follows the release tag.",
   },
 };

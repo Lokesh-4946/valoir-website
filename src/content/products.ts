@@ -32,7 +32,7 @@ export type Product = {
   licenseLabel: string;
   capabilities: Capability[];
   repoUrl: string | null;
-  /** private alpha repo access → true hides/contextualizes the repo link */
+  /** private repo access → true hides/contextualizes the repo link */
   repoPrivate: boolean;
   installCommand: string | null;
   /** a minimal usage snippet for the For Developers section */
@@ -53,14 +53,14 @@ export const products: Product[] = [
     by: "by Valoir",
     tagline: "The lightest, most connectable coding agent harness.",
     description:
-      "Rizz is Valoir's first product: a private-alpha local agent harness for setup, provider routing, visible status, and an inspectable CLI/TUI loop.",
+      "Rizz is the first product: a private-alpha local harness for setup, routing, and an inspectable CLI/TUI loop.",
     license: "open-core",
     licenseLabel: "Open-core Rizz Core",
     capabilities: [
       {
-        title: "Extremely lightweight",
+        title: "Small harness",
         detail:
-          "Agent Light keeps the current surface local and focused: one CLI, one TUI, and a small harness around the model route.",
+          "The current surface is a local CLI/TUI wrapped around setup, one active route, and the agent loop.",
       },
       {
         title: "Provider-agnostic",
@@ -75,15 +75,15 @@ export const products: Product[] = [
       {
         title: "Local review-loop",
         detail:
-          "The current discipline is local verification and review-loop dogfood. Custom QA/eval pipelines belong to the later Valoir layer.",
+          "The current discipline is local verification and review-loop dogfood. Custom QA/eval pipelines belong in the later Valoir layer.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: true,
-    // Public installers are deferred; private alpha runs from a source checkout for now.
-    installCommand: "Private alpha from source checkout",
+    // Public installers are deferred; alpha runs from a source checkout for now.
+    installCommand: "Private alpha; source checkout.",
     usageSnippet: [
-      "# private alpha from the rizz checkout",
+      "# from the rizz checkout",
       "cd /Users/lokesh/Downloads/rizz",
       "pnpm install",
       "pnpm link:local",
@@ -100,7 +100,7 @@ export const products: Product[] = [
       "pnpm check          # local review-loop gate",
     ].join("\n"),
     docsUrl: "https://valoir.space/docs",
-    // Repo is in private alpha, so there is no public star count to read yet.
+    // Repo has no public star count yet.
     stars: null,
     language: "TypeScript",
     demoVideoUrl: null,
