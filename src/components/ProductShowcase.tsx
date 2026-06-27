@@ -138,7 +138,7 @@ function PlatformTab({
       onClick={onSelect}
       className={`min-w-0 border-r border-line px-3 py-2.5 text-left font-mono text-[11px] font-semibold transition-colors last:border-r-0 sm:text-xs ${selectedClass}`}
     >
-      <span className="block truncate">{option.platform}</span>
+      <span className="block truncate">{option.tabLabel ?? option.platform}</span>
     </button>
   );
 }

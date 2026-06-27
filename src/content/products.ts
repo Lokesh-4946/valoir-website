@@ -22,6 +22,7 @@ export type Capability = {
 
 export type InstallOption = {
   platform: string;
+  tabLabel?: string;
   command: string;
 };
 
@@ -108,6 +109,7 @@ export const products: Product[] = [
       },
       {
         platform: "Windows PowerShell",
+        tabLabel: "Windows",
         command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
       },
     ],
