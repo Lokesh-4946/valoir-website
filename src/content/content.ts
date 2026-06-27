@@ -48,24 +48,24 @@ export const sections = {
   products: { label: "02 — Products", title: "Products" },
   whyRizz: {
     label: "03 — Why Rizz",
-    title: "Built against the usual failure modes.",
-    body: "Rizz starts from the objections developers already have about agent tools.",
+    title: "Why Rizz feels easier to trust.",
+    body: "A small local harness. Clear state. No surprise power mode.",
     items: [
       {
-        title: "It will get heavy.",
-        text: "Keep the front door small: one local harness, one current project, no hidden workspace machinery.",
+        title: "Stays light",
+        text: "One local CLI/TUI for the current project.",
       },
       {
-        title: "Costs will hide.",
-        text: "Expose route, approval, and budget signals where the work happens.",
+        title: "Shows state",
+        text: "Route, approvals, and budget stay visible.",
       },
       {
-        title: "The provider will own the workflow.",
-        text: "Make routing a user choice, not a product lock-in.",
+        title: "Keeps choice",
+        text: "Routing stays explicit, not locked away.",
       },
       {
-        title: "Power will sprawl.",
-        text: "Keep larger modes behind an explicit switch.",
+        title: "Adds power carefully",
+        text: "Workspace and team features stay opt-in.",
       },
     ],
   },

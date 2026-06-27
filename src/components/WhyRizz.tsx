@@ -20,11 +20,19 @@ export default function WhyRizz() {
         <p className="font-mono text-base leading-relaxed text-muted">{section.body}</p>
       </Reveal>
 
-      <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
-        {section.items.map((item) => (
-          <Reveal key={item.title} className="bg-[var(--bg)] p-6">
-            <p className="font-mono text-sm font-semibold text-fg">{item.title}</p>
-            <p className="mt-3 font-mono text-sm leading-relaxed text-muted">{item.text}</p>
+      <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
+        {section.items.map((item, index) => (
+          <Reveal
+            key={item.title}
+            className="grid gap-3 bg-[var(--bg)] p-5"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line font-mono text-[11px] text-accent">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <p className="font-mono text-sm font-semibold text-fg">{item.title}</p>
+            </div>
+            <p className="font-mono text-sm leading-relaxed text-muted">{item.text}</p>
           </Reveal>
         ))}
       </div>
