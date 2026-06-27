@@ -2,7 +2,7 @@ import type { DocPage } from "./types";
 
 /**
  * The Rizz documentation, authored from `knowledge/docs-content.md`.
- * Honesty rule: Rizz is alpha software — features carry [now] / [alpha] / [planned]
+ * Honesty rule: Rizz is preview software — features carry [now] / [preview] / [planned]
  * status; never present planned features as shipped.
  */
 export const docsPages: DocPage[] = [
@@ -34,22 +34,25 @@ export const docsPages: DocPage[] = [
   {
     slug: "quickstart",
     title: "Quickstart",
-    description: "Run Rizz from a source checkout and launch the current alpha.",
+    description: "Install Rizz with npm and launch the current preview.",
     order: 2,
     blocks: [
       { type: "h", level: 2, text: "Install", status: "now" },
       {
         type: "p",
-        text: "Public packaging is not available yet. Run the alpha from source.",
+        text: "Use the same npm path on macOS, Linux, and Windows PowerShell.",
       },
       {
         type: "code",
         lang: "bash",
-        code: "# source checkout\ncd /Users/lokesh/Downloads/rizz\npnpm install\npnpm link:local\nrizz --help",
+        code: "# macOS, Linux, or Windows PowerShell\nnpm install -g @valoir/rizz\nrizz setup\nrizz",
       },
-      { type: "p", text: "Requires Node ≥ 22 (CI pins 24 LTS) and pnpm." },
+      { type: "p", text: "Requirement for all: Node ≥ 22 and npm." },
       { type: "h", level: 2, text: "Setup" },
-      { type: "code", lang: "bash", code: "rizz setup --dry-run\nrizz setup          # choose a model route\nrizz                # launches the TUI" },
+      {
+        type: "p",
+        text: "Run `rizz setup` once to choose a model route and handle credentials explicitly. `rizz` launches the TUI.",
+      },
       {
         type: "p",
         text: "Provider details live in Model providers. Rizz setup keeps credential handling explicit.",
@@ -222,7 +225,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "callout",
-        tone: "alpha",
+        tone: "preview",
         text: "TUI + print-mode are seeded now; RPC and SDK are planned.",
       },
     ],
@@ -263,14 +266,14 @@ export const docsPages: DocPage[] = [
         type: "ul",
         items: [
           "**Now** — Agent Light, local CLI, setup flow, route picker, visible status.",
-          "**Next** — alpha dogfood, release tag, public package.",
+          "**Next** — preview dogfood, release tag, native installers.",
           "**Later** — Workspace Mode, Repo Brain, OS/Jarvis connectors, enterprise providers.",
           "**Valoir offering** — hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, custom QA/eval pipelines.",
         ],
       },
       {
         type: "p",
-        text: "Repo: [github.com/Lokesh-4946/rizz](https://github.com/Lokesh-4946/rizz) (alpha; source checkout).",
+        text: "Repo: [github.com/Lokesh-4946/rizz](https://github.com/Lokesh-4946/rizz). Package: `npm install -g @valoir/rizz`.",
       },
     ],
   },

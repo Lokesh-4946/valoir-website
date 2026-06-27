@@ -8,14 +8,7 @@ import CopyButton from "./CopyButton";
 import MagneticButton from "./MagneticButton";
 import RizzDemoLoop from "./RizzDemoLoop";
 
-function NeedsInput({ children }: { children: React.ReactNode }) {
-  // Renders a value or a clearly-flagged placeholder when a fact was absent.
-  const text = String(children);
-  const missing = text.includes("[NEEDS INPUT]");
-  return (
-    <span className={missing ? "text-rose" : undefined}>{children}</span>
-  );
-}
+type InstallOption = Product["installOptions"][number];
 
 /** Future-ready media slot: renders a player / live embed when a URL is set. */
 function MediaSlot({ product }: { product: Product }) {
@@ -63,22 +56,49 @@ function ActionRow({ product }: { product: Product }) {
     );
   }
 
-  if (!product.installCommand) return null;
-
-  const installLabel = product.installCommand.toLowerCase();
-  const isPrivateAlpha = product.repoPrivate && installLabel.includes("source checkout");
+  if (product.installOptions.length === 0) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3 rounded-lg border border-line bg-[var(--bg-2)] px-4 py-3">
-        {!isPrivateAlpha && <span className="select-none font-mono text-sm text-faint">$</span>}
-        <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm text-bone">
-          <NeedsInput>{product.installCommand}</NeedsInput>
-        </code>
-        {!isPrivateAlpha && !product.installCommand.includes("[NEEDS INPUT]") && (
-          <CopyButton text={product.installCommand} />
+    <div className="rounded-xl border border-line bg-[var(--bg-2)] p-4 sm:p-5">
+      <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+        <div>
+          {product.installTitle && (
+            <p className="font-mono text-sm font-semibold text-fg">{product.installTitle}</p>
+          )}
+          {product.installIntro && (
+            <p className="mt-1 max-w-md font-mono text-sm leading-relaxed text-muted">
+              {product.installIntro}
+            </p>
+          )}
+        </div>
+        {product.installRequirement && (
+          <p className="font-mono text-xs leading-relaxed text-accent sm:text-right">
+            {product.installRequirement}
+          </p>
         )}
       </div>
+
+      <div className="mt-5 grid gap-3 2xl:grid-cols-3">
+        {product.installOptions.map((option) => (
+          <InstallCard key={option.platform} option={option} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function InstallCard({ option }: { option: InstallOption }) {
+  return (
+    <div className="rounded-lg border border-line bg-[var(--bg)] p-3">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="font-mono text-xs font-semibold text-fg">
+          {option.platform}
+        </p>
+        <CopyButton text={option.command} label="copy" />
+      </div>
+      <pre className="overflow-x-auto whitespace-pre rounded-md bg-[var(--bg-3)] p-3 font-mono text-[12px] leading-relaxed text-bone">
+        <code>{option.command}</code>
+      </pre>
     </div>
   );
 }

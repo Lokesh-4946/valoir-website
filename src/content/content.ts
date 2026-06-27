@@ -26,7 +26,7 @@ export const nav = {
     { label: "Open Source", href: "/#open-source" },
     { label: "Docs", href: "/docs" },
   ],
-  cta: { label: "Get Rizz", href: "/#products" },
+  cta: { label: "Install Rizz", href: "/#products" },
 };
 
 export const hero = {
@@ -56,7 +56,7 @@ export const repos = [
     language: "TypeScript",
     stars: null as number | null,
     href: "https://github.com/Lokesh-4946/rizz",
-    note: "Private alpha; source checkout.",
+    note: "npm package available.",
   },
 ];
 
@@ -97,7 +97,7 @@ export const sections = {
       {
         label: "Next",
         title: "Release path",
-        items: ["alpha dogfood", "release tag", "public package"],
+        items: ["preview dogfood", "release tag", "native installers"],
       },
       {
         label: "Later",
@@ -121,7 +121,7 @@ export const sections = {
   },
   openSource: {
     label: "06 — Open Source",
-    title: "Source first, package later.",
-    body: "The repo stays private while the alpha hardens. Public packaging follows the release tag.",
+    title: "Package now, source next.",
+    body: "Rizz installs through npm today. Source access and native installers expand as the harness hardens.",
   },
 };

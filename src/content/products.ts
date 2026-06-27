@@ -20,6 +20,11 @@ export type Capability = {
   detail: string;
 };
 
+export type InstallOption = {
+  platform: string;
+  command: string;
+};
+
 export type Product = {
   slug: string;
   name: string;
@@ -34,7 +39,10 @@ export type Product = {
   repoUrl: string | null;
   /** private repo access → true hides/contextualizes the repo link */
   repoPrivate: boolean;
-  installCommand: string | null;
+  installTitle: string | null;
+  installIntro: string | null;
+  installRequirement: string | null;
+  installOptions: InstallOption[];
   /** a minimal usage snippet for the For Developers section */
   usageSnippet: string | null;
   docsUrl: string | null;
@@ -53,7 +61,7 @@ export const products: Product[] = [
     by: "by Valoir",
     tagline: "The lightest, most connectable coding agent harness.",
     description:
-      "Rizz is the first product: a private-alpha local harness for setup, routing, and an inspectable CLI/TUI loop.",
+      "Rizz is the first product: a local Agent Light harness for setup, routing, and an inspectable CLI/TUI loop.",
     license: "open-core",
     licenseLabel: "Open-core Rizz Core",
     capabilities: [
@@ -65,7 +73,7 @@ export const products: Product[] = [
       {
         title: "Provider-agnostic",
         detail:
-          "OpenRouter BYOK is the alpha fast path. Codex is available as a secondary local route through the signed-in Codex CLI/app.",
+          "OpenRouter BYOK is the fast path. Codex is available as a secondary local route through the signed-in Codex CLI/app.",
       },
       {
         title: "Visible control loop",
@@ -80,17 +88,30 @@ export const products: Product[] = [
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: true,
-    // Public installers are deferred; alpha runs from a source checkout for now.
-    installCommand: "Private alpha; source checkout.",
+    installTitle: "Install Rizz",
+    installIntro: "Run the current Rizz preview on macOS, Linux, or Windows PowerShell.",
+    installRequirement: "Requires Node >= 22 and npm.",
+    installOptions: [
+      {
+        platform: "macOS",
+        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+      },
+      {
+        platform: "Linux",
+        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+      },
+      {
+        platform: "Windows PowerShell",
+        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+      },
+    ],
     usageSnippet: [
-      "# from the rizz checkout",
-      "cd /Users/lokesh/Downloads/rizz",
-      "pnpm install",
-      "pnpm link:local",
+      "# install",
+      "npm install -g @valoir/rizz",
       "",
-      "# setup and route",
-      "rizz setup --dry-run",
-      "rizz setup          # choose OpenRouter BYOK or Codex",
+      "# setup and launch",
+      "rizz setup",
+      "rizz",
       "",
       "# inside the TUI",
       "/status             # readiness, route, and cost signals",
@@ -106,7 +127,7 @@ export const products: Product[] = [
     demoVideoUrl: null,
     tryItUrl: null,
     flagship: true,
-    status: "Private Alpha · Agent Light",
+    status: "Preview · Agent Light",
   },
 ];
 
