@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { products, type Product } from "@/content/products";
 import { sections } from "@/content/content";
 import { MaskReveal, Reveal } from "./Reveal";
@@ -9,6 +10,7 @@ import MagneticButton from "./MagneticButton";
 import RizzDemoLoop from "./RizzDemoLoop";
 
 type InstallOption = Product["installOptions"][number];
+type InstallNote = Product["installNotes"][number];
 
 /** Future-ready media slot: renders a player / live embed when a URL is set. */
 function MediaSlot({ product }: { product: Product }) {
@@ -58,6 +60,15 @@ function ActionRow({ product }: { product: Product }) {
 
   if (product.installOptions.length === 0) return null;
 
+  return <InstallPanel product={product} />;
+}
+
+function InstallPanel({ product }: { product: Product }) {
+  const firstOption = product.installOptions[0];
+  const [selectedPlatform, setSelectedPlatform] = useState(firstOption.platform);
+  const selectedOption =
+    product.installOptions.find((option) => option.platform === selectedPlatform) ?? firstOption;
+
   return (
     <div className="rounded-xl border border-line bg-[var(--bg-2)] p-4 sm:p-5">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
@@ -78,18 +89,63 @@ function ActionRow({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="mt-5 grid gap-3 2xl:grid-cols-3">
+      <div
+        role="tablist"
+        aria-label="Install platform"
+        className="mt-5 grid grid-cols-3 overflow-hidden rounded-lg border border-line bg-[var(--bg)]"
+      >
         {product.installOptions.map((option) => (
-          <InstallCard key={option.platform} option={option} />
+          <PlatformTab
+            key={option.platform}
+            option={option}
+            selected={option.platform === selectedOption.platform}
+            onSelect={() => setSelectedPlatform(option.platform)}
+          />
         ))}
       </div>
+
+      <InstallCommand option={selectedOption} />
+
+      {product.installNotes.length > 0 && (
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          {product.installNotes.map((note) => (
+            <InstallNoteItem key={note.label} note={note} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function InstallCard({ option }: { option: InstallOption }) {
+function PlatformTab({
+  option,
+  selected,
+  onSelect,
+}: {
+  option: InstallOption;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const selectedClass = selected
+    ? "bg-[var(--bg-3)] text-accent"
+    : "text-muted hover:text-fg";
+
   return (
-    <div className="rounded-lg border border-line bg-[var(--bg)] p-3">
+    <button
+      type="button"
+      role="tab"
+      aria-selected={selected}
+      onClick={onSelect}
+      className={`min-w-0 border-r border-line px-3 py-2.5 text-left font-mono text-[11px] font-semibold transition-colors last:border-r-0 sm:text-xs ${selectedClass}`}
+    >
+      <span className="block truncate">{option.platform}</span>
+    </button>
+  );
+}
+
+function InstallCommand({ option }: { option: InstallOption }) {
+  return (
+    <div className="mt-3 rounded-lg border border-line bg-[var(--bg)] p-3">
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="font-mono text-xs font-semibold text-fg">
           {option.platform}
@@ -99,6 +155,17 @@ function InstallCard({ option }: { option: InstallOption }) {
       <pre className="overflow-x-auto whitespace-pre rounded-md bg-[var(--bg-3)] p-3 font-mono text-[12px] leading-relaxed text-bone">
         <code>{option.command}</code>
       </pre>
+    </div>
+  );
+}
+
+function InstallNoteItem({ note }: { note: InstallNote }) {
+  return (
+    <div className="border-t border-line pt-3">
+      <p className="font-mono text-[10px] uppercase tracking-eyebrow text-faint">
+        {note.label}
+      </p>
+      <p className="mt-1 font-mono text-xs leading-relaxed text-muted">{note.value}</p>
     </div>
   );
 }
