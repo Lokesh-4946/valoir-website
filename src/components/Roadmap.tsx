@@ -17,22 +17,27 @@ export default function Roadmap() {
         className="display max-w-4xl text-[clamp(2.2rem,6vw,4.6rem)] font-semibold text-fg"
       />
 
-      <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-3">
-        {section.lanes.map((lane) => (
-          <Reveal key={lane.label} className="bg-[var(--bg)] p-6">
-            <p className="font-mono text-[11px] uppercase tracking-eyebrow text-accent">
-              {lane.label}
-            </p>
-            <p className="mt-4 font-mono text-lg font-semibold text-fg">{lane.title}</p>
-            <ul className="mt-6 space-y-3">
-              {lane.items.map((item) => (
-                <li key={item} className="border-l border-line pl-4 font-mono text-sm text-muted">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        ))}
+      <div className="-mx-4 mt-10 overflow-x-auto px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0">
+        <div className="grid min-w-[640px] grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line md:min-w-0">
+          {section.lanes.map((lane) => (
+            <Reveal key={lane.label} className="bg-[var(--bg)] p-5">
+              <p className="font-mono text-[11px] uppercase tracking-eyebrow text-accent">
+                {lane.label}
+              </p>
+              <p className="mt-3 font-mono text-base font-semibold text-fg">{lane.title}</p>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                {lane.items.map((item) => (
+                  <li
+                    key={item}
+                    className="rounded-full border border-line px-2.5 py-1 font-mono text-[11px] leading-snug text-muted"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
