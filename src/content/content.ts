@@ -23,7 +23,6 @@ export const nav = {
     { label: "Why Rizz", href: "/#why-rizz" },
     { label: "Roadmap", href: "/#roadmap" },
     { label: "Offering", href: "/#offering" },
-    { label: "Open Source", href: "/#open-source" },
     { label: "Docs", href: "/docs" },
   ],
   cta: { label: "Install Rizz", href: "/#products" },
@@ -44,21 +43,6 @@ export const manifesto = {
   ],
   body: "The default view should stay quiet. Routing, cost, and workspace power stay visible without turning the harness into the product.",
 };
-
-/**
- * Open-source repos. Adding a repo = one line here.
- * stars: null renders "—" while the repo has no public count.
- */
-export const repos = [
-  {
-    name: "rizz",
-    description: "Local agent harness for setup, routing, and visible control.",
-    language: "TypeScript",
-    stars: null as number | null,
-    href: "https://github.com/Lokesh-4946/rizz",
-    note: "npm package available.",
-  },
-];
 
 export const sections = {
   products: { label: "02 — Products", title: "Products" },
@@ -118,10 +102,5 @@ export const sections = {
       "workflow packs",
       "custom QA/eval pipelines",
     ],
-  },
-  openSource: {
-    label: "06 — Open Source",
-    title: "Package now, source next.",
-    body: "Rizz installs through npm today. Source access and native installers expand as the harness hardens.",
   },
 };

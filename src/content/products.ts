@@ -25,6 +25,11 @@ export type InstallOption = {
   command: string;
 };
 
+export type InstallNote = {
+  label: string;
+  value: string;
+};
+
 export type Product = {
   slug: string;
   name: string;
@@ -43,6 +48,7 @@ export type Product = {
   installIntro: string | null;
   installRequirement: string | null;
   installOptions: InstallOption[];
+  installNotes: InstallNote[];
   /** a minimal usage snippet for the For Developers section */
   usageSnippet: string | null;
   docsUrl: string | null;
@@ -104,6 +110,11 @@ export const products: Product[] = [
         platform: "Windows PowerShell",
         command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
       },
+    ],
+    installNotes: [
+      { label: "Package", value: "@valoir/rizz" },
+      { label: "Source", value: "opens as the core hardens" },
+      { label: "Native installers", value: "planned" },
     ],
     usageSnippet: [
       "# install",
