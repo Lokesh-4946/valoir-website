@@ -201,6 +201,18 @@ function ProductPanel({ product, index }: { product: Product; index: number }) {
         <p className="mt-3 font-mono text-xs uppercase tracking-eyebrow text-faint">
           {product.status}
         </p>
+        {product.badges.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {product.badges.map((badge) => (
+              <span
+                key={badge}
+                className="rounded-full border border-line bg-[var(--bg-2)] px-3 py-1.5 font-mono text-[11px] text-bone"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        )}
         <p className="mt-6 max-w-xl font-mono text-base leading-relaxed text-muted">
           {product.description}
         </p>

@@ -6,10 +6,10 @@
  *
  * Inline text in `p`, list items, table cells, and callouts supports a tiny
  * markup subset (see `renderInline`): `code`, **bold**, [text](url), bare URLs,
- * and the status tokens [now] / [preview] / [planned] rendered as badges.
+ * and the status tokens [now] / [planned] rendered as badges.
  */
 
-export type DocStatus = "now" | "preview" | "planned";
+export type DocStatus = "now" | "planned";
 
 export type DocBlock =
   | { type: "p"; text: string }
@@ -17,7 +17,7 @@ export type DocBlock =
   | { type: "code"; lang?: string; code: string }
   | { type: "ul"; items: string[] }
   | { type: "table"; head: string[]; rows: string[][] }
-  | { type: "callout"; tone: "note" | "now" | "preview" | "planned"; text: string };
+  | { type: "callout"; tone: "note" | "now" | "planned"; text: string };
 
 export type DocPage = {
   /** URL segment under /docs, e.g. "quickstart" */

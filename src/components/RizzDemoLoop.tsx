@@ -1,17 +1,17 @@
 "use client";
 
 const steps = [
-  { label: "diff", text: "read branch changes and package scripts" },
-  { label: "route", text: "show active model and fallback path" },
-  { label: "check", text: "run build, types, and local review" },
-  { label: "report", text: "return blockers and next release step" },
+  { label: "map", text: "extract components, flows, tests, and commands" },
+  { label: "explain", text: "summarize the files that matter first" },
+  { label: "review", text: "connect the diff to blast radius and risks" },
+  { label: "report", text: "write Mission Control and research artifacts" },
 ];
 
 export default function RizzDemoLoop() {
   return (
     <div
       role="img"
-      aria-label="Animated four-second Rizz demo loop showing a prompt, tool steps, build progress, and a verified result."
+      aria-label="Animated four-second Rizz demo loop showing project understanding, explanation, review, and a local report."
       className="rizz-demo-loop relative aspect-video overflow-hidden rounded-xl border border-line bg-[var(--bg-2)]"
     >
       <div className="rizz-demo-field absolute inset-0" />
@@ -21,9 +21,9 @@ export default function RizzDemoLoop() {
         <div className="border-b border-line pb-3">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-eyebrow text-faint">
-              harness mode
+              project intelligence
             </p>
-            <p className="mt-1 font-mono text-sm font-semibold text-bone">rizz operator</p>
+            <p className="mt-1 font-mono text-sm font-semibold text-bone">rizz mission control</p>
           </div>
         </div>
 
@@ -31,12 +31,12 @@ export default function RizzDemoLoop() {
           <div className="flex min-h-0 flex-col">
             <div className="space-y-2 font-mono text-[11px] leading-relaxed sm:text-xs">
               <p className="rizz-demo-row rizz-demo-row-1 text-bone">
-                <span className="text-accent">you</span> what changed in this branch, and what
-                should I verify before release?
+                <span className="text-accent">you</span> what should I understand before changing
+                the auth flow?
               </p>
               <p className="rizz-demo-row rizz-demo-row-2 text-muted">
-                <span className="text-teal">rizz</span> I will inspect the project state, keep the
-                route visible, and separate shipped work from planned power.
+                <span className="text-teal">rizz</span> I will map the repo, explain the affected
+                files, and surface evidence before edits.
               </p>
               <div className="rizz-demo-row rizz-demo-row-3 space-y-1 text-muted">
                 {steps.map((step) => (
@@ -47,8 +47,8 @@ export default function RizzDemoLoop() {
                 ))}
               </div>
               <p className="rizz-demo-row rizz-demo-row-4 text-bone">
-                <span className="text-teal">rizz</span> build passed. Install is npm today; native
-                installers stay planned.
+                <span className="text-teal">rizz</span> report ready. Open
+                .rizz/reports/index.html for the local project brain.
               </p>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function RizzDemoLoop() {
           <div className="relative hidden min-h-0 rounded-lg border border-line bg-[var(--bg)] p-3 md:block">
             <div className="absolute inset-x-3 top-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-eyebrow text-faint">
               <span>project trace</span>
-              <span>checks visible</span>
+              <span>evidence visible</span>
             </div>
             <div className="rizz-demo-node rizz-demo-node-1 left-[18%] top-[42%]" />
             <div className="rizz-demo-node rizz-demo-node-2 left-[45%] top-[24%]" />
@@ -64,7 +64,7 @@ export default function RizzDemoLoop() {
             <div className="absolute left-[20%] top-[46%] h-px w-[52%] rotate-[-13deg] bg-line" />
             <div className="absolute left-[46%] top-[30%] h-px w-[32%] rotate-[33deg] bg-line" />
             <div className="absolute bottom-3 left-3 right-3 rounded-md border border-line bg-[var(--bg-2)] px-3 py-2 font-mono text-[10px] text-muted">
-              verified patch · build green · ready for review
+              brain ready · blast radius mapped · research written
             </div>
           </div>
         </div>

@@ -4,11 +4,11 @@ import StatusBadge from "./StatusBadge";
 
 /**
  * Renders the tiny inline markup used in docs text into React nodes:
- *   `code` · **bold** · [text](url) · bare https:// urls · [now]/[preview]/[planned].
+ *   `code` · **bold** · [text](url) · bare https:// urls · [now]/[planned].
  * Plain text between tokens is returned verbatim (React escapes it).
  */
 const TOKEN =
-  /(`[^`]+`)|(\*\*[^*]+\*\*)|(\[[^\]]+\]\([^)]+\))|(\[(?:now|preview|planned)\])|(https?:\/\/[^\s)]+)/g;
+  /(`[^`]+`)|(\*\*[^*]+\*\*)|(\[[^\]]+\]\([^)]+\))|(\[(?:now|planned)\])|(https?:\/\/[^\s)]+)/g;
 
 function externalLink(text: string, href: string, key: number): ReactNode {
   const external = href.startsWith("http");

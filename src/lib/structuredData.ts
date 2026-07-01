@@ -41,7 +41,7 @@ function software(): Json {
     name: flagship.name,
     description: flagship.tagline,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "macOS, Linux",
+    operatingSystem: "macOS, Linux, Windows",
     programmingLanguage: flagship.language,
     codeRepository: flagship.repoUrl,
     license: "https://opensource.org/license/mit",

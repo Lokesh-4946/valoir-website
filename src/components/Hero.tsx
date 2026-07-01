@@ -5,6 +5,7 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { hero } from "@/content/content";
 import MagneticButton from "./MagneticButton";
+import CopyButton from "./CopyButton";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 
@@ -85,13 +86,31 @@ export default function Hero() {
           ))}
         </h1>
 
+        <p
+          data-h-fade
+          className="mt-8 max-w-2xl font-mono text-base leading-relaxed text-muted opacity-0"
+        >
+          {hero.subhead}
+        </p>
+
         <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4 opacity-0">
           <MagneticButton href={hero.primary.href} variant="accent">
             {hero.primary.label}
           </MagneticButton>
-          <MagneticButton href={hero.secondary.href} variant="line" external>
-            {hero.secondary.label} <ArrowOut />
-          </MagneticButton>
+          <div className="flex min-w-0 max-w-full items-center gap-2 rounded-full border border-line bg-[var(--bg-2)] py-1 pl-4 pr-1 font-mono text-xs text-bone">
+            <code className="min-w-0 truncate">{hero.command}</code>
+            <CopyButton text={hero.command} label="copy" className="rounded-full" />
+          </div>
+          {hero.secondary.map((link) => (
+            <MagneticButton
+              key={link.label}
+              href={link.href}
+              variant="line"
+              external={link.external}
+            >
+              {link.label} {link.external && <ArrowOut />}
+            </MagneticButton>
+          ))}
         </div>
       </div>
 

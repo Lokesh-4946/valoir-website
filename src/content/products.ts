@@ -5,12 +5,10 @@
  * Future-ready slots:
  *   - demoVideoUrl: set a URL to auto-render a video player in the showcase.
  *   - tryItUrl:     set a URL to auto-render a "Try it yourself" live embed/CTA.
- * Both default to null and show the animated Rizz demo loop.
+ * Both default to null and show the animated Rizz project-intelligence loop.
  *
- * Facts sourced from: rizz_cowork_brief.md, rizz_cowork_brief_5.md,
- * rizz_ui_ux_spec.md, rizz_experience.html, and the rizz repo
- * (README.md, CLAUDE.md, package.json). Where a public fact is genuinely
- * undecided in those files it is marked [NEEDS INPUT].
+ * Facts sourced from the Valoir product brain and the Rizz 0.2.0 public npm
+ * release brief. Missing product facts must be marked [NEEDS INPUT].
  */
 
 export type License = "open-source" | "premium" | "open-core";
@@ -41,6 +39,7 @@ export type Product = {
   license: License;
   /** short badge label shown in the UI */
   licenseLabel: string;
+  badges: string[];
   capabilities: Capability[];
   repoUrl: string | null;
   /** private repo access → true hides/contextualizes the repo link */
@@ -66,72 +65,79 @@ export const products: Product[] = [
     slug: "rizz",
     name: "Rizz",
     by: "by Valoir",
-    tagline: "The lightest, most connectable coding agent harness.",
+    tagline: "Local Project Intelligence Engine",
     description:
-      "Rizz is the first product: a local Agent Light harness for setup, routing, and an inspectable CLI/TUI loop.",
+      "Understand any repo faster with a structured local brain, Mission Control, Explain, Review, and evidence-backed research artifacts.",
     license: "open-core",
-    licenseLabel: "Open-core Rizz Core",
+    licenseLabel: "Open-core Project Intelligence Engine",
+    badges: [
+      "Public npm release",
+      "Project Intelligence Engine",
+      "Local-first",
+      "Evidence-backed",
+    ],
     capabilities: [
       {
-        title: "Small harness",
+        title: "Project Knowledge Store",
         detail:
-          "The current surface is a local CLI/TUI wrapped around setup, one active route, and the agent loop.",
+          "Rizz builds a structured local brain under .rizz/brain so the repo becomes searchable, explainable, and reviewable.",
       },
       {
-        title: "Provider-agnostic",
+        title: "Mission Control",
         detail:
-          "OpenRouter BYOK is the fast path. Codex is available as a secondary local route through the signed-in Codex CLI/app.",
+          "The local report in .rizz/reports/index.html gives components, flows, commands, tests, risks, and evidence in one place.",
       },
       {
-        title: "Visible control loop",
+        title: "Explain and Review",
         detail:
-          "`/status`, `/model`, `/workspace`, and setup checks keep routing, readiness, and limits visible.",
+          "`rizz explain` explains files, components, and flows. `rizz review` connects diffs to affected code, tests, configs, and risks.",
       },
       {
-        title: "Local review-loop",
+        title: "Research artifacts",
         detail:
-          "The current discipline is local verification and review-loop dogfood. Custom QA/eval pipelines belong in the later Valoir layer.",
+          "Rizz writes coverage, confidence, evidence quality, benchmark readiness, and PIE acceptance data under .rizz/research.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: true,
     installTitle: "Install Rizz",
-    installIntro: "Run the current Rizz preview on macOS, Linux, or Windows PowerShell.",
+    installIntro:
+      "Install the public npm release and generate your first local Project Intelligence Layer.",
     installRequirement: "Requires Node >= 22 and npm.",
     installOptions: [
       {
         platform: "macOS",
-        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz"].join("\n"),
       },
       {
         platform: "Linux",
-        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz"].join("\n"),
       },
       {
         platform: "Windows PowerShell",
         tabLabel: "Windows",
-        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz"].join("\n"),
       },
     ],
     installNotes: [
-      { label: "Package", value: "@valoir/rizz" },
-      { label: "Source", value: "opens as the core hardens" },
-      { label: "Native installers", value: "planned" },
+      { label: "Package", value: "@valoir/rizz on npm" },
+      { label: "Core", value: "local Project Intelligence Engine" },
+      { label: "Team layer", value: "separate from the default install" },
     ],
     usageSnippet: [
       "# install",
       "npm install -g @valoir/rizz",
       "",
-      "# setup and launch",
-      "rizz setup",
+      "# understand the current repo",
+      "cd your-repo",
       "rizz",
       "",
-      "# inside the TUI",
-      "/status             # readiness, route, and cost signals",
-      "/model              # switch route/profile",
-      "/workspace          # visible stub; future Workspace Mode",
+      "# explain and review",
+      "rizz explain README.md",
+      "rizz review --json",
+      "rizz ask \"what should I read first?\"",
       "",
-      "pnpm check          # local review-loop gate",
+      "open .rizz/reports/index.html",
     ].join("\n"),
     docsUrl: "https://valoir.space/docs",
     // Repo has no public star count yet.
@@ -140,7 +146,7 @@ export const products: Product[] = [
     demoVideoUrl: null,
     tryItUrl: null,
     flagship: true,
-    status: "Preview · Agent Light",
+    status: "Rizz 0.2.0 · Public npm release",
   },
 ];
 

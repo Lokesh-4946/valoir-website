@@ -6,7 +6,8 @@ import JsonLd from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: "Rizz documentation",
-  description: "Documentation for Rizz setup, commands, provider routes, and roadmap.",
+  description:
+    "Documentation for Rizz 0.2.0, the local Project Intelligence Engine.",
   alternates: { canonical: "/docs" },
 };
 
@@ -19,7 +20,7 @@ export default function DocsIndex() {
       <p className="eyebrow mb-4">Documentation</p>
       <h1 className="display text-[clamp(2rem,5vw,3.4rem)] font-semibold text-fg">Rizz docs</h1>
       <p className="mt-5 max-w-xl font-mono text-base leading-relaxed text-muted">
-        Start with the Quickstart, then jump to commands, provider routes, or the roadmap.
+        Start with the Quickstart, then jump to Project Intelligence concepts, commands, provider routes, or the roadmap.
       </p>
 
       <ul className="mt-12 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">

@@ -6,8 +6,9 @@
 export const site = {
   name: "Valoir",
   wordmark: "Valoir",
-  tagline: "Open-core agent infrastructure.",
-  description: "Infrastructure for local-first coding agents and the teams that run them.",
+  tagline: "Project Intelligence infrastructure.",
+  description:
+    "Valoir builds Project Intelligence infrastructure. Rizz is the local Project Intelligence Engine for understanding repositories before changing them.",
   url: "https://valoir.space", // production domain (owned; registered at Namecheap, 2026-06-14)
   github: "https://github.com/Lokesh-4946",
   socials: [
@@ -29,43 +30,54 @@ export const nav = {
 };
 
 export const hero = {
-  headline: ["Valoir builds", "open-core agent", "infrastructure."],
-  primary: { label: "Explore Rizz", href: "#products" },
-  secondary: { label: "View on GitHub", href: "https://github.com/Lokesh-4946/rizz" },
+  headline: [
+    "Valoir builds",
+    "Project Intelligence",
+    "infrastructure.",
+  ],
+  subhead:
+    "Rizz is the local Project Intelligence Engine for understanding repositories before changing them.",
+  primary: { label: "Install Rizz", href: "#products" },
+  command: "npm install -g @valoir/rizz",
+  secondary: [
+    { label: "View docs", href: "/docs", external: false },
+    { label: "View on GitHub", href: "https://github.com/Lokesh-4946/rizz", external: true },
+  ],
 };
 
 export const manifesto = {
   label: "01 — Manifesto",
   lines: [
-    "Small by default.",
-    "Routes you can see.",
-    "Power only when asked.",
+    "Understand first.",
+    "Change second.",
+    "Power stays opt-in.",
   ],
-  body: "The default view should stay quiet. Routing, cost, and workspace power stay visible without turning the harness into the product.",
+  body:
+    "Rizz turns a repository into a local Project Intelligence Layer: components, flows, evidence, risks, reviews, and research artifacts. Local-first by default; model and workspace power only when asked.",
 };
 
 export const sections = {
   products: { label: "02 — Products", title: "Products" },
   whyRizz: {
     label: "03 — Why Rizz",
-    title: "Why Rizz feels easier to trust.",
-    body: "A small local harness. Clear state. No surprise power mode.",
+    title: "Understand the repo before you touch it.",
+    body: "Rizz turns scattered project knowledge into a local, inspectable layer you can explain, review, and question.",
     items: [
       {
-        title: "Stays light",
-        text: "One local CLI/TUI for the current project.",
+        title: "Understand the system",
+        text: "Components, flows, commands, tests, dependencies, risks, and evidence are extracted into a local Project Intelligence Layer.",
       },
       {
-        title: "Shows state",
-        text: "Route, approvals, and budget stay visible.",
+        title: "Explain before editing",
+        text: "Use rizz explain for files, components, and flows before changing code.",
       },
       {
-        title: "Keeps choice",
-        text: "Routing stays explicit, not locked away.",
+        title: "Review with blast radius",
+        text: "Use rizz review to connect a diff to affected components, flows, tests, configs, and risks.",
       },
       {
-        title: "Adds power carefully",
-        text: "Workspace and team features stay opt-in.",
+        title: "Research-grade artifacts",
+        text: "Rizz emits coverage, confidence, evidence quality, architecture reasoning, benchmark readiness, and PIE acceptance data under .rizz/research.",
       },
     ],
   },
@@ -75,28 +87,49 @@ export const sections = {
     lanes: [
       {
         label: "Now",
-        title: "Agent Light",
-        items: ["local CLI", "setup flow", "route picker", "visible status"],
+        title: "Project Intelligence Engine",
+        items: [
+          "Project Knowledge Store",
+          "Mission Control",
+          "Explain",
+          "Review",
+          "gated Ask",
+          "research artifacts",
+          "npm install",
+        ],
       },
       {
         label: "Next",
-        title: "Release path",
-        items: ["preview dogfood", "release tag", "native installers"],
+        title: "Validation path",
+        items: [
+          "real-repo validation",
+          "PI-Bench expansion",
+          "reliability benchmark seeds",
+          "evidence calibration",
+          "release/docs polish",
+        ],
       },
       {
         label: "Later",
-        title: "Opt-in power",
-        items: ["Workspace Mode", "Repo Brain", "OS/Jarvis connectors", "enterprise providers"],
+        title: "Team power",
+        items: [
+          "Workspace Mode",
+          "team layer",
+          "hosted relay",
+          "enterprise provider setup",
+          "native installers",
+        ],
       },
     ],
   },
   offering: {
     label: "05 — Valoir offering",
-    title: "Team layer, not Rizz Core.",
-    body: "Rizz Core stays local. Valoir's paid layer is for teams that need managed routing, approvals, and auditability.",
+    title: "A team layer on top of local intelligence.",
+    body:
+      "Valoir's commercial layer will build on Rizz's Project Intelligence Layer for teams that need managed review, shared architecture intelligence, auditability, and benchmark-backed software understanding.",
     items: [
       "hosted relay",
-      "approval inbox",
+      "managed review",
       "team audit logs",
       "enterprise provider setup",
       "workflow packs",

@@ -2,8 +2,8 @@ import type { DocPage } from "./types";
 
 /**
  * The Rizz documentation, authored from `knowledge/docs-content.md`.
- * Honesty rule: Rizz is preview software — features carry [now] / [preview] / [planned]
- * status; never present planned features as shipped.
+ * Honesty rule: shipped and planned surfaces stay labeled; never present
+ * planned features as shipped.
  */
 export const docsPages: DocPage[] = [
   {
@@ -14,27 +14,29 @@ export const docsPages: DocPage[] = [
     blocks: [
       {
         type: "p",
-        text: "**Rizz is a local coding-agent harness.** It wraps setup, model routing, tool calls, visible status, and an inspectable CLI/TUI loop.",
+        text: "**Rizz is a local Project Intelligence Engine.** It scans a repository, builds a structured Project Knowledge Store under `.rizz/brain`, emits research artifacts under `.rizz/research`, and renders Mission Control as a local HTML portal.",
       },
-      { type: "h", level: 2, text: "Three principles" },
+      { type: "h", level: 2, text: "Principles" },
       {
         type: "ul",
         items: [
-          "**Small harness** — local CLI, small TUI, visible setup checks, and a footprint budget.",
-          "**Visible routing** — the active route and cost signals stay inspectable.",
-          "**Opt-in power** — larger workspace features stay out of the default path.",
+          "**Understand before changing** — build project context before editing.",
+          "**Evidence-backed claims** — tie findings to files, commands, tests, and reconstructed flows.",
+          "**Local-first Project Knowledge Store** — keep the project brain under `.rizz/brain` by default.",
+          "**Research artifacts for evaluation** — write coverage, confidence, evidence quality, benchmark readiness, and PIE acceptance data under `.rizz/research`.",
+          "**Opt-in model/chat power** — model routes and chat stay explicit, not hidden in the default scan.",
         ],
       },
       {
         type: "p",
-        text: "Open-core: Rizz Core is separate from Valoir's later hosted and enterprise layer.",
+        text: "Rizz is the local Project Intelligence Engine for understanding repositories before changing them. Valoir's later hosted and enterprise layer stays separate from the default install.",
       },
     ],
   },
   {
     slug: "quickstart",
     title: "Quickstart",
-    description: "Install Rizz with npm and launch the current preview.",
+    description: "Install Rizz with npm and generate your first Project Intelligence Layer.",
     order: 2,
     blocks: [
       { type: "h", level: 2, text: "Install", status: "now" },
@@ -45,65 +47,90 @@ export const docsPages: DocPage[] = [
       {
         type: "code",
         lang: "bash",
-        code: "# macOS, Linux, or Windows PowerShell\nnpm install -g @valoir/rizz\nrizz setup\nrizz",
+        code: "npm install -g @valoir/rizz\ncd path/to/your/repo\nrizz\nopen .rizz/reports/index.html",
       },
-      { type: "p", text: "Requirement for all: Node ≥ 22 and npm." },
-      { type: "h", level: 2, text: "Setup" },
+      { type: "p", text: "Requirement for all: Node >= 22 and npm." },
+      { type: "h", level: 2, text: "Explain, review, ask" },
+      {
+        type: "code",
+        lang: "bash",
+        code: "rizz explain README.md\nrizz review --json\nrizz ask \"what should I read first?\"",
+      },
       {
         type: "p",
-        text: "Run `rizz setup` once to choose a model route and handle credentials explicitly. `rizz` launches the TUI.",
+        text: "`rizz ask` and chat-style model power are gated. Run `rizz setup` when you intentionally want to configure a provider route.",
       },
-      {
-        type: "p",
-        text: "Provider details live in Model providers. Rizz setup keeps credential handling explicit.",
-      },
-      { type: "h", level: 2, text: "Inside the TUI", status: "now" },
+      { type: "h", level: 2, text: "Optional TUI commands" },
       {
         type: "code",
         lang: "text",
-        code: "/status           # readiness, route, and cost signals\n/model            # switch route/profile\n/workspace        # visible stub; future Workspace Mode\n/help",
+        code: "/status           # readiness and route state\n/model            # switch route/profile\n/workspace        # future Workspace Mode\n/help",
       },
     ],
   },
   {
     slug: "core-concepts",
     title: "Core concepts",
-    description: "The Rizz loop, visible controls, and planned workspace power.",
+    description: "The shipped Project Intelligence concepts behind Rizz.",
     order: 3,
     blocks: [
-      { type: "h", level: 2, text: "The loop" },
+      { type: "h", level: 2, text: "Project Intelligence Layer" },
       {
         type: "p",
-        text: "Each turn: call the model → dispatch any tool calls → feed results back → repeat, until done or a limit hits. Built in for reliability:",
+        text: "A local layer of project understanding: components, flows, commands, tests, dependencies, risks, and evidence extracted from the repository before edits begin.",
       },
+      { type: "h", level: 2, text: "Project Knowledge Store" },
+      {
+        type: "p",
+        text: "The structured brain Rizz writes under `.rizz/brain`, including the latest project graph and supporting data.",
+      },
+      { type: "h", level: 2, text: "Mission Control" },
+      {
+        type: "p",
+        text: "The local HTML portal at `.rizz/reports/index.html` for reading the project map, evidence, risks, commands, tests, and review context.",
+      },
+      { type: "h", level: 2, text: "Explain" },
+      {
+        type: "p",
+        text: "`rizz explain <target>` explains files, components, and flows before you change them.",
+      },
+      { type: "h", level: 2, text: "Review" },
+      {
+        type: "p",
+        text: "`rizz review` connects the current git diff to affected components, flows, tests, configs, and risks. `rizz review --json` returns automation-friendly output.",
+      },
+      { type: "h", level: 2, text: "Research artifacts" },
+      {
+        type: "p",
+        text: "Rizz writes coverage, confidence, evidence quality, architecture reasoning, benchmark readiness, and PIE acceptance data under `.rizz/research`.",
+      },
+      { type: "h", level: 2, text: "Gated Ask" },
+      {
+        type: "p",
+        text: "`rizz ask <question>` lets you query the local Project Intelligence Layer with explicit, opt-in model power.",
+      },
+      { type: "h", level: 2, text: "Current concepts" },
       {
         type: "ul",
         items: [
-          "**Interrupt** [now] — `esc` (or Ctrl+C) stops a running turn; typing mid-stream queues a redirect (the loop finishes the current tool, then takes the new instruction).",
-          "**Visible cost** [now] — the active route and cost/budget signals are visible in the TUI.",
-          "**Compression** [planned] — auxiliary-model summarization that protects head & tail context; never silently drops critical info.",
-          "**Fallback** [planned] — on rate-limit / outage, fall to the next model in the chain, shown to you, with a manual override.",
+          "**Project Intelligence Layer** [now] — the local understanding layer Rizz builds from a repo.",
+          "**Project Knowledge Store** [now] — `.rizz/brain` stores the structured local brain.",
+          "**Mission Control** [now] — `.rizz/reports/index.html` renders the local portal.",
+          "**Explain** [now] — file, component, and flow explanations.",
+          "**Review** [now] — diff review with blast radius.",
+          "**Research artifacts** [now] — evaluation and evidence files under `.rizz/research`.",
+          "**Gated Ask** [now] — explicit question-answering over the local project layer.",
         ],
-      },
-      {
-        type: "callout",
-        tone: "note",
-        text: "**Reliability rule (binding):** every edit is verified after write — the apply path re-reads and confirms the change landed byte-for-byte before reporting success. A write that can't be verified is a failure, not a warning.",
-      },
-      { type: "h", level: 2, text: "Current surface now, Workspace later" },
-      {
-        type: "p",
-        text: "`/workspace` is visible but not connected. Workspace Mode, Repo Brain, and OS/Jarvis connectors are later tracks.",
       },
     ],
   },
   {
     slug: "model-providers",
     title: "Model providers",
-    description: "Current provider routes and credential boundaries.",
+    description: "Opt-in provider routes and credential boundaries.",
     order: 4,
     blocks: [
-      { type: "p", text: "Current routes:" },
+      { type: "p", text: "Model routes are opt-in power for Ask and chat surfaces:" },
       {
         type: "ul",
         items: [
@@ -127,32 +154,40 @@ export const docsPages: DocPage[] = [
   {
     slug: "commands-and-keys",
     title: "Commands & keys",
-    description:
-      "The Rizz command palette and keyboard shortcuts, with the build status of each command.",
+    description: "Shipped Rizz commands, optional TUI commands, and keyboard shortcuts.",
     order: 5,
     blocks: [
-      { type: "h", level: 2, text: "Commands" },
+      { type: "h", level: 2, text: "CLI commands" },
       {
         type: "table",
         head: ["Command", "Does", "Status"],
         rows: [
-          ["`/login`", "Provider auth path", "[planned]"],
-          ["`/status`", "Readiness, route, and cost signals", "[now]"],
-          ["`/model`, `⌃L`", "Model route/profile picker", "[now]"],
-          ["`/theme`", "List / set themes", "[now]"],
-          ["`/workspace`", "Enter multi-agent Workspace mode", "[planned]"],
-          ["`/plan`", "Plan-mode: draft a step list before editing", "[planned]"],
-          ["`/session`, `/resume`", "List / switch / resume sessions (tree-structured)", "[planned]"],
-          ["`/cost`", "Usage + budget signals", "[now]"],
-          ["`/skills`, `/mcp`", "Manage installed skills / MCP servers", "[planned]"],
-          ["`/account`", "Optional Rizz account (sync, evals, team)", "[planned]"],
+          ["`rizz` / `rizz understand`", "Generate project intelligence", "[now]"],
+          ["`rizz brain`", "Refresh the Project Knowledge Store", "[now]"],
+          ["`rizz explain <target>`", "Explain a file or component", "[now]"],
+          ["`rizz explain flow <id>`", "Explain a reconstructed flow", "[now]"],
+          ["`rizz review`", "Review the current git diff with blast radius", "[now]"],
+          ["`rizz review --json`", "Return automation-friendly review output", "[now]"],
+          ["`rizz ask <question>`", "Ask a gated Project Intelligence question", "[now]"],
+          ["`rizz setup`", "Configure an opt-in model route", "[now]"],
+          ["`rizz chat`", "Open the opt-in model TUI", "[now]"],
+        ],
+      },
+      { type: "h", level: 2, text: "TUI commands" },
+      {
+        type: "table",
+        head: ["Command", "Does", "Status"],
+        rows: [
+          ["`/status`", "Readiness and route state", "[now]"],
+          ["`/model`, `Ctrl+L`", "Model route/profile picker", "[now]"],
+          ["`/workspace`", "Enter multi-agent Workspace Mode", "[planned]"],
           ["`/help`, `/exit`", "Keys + commands; quit", "[now]"],
         ],
       },
       { type: "h", level: 2, text: "Keys" },
       {
         type: "p",
-        text: "`↵` send · `⇧↵` newline · `esc` interrupt · `⌃L` model picker · `⌃K` command palette [planned].",
+        text: "`Enter` send · `Shift+Enter` newline · `esc` interrupt · `Ctrl+L` model picker.",
       },
     ],
   },
@@ -166,11 +201,11 @@ export const docsPages: DocPage[] = [
       {
         type: "callout",
         tone: "planned",
-        text: "Workspace mode is planned — it is not in the current build.",
+        text: "Workspace Mode is planned — it is not in the current build.",
       },
       {
         type: "p",
-        text: "`/workspace` is visible today as an honest stub. Later tracks include Workspace Mode, Repo Brain, OS/Jarvis connectors, and enterprise providers.",
+        text: "Later tracks include Workspace Mode, team collaboration, hosted relay, enterprise provider setup, and native installers.",
       },
     ],
   },
@@ -192,7 +227,7 @@ export const docsPages: DocPage[] = [
     slug: "states",
     title: "States you'll see",
     description:
-      "The interface states in Rizz — empty, loading, offline, rate-limited, auth-expired, and bad-edit — and which are shipped vs planned.",
+      "Interface states in Rizz, including empty, loading, offline, rate-limited, auth-expired, and review states.",
     order: 8,
     blocks: [
       {
@@ -203,11 +238,11 @@ export const docsPages: DocPage[] = [
         type: "ul",
         items: [
           "**Empty** [now] — a one-line invitation, never a blank screen.",
-          "**Loading** [now] — a thinking line + quiet spinner.",
-          "**Offline** [planned] — banner offering a local model.",
-          "**Rate-limited** [planned] — fallback shown.",
-          "**Auth-expired** [planned] — inline re-login, turn preserved.",
-          "**Bad edit** [now] — rejected diff + reason + retry.",
+          "**Loading** [now] — visible scan and report progress.",
+          "**Offline** [planned] — banner offering a local model path.",
+          "**Rate-limited** [planned] — fallback shown for opt-in model surfaces.",
+          "**Auth-expired** [planned] — inline re-login for configured providers.",
+          "**Review state** [now] — diff context, blast radius, risks, and JSON output.",
         ],
       },
     ],
@@ -215,18 +250,17 @@ export const docsPages: DocPage[] = [
   {
     slug: "run-modes",
     title: "Run modes",
-    description:
-      "One Rizz binary, four run modes: interactive TUI, print/JSON, RPC, and SDK.",
+    description: "One Rizz binary, with current CLI/report modes and planned integration modes.",
     order: 9,
     blocks: [
       {
         type: "p",
-        text: "One binary, four modes: **interactive TUI** (the focus), **print/JSON** (scriptable), **RPC** (process integration), **SDK** (embed).",
+        text: "Current surfaces focus on the local CLI, Mission Control report, Explain, Review, and gated Ask. Interactive chat, RPC, and SDK paths remain opt-in or planned integration surfaces.",
       },
       {
         type: "callout",
-        tone: "preview",
-        text: "TUI + print-mode are seeded now; RPC and SDK are planned.",
+        tone: "note",
+        text: "CLI understanding, local reports, Explain, Review, and gated Ask are current. RPC and SDK remain planned.",
       },
     ],
   },
@@ -234,7 +268,7 @@ export const docsPages: DocPage[] = [
     slug: "contributing",
     title: "Contributing",
     description:
-      "Rizz dogfoods the discipline it ships: strict TypeScript, a footprint budget, and a local review-loop before merge.",
+      "Rizz dogfoods strict TypeScript, evidence-backed review, and local validation before merge.",
     order: 10,
     blocks: [
       {
@@ -243,7 +277,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "p",
-        text: "TypeScript strict, ESM-only, Node ≥ 22; conventional commits; service-layer split (orchestration in `core`/`cli`, mechanics in `providers`). A new dependency in `core`/`providers` must be justified — the footprint budget is a gate.",
+        text: "TypeScript strict, ESM-only, Node >= 22; conventional commits; service-layer split (orchestration in `core`/`cli`, mechanics in `providers`). A new dependency in `core`/`providers` must be justified — the footprint budget is a gate.",
       },
       {
         type: "p",
@@ -254,21 +288,21 @@ export const docsPages: DocPage[] = [
   {
     slug: "status-and-roadmap",
     title: "Status & roadmap",
-    description: "Current status, release path, and later tracks.",
+    description: "Current release, shipped surfaces, and later tracks.",
     order: 11,
     blocks: [
       {
         type: "callout",
         tone: "note",
-        text: "The lanes below separate what exists now from release work and later opt-in power.",
+        text: "The lanes below separate the current npm release from validation work and later team power.",
       },
       {
         type: "ul",
         items: [
-          "**Now** — Agent Light, local CLI, setup flow, route picker, visible status.",
-          "**Next** — preview dogfood, release tag, native installers.",
-          "**Later** — Workspace Mode, Repo Brain, OS/Jarvis connectors, enterprise providers.",
-          "**Valoir offering** — hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, custom QA/eval pipelines.",
+          "**Current** — Rizz 0.2.0 public npm release.",
+          "**Shipped** — Project Intelligence Engine, Project Knowledge Store under `.rizz/brain`, research artifacts, Mission Control, Explain, Review, gated Ask.",
+          "**Next** — real-repo validation, PI-Bench expansion, reliability benchmark seeds, evidence quality calibration, release/docs polish.",
+          "**Later** — Workspace Mode, hosted/team layer, enterprise setup, native installers.",
         ],
       },
       {
