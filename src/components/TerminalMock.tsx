@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 /**
  * A faithful-feeling miniature of Rizz's local Project Intelligence flow.
  * Static, decorative, and aria-hidden — the real story is in the copy.
@@ -8,7 +10,7 @@ export default function TerminalMock() {
   return (
     <div
       aria-hidden
-      className="overflow-hidden rounded-xl border border-line bg-[var(--bg-2)] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)]"
+      className="w-full min-w-0 overflow-hidden rounded-xl border border-line bg-[var(--bg-2)] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)]"
     >
       {/* chrome */}
       <div className="flex items-center gap-3 border-b border-line px-4 py-3">
@@ -38,18 +40,18 @@ export default function TerminalMock() {
           cd your-repo
         </Line>
         <Line who="you" whoClass="text-accent">
-          rizz
+          rizz understand
         </Line>
         <Line who="rizz" whoClass="text-teal">
-          <span className="text-muted">understood 136 file(s)</span>
+          <span className="text-muted">project intelligence written</span>
         </Line>
         <Tool verb="brain" path=".rizz/brain/latest.json" meta="ready" ok />
         <Tool verb="research" path=".rizz/research" meta="evidence" ok />
         <Tool verb="report" path=".rizz/reports/index.html" meta="local" />
-        <Tool verb="components" path="10" meta="mapped" />
-        <Tool verb="flows" path="17" meta="rebuilt" />
-        <Tool verb="commands" path="16" meta="found" />
-        <Tool verb="tests" path="31" meta="linked" />
+        <Tool verb="components" path="source map" meta="mapped" />
+        <Tool verb="flows" path="runtime paths" meta="rebuilt" />
+        <Tool verb="commands" path="repo scripts" meta="found" />
+        <Tool verb="tests" path="available checks" meta="linked" />
         <div className="flex items-center gap-2 pt-2">
           <span className="text-accent">›</span>
           <span className="min-w-0 truncate text-bone">rizz explain src/auth/session.ts</span>
@@ -83,7 +85,7 @@ function Line({
 }: {
   who: string;
   whoClass: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="flex gap-3">

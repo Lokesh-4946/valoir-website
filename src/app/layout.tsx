@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { display, mono } from "@/lib/fonts";
 import { site } from "@/content/content";
 import { siteGraph } from "@/lib/structuredData";
@@ -15,6 +16,8 @@ export const metadata: Metadata = {
   keywords: [
     "Valoir",
     "Rizz",
+    "applied AI systems",
+    "workflow intelligence",
     "Project Intelligence Engine",
     "Project Intelligence infrastructure",
     "repository intelligence",
@@ -52,7 +55,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable}`}>

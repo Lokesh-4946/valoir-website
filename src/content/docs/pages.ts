@@ -47,7 +47,7 @@ export const docsPages: DocPage[] = [
       {
         type: "code",
         lang: "bash",
-        code: "npm install -g @valoir/rizz\ncd path/to/your/repo\nrizz\nopen .rizz/reports/index.html",
+        code: "npm install -g @valoir/rizz\ncd path/to/your/repo\nrizz understand\nopen .rizz/reports/index.html",
       },
       { type: "p", text: "Requirement for all: Node >= 22 and npm." },
       { type: "h", level: 2, text: "Explain, review, ask" },
@@ -162,7 +162,7 @@ export const docsPages: DocPage[] = [
         type: "table",
         head: ["Command", "Does", "Status"],
         rows: [
-          ["`rizz` / `rizz understand`", "Generate project intelligence", "[now]"],
+          ["`rizz understand`", "Generate project intelligence", "[now]"],
           ["`rizz brain`", "Refresh the Project Knowledge Store", "[now]"],
           ["`rizz explain <target>`", "Explain a file or component", "[now]"],
           ["`rizz explain flow <id>`", "Explain a reconstructed flow", "[now]"],
@@ -273,11 +273,11 @@ export const docsPages: DocPage[] = [
     blocks: [
       {
         type: "p",
-        text: "Rizz dogfoods the discipline it ships. Dev loop per change: **plan → git worktree per task → build → `pnpm check` → code-simplifier pass → PR via `gh` → local review-loop → merge to `develop`**.",
+        text: "Rizz dogfoods the discipline it ships. Changes should be small, reviewed, and backed by local validation before they merge.",
       },
       {
         type: "p",
-        text: "TypeScript strict, ESM-only, Node >= 22; conventional commits; service-layer split (orchestration in `core`/`cli`, mechanics in `providers`). A new dependency in `core`/`providers` must be justified — the footprint budget is a gate.",
+        text: "TypeScript strict, ESM-only, Node >= 22, conventional commits, and a justified dependency footprint are part of the contribution bar.",
       },
       {
         type: "p",

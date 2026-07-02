@@ -6,9 +6,9 @@
 export const site = {
   name: "Valoir",
   wordmark: "Valoir",
-  tagline: "Project Intelligence infrastructure.",
+  tagline: "Applied AI systems for real workflows.",
   description:
-    "Valoir builds Project Intelligence infrastructure. Rizz is the local Project Intelligence Engine for understanding repositories before changing them.",
+    "Valoir builds applied AI systems for real workflows. Rizz is the first product: repository intelligence for understanding codebases before changing them.",
   url: "https://valoir.space", // production domain (owned; registered at Namecheap, 2026-06-14)
   github: "https://github.com/Lokesh-4946",
   socials: [
@@ -23,117 +23,126 @@ export const nav = {
     { label: "Products", href: "/#products" },
     { label: "Why Rizz", href: "/#why-rizz" },
     { label: "Roadmap", href: "/#roadmap" },
-    { label: "Offering", href: "/#offering" },
+    { label: "Valoir", href: "/#offering" },
     { label: "Docs", href: "/docs" },
   ],
-  cta: { label: "Install Rizz", href: "/#products" },
+  cta: { label: "See Rizz", href: "/#products" },
 };
 
 export const hero = {
   headline: [
     "Valoir builds",
-    "Project Intelligence",
-    "infrastructure.",
+    "applied AI systems",
+    "for real workflows.",
   ],
   subhead:
-    "Rizz is the local Project Intelligence Engine for understanding repositories before changing them.",
-  primary: { label: "Install Rizz", href: "#products" },
+    "Rizz is the first product: repository intelligence for understanding codebases before changing them.",
+  primary: { label: "Explore products", href: "#products" },
   command: "npm install -g @valoir/rizz",
   secondary: [
-    { label: "View docs", href: "/docs", external: false },
+    { label: "Read docs", href: "/docs", external: false },
     { label: "View on GitHub", href: "https://github.com/Lokesh-4946/rizz", external: true },
   ],
 };
 
 export const manifesto = {
-  label: "01 — Manifesto",
+  label: "01 — How Valoir builds",
   lines: [
-    "Understand first.",
-    "Change second.",
-    "Power stays opt-in.",
+    "Start with the workflow.",
+    "Keep the evidence visible.",
+    "Make power opt-in.",
   ],
   body:
-    "Rizz turns a repository into a local Project Intelligence Layer: components, flows, evidence, risks, reviews, and research artifacts. Local-first by default; model and workspace power only when asked.",
+    "Valoir products are built around specific work, not generic demos. Rizz applies that method to software repositories first: local context, inspectable artifacts, and model power only when asked.",
 };
 
 export const sections = {
-  products: { label: "02 — Products", title: "Products" },
+  products: {
+    label: "02 — Products",
+    title: "Products by Valoir",
+    body:
+      "Rizz is the first product. The product catalog is built to hold more Valoir systems when those products are real.",
+  },
   whyRizz: {
     label: "03 — Why Rizz",
-    title: "Understand the repo before you touch it.",
-    body: "Rizz turns scattered project knowledge into a local, inspectable layer you can explain, review, and question.",
+    title: "Repository intelligence before production risk.",
+    body: "Rizz gives developers a local map of the system before a change becomes a guess.",
     items: [
       {
-        title: "Understand the system",
-        text: "Components, flows, commands, tests, dependencies, risks, and evidence are extracted into a local Project Intelligence Layer.",
+        title: "Map the change surface",
+        text: "Components, flows, commands, tests, dependencies, risks, and evidence are extracted before edits begin.",
       },
       {
-        title: "Explain before editing",
-        text: "Use rizz explain for files, components, and flows before changing code.",
+        title: "Explain files and flows",
+        text: "Use rizz explain to read the paths that matter before touching them.",
       },
       {
-        title: "Review with blast radius",
-        text: "Use rizz review to connect a diff to affected components, flows, tests, configs, and risks.",
+        title: "Review diffs with context",
+        text: "Use rizz review to connect a change to affected areas, configs, risks, and available tests.",
       },
       {
-        title: "Research-grade artifacts",
-        text: "Rizz emits coverage, confidence, evidence quality, architecture reasoning, benchmark readiness, and PIE acceptance data under .rizz/research.",
+        title: "Keep artifacts inspectable",
+        text: "Mission Control, .rizz/brain, and .rizz/research stay in the repo workspace so the reasoning can be inspected.",
       },
     ],
   },
   roadmap: {
     label: "04 — Roadmap",
-    title: "Now, next, later.",
+    title: "What is real, what is next.",
     lanes: [
       {
         label: "Now",
-        title: "Project Intelligence Engine",
+        title: "Rizz 0.2.0",
         items: [
+          "npm install",
           "Project Knowledge Store",
           "Mission Control",
           "Explain",
           "Review",
           "gated Ask",
           "research artifacts",
-          "npm install",
         ],
       },
       {
         label: "Next",
-        title: "Validation path",
+        title: "Validation and polish",
         items: [
           "real-repo validation",
-          "PI-Bench expansion",
-          "reliability benchmark seeds",
-          "evidence calibration",
-          "release/docs polish",
+          "evidence quality checks",
+          "benchmark seeds",
+          "docs polish",
         ],
       },
       {
         label: "Later",
-        title: "Team power",
+        title: "Valoir product layer",
         items: [
           "Workspace Mode",
           "team layer",
           "hosted relay",
           "enterprise provider setup",
           "native installers",
+          "future workflow products",
         ],
       },
     ],
   },
   offering: {
-    label: "05 — Valoir offering",
-    title: "A team layer on top of local intelligence.",
+    label: "05 — Valoir",
+    title: "One company, more than one product.",
     body:
-      "Valoir's commercial layer will build on Rizz's Project Intelligence Layer for teams that need managed review, shared architecture intelligence, auditability, and benchmark-backed software understanding.",
+      "Rizz is the first proof of Valoir's approach: applied AI systems that understand real workflow context, show their evidence, and keep people in control. Future products can carry the same pattern into other workflow domains when the facts are ready.",
     items: [
-      "hosted relay",
-      "managed review",
-      "team audit logs",
-      "enterprise provider setup",
-      "workflow packs",
-      "custom QA/eval pipelines",
+      "applied AI systems",
+      "repository intelligence first",
+      "evidence-backed outputs",
+      "human-in-the-loop workflows",
+      "future products when defined",
+      "team layer later",
     ],
+    ctas: [
+      { label: "Explore Rizz", href: "#products", variant: "accent" },
+      { label: "Read docs", href: "/docs", variant: "line" },
+    ] as const,
   },
 };

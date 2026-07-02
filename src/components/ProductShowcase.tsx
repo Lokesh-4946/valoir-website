@@ -174,15 +174,15 @@ function ProductPanel({ product, index }: { product: Product; index: number }) {
   return (
     <div className="grid gap-12 border-t border-line py-20 lg:grid-cols-[1fr_1fr] lg:gap-16">
       {/* sticky visual column */}
-      <div className="lg:sticky lg:top-24 lg:h-fit">
-        <div className="space-y-6">
+      <div className="min-w-0 lg:sticky lg:top-24 lg:h-fit">
+        <div className="min-w-0 space-y-6">
           <TerminalMock />
           <MediaSlot product={product} />
         </div>
       </div>
 
       {/* details column */}
-      <div>
+      <div className="min-w-0">
         <div className="mb-4 flex items-center gap-4">
           <span className="font-mono text-sm text-faint">
             {String(index + 1).padStart(2, "0")}
@@ -247,6 +247,11 @@ export default function ProductShowcase() {
         lines={[sections.products.title]}
         className="display text-[clamp(2.4rem,7vw,5rem)] font-semibold text-fg"
       />
+      <Reveal delay={0.05} className="mt-6 max-w-2xl">
+        <p className="font-mono text-base leading-relaxed text-muted">
+          {sections.products.body}
+        </p>
+      </Reveal>
 
       <div className="mt-10">
         {products.map((p, i) => (

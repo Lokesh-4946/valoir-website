@@ -65,14 +65,14 @@ export const products: Product[] = [
     slug: "rizz",
     name: "Rizz",
     by: "by Valoir",
-    tagline: "Local Project Intelligence Engine",
+    tagline: "Repository intelligence for codebase understanding",
     description:
-      "Understand any repo faster with a structured local brain, Mission Control, Explain, Review, and evidence-backed research artifacts.",
+      "Rizz maps repository structure into inspectable local artifacts before you edit: .rizz/brain, Mission Control, Explain, Review, gated Ask, and research files.",
     license: "open-core",
     licenseLabel: "Open-core Project Intelligence Engine",
     badges: [
+      "First Valoir product",
       "Public npm release",
-      "Project Intelligence Engine",
       "Local-first",
       "Evidence-backed",
     ],
@@ -80,7 +80,7 @@ export const products: Product[] = [
       {
         title: "Project Knowledge Store",
         detail:
-          "Rizz builds a structured local brain under .rizz/brain so the repo becomes searchable, explainable, and reviewable.",
+          "Rizz writes a structured project store under .rizz/brain so the repo can be explained and reviewed from local evidence.",
       },
       {
         title: "Mission Control",
@@ -93,35 +93,35 @@ export const products: Product[] = [
           "`rizz explain` explains files, components, and flows. `rizz review` connects diffs to affected code, tests, configs, and risks.",
       },
       {
-        title: "Research artifacts",
+        title: "Gated Ask and research",
         detail:
-          "Rizz writes coverage, confidence, evidence quality, benchmark readiness, and PIE acceptance data under .rizz/research.",
+          "`rizz ask` stays explicit and opt-in. Research artifacts under .rizz/research show coverage, confidence, evidence quality, and architecture reasoning.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
-    repoPrivate: true,
+    repoPrivate: false,
     installTitle: "Install Rizz",
     installIntro:
-      "Install the public npm release and generate your first local Project Intelligence Layer.",
+      "Install the public npm release and generate your first local project map.",
     installRequirement: "Requires Node >= 22 and npm.",
     installOptions: [
       {
         platform: "macOS",
-        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz understand"].join("\n"),
       },
       {
         platform: "Linux",
-        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz understand"].join("\n"),
       },
       {
         platform: "Windows PowerShell",
         tabLabel: "Windows",
-        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "cd your-repo", "rizz understand"].join("\n"),
       },
     ],
     installNotes: [
       { label: "Package", value: "@valoir/rizz on npm" },
-      { label: "Core", value: "local Project Intelligence Engine" },
+      { label: "Core", value: "repository understanding before edits" },
       { label: "Team layer", value: "separate from the default install" },
     ],
     usageSnippet: [
@@ -130,7 +130,7 @@ export const products: Product[] = [
       "",
       "# understand the current repo",
       "cd your-repo",
-      "rizz",
+      "rizz understand",
       "",
       "# explain and review",
       "rizz explain README.md",

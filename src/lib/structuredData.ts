@@ -44,7 +44,6 @@ function software(): Json {
     operatingSystem: "macOS, Linux, Windows",
     programmingLanguage: flagship.language,
     codeRepository: flagship.repoUrl,
-    license: "https://opensource.org/license/mit",
     author: { "@id": ORG_ID },
     publisher: { "@id": ORG_ID },
     url: `${site.url}/docs`,

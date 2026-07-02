@@ -33,7 +33,7 @@ export default function Nav() {
     >
       <nav className="shell flex h-16 items-center justify-between">
         <a
-          href="#top"
+          href="/"
           className="font-display text-lg font-semibold tracking-tightest text-fg"
         >
           {site.wordmark}

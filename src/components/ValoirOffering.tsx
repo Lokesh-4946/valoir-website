@@ -2,6 +2,7 @@
 
 import { sections } from "@/content/content";
 import { MaskReveal, Reveal } from "./Reveal";
+import MagneticButton from "./MagneticButton";
 
 export default function ValoirOffering() {
   const section = sections.offering;
@@ -29,6 +30,14 @@ export default function ValoirOffering() {
           </Reveal>
         ))}
       </div>
+
+      <Reveal delay={0.08} className="mt-12 flex flex-wrap gap-4">
+        {section.ctas.map((cta) => (
+          <MagneticButton key={cta.label} href={cta.href} variant={cta.variant}>
+            {cta.label}
+          </MagneticButton>
+        ))}
+      </Reveal>
     </section>
   );
 }
