@@ -1,7 +1,8 @@
 import { fail, rejectUnknownFields, requireBoolean, requireIdentity, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
 import { normalizedHash } from './hash.mjs';
+import { validateScopeExceptions } from './scope.mjs';
 
-const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'risk_level', 'ui_changes', 'security_sensitive', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
+const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'risk_level', 'ui_changes', 'security_sensitive', 'scope_exceptions', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
 const FINDING_FIELDS = ['id', 'priority', 'category', 'file', 'line_start', 'line_end', 'evidence', 'required_change', 'status', 'adjudication_rationale'];
 const RIZZ_EVIDENCE_FIELDS = ['cli_version', 'true_positives', 'false_positives', 'missed_findings', 'useful_prompts', 'investigation_minutes_saved'];
 
@@ -72,6 +73,7 @@ export function validateReview(review, context) {
   if (!['low', 'medium', 'high'].includes(review.risk_level)) fail('invalid_risk_level', '$.risk_level', 'must be low, medium, or high');
   requireBoolean(review.ui_changes, '$.ui_changes');
   requireBoolean(review.security_sensitive, '$.security_sensitive');
+  validateScopeExceptions(review.scope_exceptions);
   if (review.ui_changes !== uiChanges) fail('applicability_mismatch', '$.ui_changes', 'must match independently supplied UI applicability');
   if (!Array.isArray(review.reviewers)) fail('invalid_type', '$.reviewers', 'must be an array');
   const reviewerRoles = new Set();

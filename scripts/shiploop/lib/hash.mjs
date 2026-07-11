@@ -12,6 +12,15 @@ export function normalizedHash(value) {
   return createHash('sha256').update(JSON.stringify(normalized(value))).digest('hex');
 }
 
-export function certificateHash({ mission, review, requiredChecks, reviewedSha }) {
-  return normalizedHash({ mission, review, required_checks: requiredChecks, reviewed_sha: reviewedSha });
+export function normalizedChangedPaths(changes) {
+  const paths = changes.flatMap((change) => change.oldPath ? [change.oldPath, change.path] : [change.path]);
+  return [...new Set(paths)].sort();
+}
+
+export function changedPathsHash(changes) {
+  return normalizedHash(normalizedChangedPaths(changes));
+}
+
+export function certificateHash({ mission, review, requiredChecks, reviewedSha, changedPaths = [] }) {
+  return normalizedHash({ mission, review, required_checks: requiredChecks, reviewed_sha: reviewedSha, changed_paths_hash: changedPathsHash(changedPaths) });
 }

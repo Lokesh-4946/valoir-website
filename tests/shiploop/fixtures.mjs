@@ -1,8 +1,9 @@
-import { certificateHash, normalizedHash } from '../../scripts/shiploop/lib/hash.mjs';
+import { certificateHash, changedPathsHash, normalizedHash } from '../../scripts/shiploop/lib/hash.mjs';
 
 export const HEAD_SHA = 'a'.repeat(40);
 export const BASE_SHA = 'b'.repeat(40);
 export const NOW = '2026-07-11T10:00:00.000Z';
+export const WEBSITE_CHANGES = [{ status: 'M', path: 'src/app/page.tsx', kind: 'file' }, { status: 'A', path: 'tests/ui/release.spec.ts', kind: 'file' }];
 
 export function websiteFixture() {
   const mission = {
@@ -44,6 +45,7 @@ export function websiteFixture() {
     risk_level: 'medium',
     ui_changes: true,
     security_sensitive: false,
+    scope_exceptions: [],
     reviewers: [
       { id: 'reviewer-a', role: 'intent-architecture' },
       { id: 'reviewer-b', role: 'correctness-risk' },
@@ -74,8 +76,9 @@ export function websiteFixture() {
     adjudicator: review.adjudicator,
     generated_at: '2026-07-11T09:30:00.000Z',
     expires_at: '2026-07-12T09:30:00.000Z',
+    changed_paths_hash: changedPathsHash(WEBSITE_CHANGES),
   };
-  certificate.certificate_hash = certificateHash({ mission, review, requiredChecks, reviewedSha: HEAD_SHA });
+  certificate.certificate_hash = certificateHash({ mission, review, requiredChecks, reviewedSha: HEAD_SHA, changedPaths: WEBSITE_CHANGES });
   return { mission, policy, review, certificate };
 }
 
@@ -103,6 +106,6 @@ export function rizzFixture() {
   fixture.certificate.review_artifact_hash = normalizedHash(fixture.review);
   fixture.certificate.required_checks = fixture.mission.required_checks.map((name) => ({ name, conclusion: 'success', sha: HEAD_SHA }));
   fixture.certificate.preview = { required: false, conclusion: 'not_required', sha: HEAD_SHA };
-  fixture.certificate.certificate_hash = certificateHash({ mission: fixture.mission, review: fixture.review, requiredChecks: fixture.certificate.required_checks, reviewedSha: HEAD_SHA });
+  fixture.certificate.certificate_hash = certificateHash({ mission: fixture.mission, review: fixture.review, requiredChecks: fixture.certificate.required_checks, reviewedSha: HEAD_SHA, changedPaths: WEBSITE_CHANGES });
   return fixture;
 }

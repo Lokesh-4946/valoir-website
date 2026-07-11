@@ -1,12 +1,18 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
 import { parsePolicy, validatePolicy } from '../../scripts/shiploop/lib/policy.mjs';
 import { validateMission } from '../../scripts/shiploop/lib/mission.mjs';
 import { validateReview } from '../../scripts/shiploop/lib/review.mjs';
 import { validateCertificate } from '../../scripts/shiploop/lib/certificate.mjs';
 import { validateArtifactSet } from '../../scripts/shiploop/lib/artifacts.mjs';
-import { certificateHash, normalizedHash } from '../../scripts/shiploop/lib/hash.mjs';
-import { BASE_SHA, HEAD_SHA, NOW, rizzFixture, websiteFixture } from './fixtures.mjs';
+import { certificateHash, changedPathsHash, normalizedHash } from '../../scripts/shiploop/lib/hash.mjs';
+import { deriveChangedPaths, parseNameStatus } from '../../scripts/shiploop/lib/git-changes.mjs';
+import { validateChangedPaths } from '../../scripts/shiploop/lib/scope.mjs';
+import { BASE_SHA, HEAD_SHA, NOW, WEBSITE_CHANGES, rizzFixture, websiteFixture } from './fixtures.mjs';
 
 function expectCode(code, operation) {
   assert.throws(operation, (error) => error?.errors?.some((item) => item.code === code));
@@ -15,7 +21,7 @@ function expectCode(code, operation) {
 test('complete website and Rizz fixtures pass', () => {
   for (const fixture of [websiteFixture(), rizzFixture()]) {
     const uiChanges = fixture.policy.profile === 'valoir-shiploop';
-    assert.doesNotThrow(() => validateArtifactSet(fixture, { headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges }));
+    assert.doesNotThrow(() => validateArtifactSet(fixture, { headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges, changedPaths: WEBSITE_CHANGES }));
   }
 });
 
@@ -96,17 +102,17 @@ test('missing, failed, stale, or recursive checks fail', () => {
   for (const [code, mutate] of mutations) {
     const fixture = websiteFixture();
     mutate(fixture);
-    expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW }));
+    expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, changedPaths: WEBSITE_CHANGES }));
   }
 });
 
 test('expired or overlong certificates fail', () => {
   const expired = websiteFixture();
   expired.certificate.expires_at = '2026-07-11T09:59:59.000Z';
-  expectCode('certificate_expired', () => validateCertificate(expired.certificate, { mission: expired.mission, review: expired.review, policy: expired.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW }));
+  expectCode('certificate_expired', () => validateCertificate(expired.certificate, { mission: expired.mission, review: expired.review, policy: expired.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, changedPaths: WEBSITE_CHANGES }));
   const overlong = websiteFixture();
   overlong.certificate.expires_at = '2026-07-13T09:30:00.000Z';
-  expectCode('certificate_ttl_exceeded', () => validateCertificate(overlong.certificate, { mission: overlong.mission, review: overlong.review, policy: overlong.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW }));
+  expectCode('certificate_ttl_exceeded', () => validateCertificate(overlong.certificate, { mission: overlong.mission, review: overlong.review, policy: overlong.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, changedPaths: WEBSITE_CHANGES }));
 });
 
 test('modified mission, modified review, forged hash, and stale certificate fail', () => {
@@ -119,7 +125,7 @@ test('modified mission, modified review, forged hash, and stale certificate fail
   for (const [code, mutate] of cases) {
     const fixture = websiteFixture();
     mutate(fixture);
-    expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW }));
+    expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, changedPaths: WEBSITE_CHANGES }));
   }
 });
 
@@ -150,13 +156,13 @@ test('finding buckets enforce statuses and globally unique stable IDs', () => {
 test('preview evidence is derived from policy and UI-change applicability', () => {
   const uiChange = websiteFixture();
   uiChange.certificate.preview = { required: false, conclusion: 'not_required', sha: HEAD_SHA };
-  expectCode('preview_required', () => validateCertificate(uiChange.certificate, { mission: uiChange.mission, review: uiChange.review, policy: uiChange.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
+  expectCode('preview_required', () => validateCertificate(uiChange.certificate, { mission: uiChange.mission, review: uiChange.review, policy: uiChange.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true, changedPaths: WEBSITE_CHANGES }));
   const nonUi = websiteFixture();
   nonUi.review.ui_changes = false;
   nonUi.certificate.review_artifact_hash = normalizedHash(nonUi.review);
-  nonUi.certificate.certificate_hash = certificateHash({ mission: nonUi.mission, review: nonUi.review, requiredChecks: nonUi.certificate.required_checks, reviewedSha: HEAD_SHA });
+  nonUi.certificate.certificate_hash = certificateHash({ mission: nonUi.mission, review: nonUi.review, requiredChecks: nonUi.certificate.required_checks, reviewedSha: HEAD_SHA, changedPaths: WEBSITE_CHANGES });
   nonUi.certificate.preview = { required: true, conclusion: 'success', sha: HEAD_SHA };
-  assert.doesNotThrow(() => validateCertificate(nonUi.certificate, { mission: nonUi.mission, review: nonUi.review, policy: nonUi.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: false }));
+  assert.doesNotThrow(() => validateCertificate(nonUi.certificate, { mission: nonUi.mission, review: nonUi.review, policy: nonUi.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: false, changedPaths: WEBSITE_CHANGES }));
 });
 
 test('intent failure or uncertainty is allowed only for negative verdicts', () => {
@@ -195,13 +201,13 @@ test('repository paths reject schemes, absolute paths, drive paths, and traversa
 });
 
 test('certificate time is causal and obeys review <= certificate <= now < expiry', () => {
-  const contexts = (fixture, now) => ({ mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now });
+  const contexts = (fixture, now) => ({ mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now, changedPaths: WEBSITE_CHANGES });
   const invalidNow = websiteFixture();
   expectCode('invalid_now', () => validateCertificate(invalidNow.certificate, contexts(invalidNow, 'not-a-time')));
   const reviewAfterCertificate = websiteFixture();
   reviewAfterCertificate.review.generated_at = '2026-07-11T09:31:00.000Z';
   reviewAfterCertificate.certificate.review_artifact_hash = normalizedHash(reviewAfterCertificate.review);
-  reviewAfterCertificate.certificate.certificate_hash = certificateHash({ mission: reviewAfterCertificate.mission, review: reviewAfterCertificate.review, requiredChecks: reviewAfterCertificate.certificate.required_checks, reviewedSha: HEAD_SHA });
+  reviewAfterCertificate.certificate.certificate_hash = certificateHash({ mission: reviewAfterCertificate.mission, review: reviewAfterCertificate.review, requiredChecks: reviewAfterCertificate.certificate.required_checks, reviewedSha: HEAD_SHA, changedPaths: WEBSITE_CHANGES });
   expectCode('noncausal_timestamp', () => validateCertificate(reviewAfterCertificate.certificate, contexts(reviewAfterCertificate, NOW)));
   const futureCertificate = websiteFixture();
   expectCode('noncausal_timestamp', () => validateCertificate(futureCertificate.certificate, contexts(futureCertificate, '2026-07-11T09:29:59.000Z')));
@@ -315,7 +321,7 @@ test('CI baseline requires nonempty mission checks and certificate cross-enforce
   const fixture = websiteFixture();
   fixture.mission.required_checks = [];
   expectCode('missing_required_check', () => validateMission(fixture.mission));
-  expectCode('missing_required_check', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
+  expectCode('missing_required_check', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true, changedPaths: WEBSITE_CHANGES }));
 });
 
 test('multi-role review remains forbidden across every applicability class', () => {
@@ -353,9 +359,9 @@ test('preview conclusions are strict and consistent with required state', () => 
     const fixture = websiteFixture();
     fixture.review.ui_changes = uiChanges;
     fixture.certificate.review_artifact_hash = normalizedHash(fixture.review);
-    fixture.certificate.certificate_hash = certificateHash({ mission: fixture.mission, review: fixture.review, requiredChecks: fixture.certificate.required_checks, reviewedSha: HEAD_SHA });
+    fixture.certificate.certificate_hash = certificateHash({ mission: fixture.mission, review: fixture.review, requiredChecks: fixture.certificate.required_checks, reviewedSha: HEAD_SHA, changedPaths: WEBSITE_CHANGES });
     fixture.certificate.preview = preview;
-    expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges }));
+    expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges, changedPaths: WEBSITE_CHANGES }));
   }
 });
 
@@ -371,7 +377,7 @@ test('schema v1 forbids multi-role reviewers even when low risk', () => {
 test('now must be strict canonical RFC3339', () => {
   for (const now of ['July 11 2026 10:00 UTC', '2026-02-30T10:00:00.000Z', '2026-07-11T10:00:00+00:00']) {
     const fixture = websiteFixture();
-    expectCode('invalid_now', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now, uiChanges: true }));
+    expectCode('invalid_now', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now, uiChanges: true, changedPaths: WEBSITE_CHANGES }));
   }
 });
 
@@ -398,4 +404,75 @@ test('artifact timestamps enforce mission <= review <= certificate <= now < expi
   missionEqualsReview.mission.created_at = missionEqualsReview.review.generated_at;
   missionEqualsReview.review.mission_contract_hash = normalizedHash(missionEqualsReview.mission);
   assert.doesNotThrow(() => validateReview(missionEqualsReview.review, { mission: missionEqualsReview.mission, policy: missionEqualsReview.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+});
+
+test('trusted Git changed paths enforce expected and forbidden scope with segment boundaries', () => {
+  const fixture = websiteFixture();
+  expectCode('scope_violation', () => validateChangedPaths([{ status: 'M', path: 'src-evil/a.ts', kind: 'file' }], fixture.mission, fixture.review));
+  expectCode('forbidden_path', () => validateChangedPaths([{ status: 'A', path: 'secrets/token.txt', kind: 'file' }], fixture.mission, fixture.review));
+  assert.doesNotThrow(() => validateChangedPaths(WEBSITE_CHANGES, fixture.mission, fixture.review));
+});
+
+test('renames and deletes validate every actual old and new path', () => {
+  const fixture = websiteFixture();
+  expectCode('scope_violation', () => validateChangedPaths([{ status: 'R', oldPath: 'outside/a.ts', path: 'src/a.ts', kind: 'file' }], fixture.mission, fixture.review));
+  expectCode('scope_violation', () => validateChangedPaths([{ status: 'D', path: 'outside/deleted.ts', kind: 'file' }], fixture.mission, fixture.review));
+});
+
+test('out-of-scope paths require strict independently adjudicated exceptions', () => {
+  const fixture = websiteFixture();
+  fixture.review.scope_exceptions = [{ path: 'docs/release.md', evidence: 'Release note required by acceptance.', adjudication_rationale: 'Independent adjudicator approved this bounded exception.' }];
+  assert.doesNotThrow(() => validateChangedPaths([{ status: 'A', path: 'docs/release.md', kind: 'file' }], fixture.mission, fixture.review));
+  fixture.review.scope_exceptions[0].path = 'docs/';
+  expectCode('scope_violation', () => validateChangedPaths([{ status: 'A', path: 'docs/other.md', kind: 'file' }], fixture.mission, fixture.review));
+});
+
+test('trusted changed paths reject traversal, symlinks, and malformed statuses', () => {
+  const fixture = websiteFixture();
+  for (const [code, change] of [
+    ['path_traversal', { status: 'M', path: '../src/a.ts', kind: 'file' }],
+    ['symlink_change', { status: 'A', path: 'src/link', kind: 'symlink' }],
+    ['invalid_change_status', { status: 'X', path: 'src/a.ts', kind: 'file' }],
+  ]) expectCode(code, () => validateChangedPaths([change], fixture.mission, fixture.review));
+});
+
+test('Git name-status parser handles rename/delete records and rejects truncated data', () => {
+  assert.deepEqual(parseNameStatus('R100\0src/old.ts\0src/new.ts\0D\0src/gone.ts\0'), [
+    { status: 'R', oldPath: 'src/old.ts', path: 'src/new.ts' },
+    { status: 'D', path: 'src/gone.ts' },
+  ]);
+  expectCode('invalid_git_diff', () => parseNameStatus('R100\0src/old.ts\0'));
+});
+
+test('certificate binds the normalized trusted changed-path set', () => {
+  const fixture = websiteFixture();
+  assert.equal(fixture.certificate.changed_paths_hash, changedPathsHash([...WEBSITE_CHANGES].reverse()));
+  const changed = [...WEBSITE_CHANGES, { status: 'M', path: 'src/app/other.tsx', kind: 'file' }];
+  expectCode('changed_paths_hash_mismatch', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true, changedPaths: changed }));
+});
+
+test('Git derivation rejects nonexistent and stale SHAs and detects symlinks', async () => {
+  const cwd = await mkdtemp(join(tmpdir(), 'shiploop-git-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  try {
+    git('init', '-q');
+    await writeFile(join(cwd, 'base.txt'), 'base\n');
+    git('add', '.');
+    git('-c', 'user.name=Shiploop', '-c', 'user.email=shiploop@example.invalid', 'commit', '-qm', 'base');
+    const baseSha = git('rev-parse', 'HEAD');
+    await writeFile(join(cwd, 'next.txt'), 'next\n');
+    git('add', '.');
+    git('-c', 'user.name=Shiploop', '-c', 'user.email=shiploop@example.invalid', 'commit', '-qm', 'next');
+    const staleHead = git('rev-parse', 'HEAD');
+    await symlink('base.txt', join(cwd, 'linked.txt'));
+    git('add', '.');
+    git('-c', 'user.name=Shiploop', '-c', 'user.email=shiploop@example.invalid', 'commit', '-qm', 'symlink');
+    const headSha = git('rev-parse', 'HEAD');
+    expectCode('invalid_git_sha', () => deriveChangedPaths({ baseSha, headSha: 'f'.repeat(40), cwd }));
+    expectCode('stale_head_sha', () => deriveChangedPaths({ baseSha, headSha: staleHead, cwd }));
+    const changes = deriveChangedPaths({ baseSha, headSha, cwd });
+    assert.equal(changes.find(({ path }) => path === 'linked.txt')?.kind, 'symlink');
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
 });
