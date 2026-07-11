@@ -23,6 +23,11 @@ export function requireString(value, path) {
   if (typeof value !== 'string' || value.trim() === '') fail('invalid_type', path, 'must be a non-empty string');
 }
 
+export function requireIdentity(value, path) {
+  requireString(value, path);
+  if (value !== value.trim()) fail('invalid_identity', path, 'must not contain surrounding whitespace');
+}
+
 export function requireStringArray(value, path) {
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string' || item.trim() === '')) fail('invalid_type', path, 'must be an array of non-empty strings');
 }
@@ -52,6 +57,6 @@ export function rejectUnknownFields(value, allowed, path = '$') {
 
 export function requireSafePath(value, path) {
   requireString(value, path);
-  if (value.startsWith('/') || value.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(value)) fail('unsafe_path', path, 'must be repository-relative');
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(value) || value.startsWith('/') || value.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(value)) fail('unsafe_path', path, 'must be repository-relative and contain no URL or file scheme');
   if (value.split(/[\\/]/).includes('..')) fail('path_traversal', path, 'must not traverse outside the repository');
 }

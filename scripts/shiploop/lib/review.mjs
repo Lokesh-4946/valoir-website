@@ -1,8 +1,9 @@
-import { fail, rejectUnknownFields, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
+import { fail, rejectUnknownFields, requireIdentity, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
 import { normalizedHash } from './hash.mjs';
 
 const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at'];
 const FINDING_FIELDS = ['id', 'priority', 'category', 'file', 'line_start', 'line_end', 'evidence', 'required_change', 'status', 'adjudication_rationale'];
+const RIZZ_EVIDENCE_FIELDS = ['cli_version', 'true_positives', 'false_positives', 'missed_findings', 'useful_prompts', 'investigation_minutes_saved'];
 
 function validateFinding(finding, path) {
   requireObject(finding, path);
@@ -14,6 +15,17 @@ function validateFinding(finding, path) {
   if (finding.line_start !== undefined) requireInteger(finding.line_start, `${path}.line_start`);
   if (finding.line_end !== undefined) requireInteger(finding.line_end, `${path}.line_end`);
   if (finding.line_start !== undefined && finding.line_end !== undefined && finding.line_end < finding.line_start) fail('invalid_line_range', path, 'line_end must not precede line_start');
+}
+
+function validateRizzEvidence(evidence) {
+  requireObject(evidence, '$.rizz_evidence');
+  rejectUnknownFields(evidence, RIZZ_EVIDENCE_FIELDS, '$.rizz_evidence');
+  requireString(evidence.cli_version, '$.rizz_evidence.cli_version');
+  for (const field of ['true_positives', 'false_positives', 'missed_findings', 'investigation_minutes_saved']) {
+    requireInteger(evidence[field], `$.rizz_evidence.${field}`);
+    if (evidence[field] < 0) fail('invalid_rizz_evidence', `$.rizz_evidence.${field}`, 'must be non-negative');
+  }
+  requireStringArray(evidence.useful_prompts, '$.rizz_evidence.useful_prompts');
 }
 
 export function validateReview(review, { mission, policy, headSha, baseSha }) {
@@ -28,23 +40,32 @@ export function validateReview(review, { mission, policy, headSha, baseSha }) {
   requireString(review.mission_contract_id, '$.mission_contract_id');
   if (review.mission_contract_id !== mission.contract_id) fail('mission_contract_mismatch', '$.mission_contract_id', 'must match the mission');
   if (review.mission_contract_hash !== normalizedHash(mission)) fail('mission_hash_mismatch', '$.mission_contract_hash', 'mission changed after review');
-  for (const field of ['implementation_owner', 'adjudicator']) requireString(review[field], `$.${field}`);
+  for (const field of ['implementation_owner', 'adjudicator']) requireIdentity(review[field], `$.${field}`);
   if (review.implementation_owner === review.adjudicator) fail('self_review', '$.adjudicator', 'implementation owner cannot adjudicate');
   if (!Array.isArray(review.reviewers)) fail('invalid_type', '$.reviewers', 'must be an array');
   const reviewerRoles = new Set();
   for (const [index, reviewer] of review.reviewers.entries()) {
     requireObject(reviewer, `$.reviewers[${index}]`);
     rejectUnknownFields(reviewer, ['id', 'role'], `$.reviewers[${index}]`);
-    requireString(reviewer.id, `$.reviewers[${index}].id`);
+    requireIdentity(reviewer.id, `$.reviewers[${index}].id`);
     requireString(reviewer.role, `$.reviewers[${index}].role`);
     if (reviewer.id === review.implementation_owner) fail('self_review', `$.reviewers[${index}].id`, 'implementation owner cannot review');
     reviewerRoles.add(reviewer.role);
   }
+  if (review.verdict === 'APPROVE' && review.reviewers.length === 0) fail('missing_reviewer', '$.reviewers', 'approval requires reviewer evidence');
   for (const role of policy.required_reviewers) if (!reviewerRoles.has(role)) fail('missing_reviewer', '$.reviewers', `missing required reviewer role ${role}`);
-  if (review.intent_alignment !== 'pass') fail('intent_misalignment', '$.intent_alignment', 'must pass before approval');
+  if (!['pass', 'fail', 'uncertain'].includes(review.intent_alignment)) fail('invalid_intent_alignment', '$.intent_alignment', 'must be pass, fail, or uncertain');
+  if (review.verdict === 'APPROVE' && review.intent_alignment !== 'pass') fail('intent_misalignment', '$.intent_alignment', 'must pass before approval');
+  const findingIds = new Set();
   for (const field of ['findings', 'resolved_findings']) {
     if (!Array.isArray(review[field])) fail('invalid_type', `$.${field}`, 'must be an array');
-    review[field].forEach((finding, index) => validateFinding(finding, `$.${field}[${index}]`));
+    review[field].forEach((finding, index) => {
+      validateFinding(finding, `$.${field}[${index}]`);
+      const expectedStatuses = field === 'findings' ? ['open'] : ['resolved', 'rejected'];
+      if (!expectedStatuses.includes(finding.status)) fail('finding_bucket_mismatch', `$.${field}[${index}].status`, `status is inconsistent with ${field}`);
+      if (findingIds.has(finding.id)) fail('duplicate_finding_id', `$.${field}[${index}].id`, 'finding IDs must be globally unique');
+      findingIds.add(finding.id);
+    });
   }
   const blocking = review.findings.find((finding) => policy.blocking_priorities.includes(finding.priority) && finding.status === 'open');
   if (blocking && review.verdict === 'APPROVE') fail('blocking_finding', '$.findings', `${blocking.id} blocks approval`);
@@ -57,6 +78,6 @@ export function validateReview(review, { mission, policy, headSha, baseSha }) {
   if (!['APPROVE', 'REQUEST_CHANGES', 'BLOCKED'].includes(review.verdict)) fail('invalid_verdict', '$.verdict', 'is not allowed');
   if (review.iteration === policy.max_iterations && review.verdict === 'REQUEST_CHANGES') fail('iteration_cap_requires_blocked', '$.verdict', 'the final unsuccessful iteration must be BLOCKED');
   requireTimestamp(review.generated_at, '$.generated_at');
-  if (policy.profile === 'rizz-reviewloop') requireObject(review.rizz_evidence, '$.rizz_evidence');
+  if (policy.profile === 'rizz-reviewloop') validateRizzEvidence(review.rizz_evidence);
   return review;
 }

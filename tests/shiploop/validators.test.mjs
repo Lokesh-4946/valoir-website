@@ -5,6 +5,7 @@ import { validateMission } from '../../scripts/shiploop/lib/mission.mjs';
 import { validateReview } from '../../scripts/shiploop/lib/review.mjs';
 import { validateCertificate } from '../../scripts/shiploop/lib/certificate.mjs';
 import { validateArtifactSet } from '../../scripts/shiploop/lib/artifacts.mjs';
+import { certificateHash, normalizedHash } from '../../scripts/shiploop/lib/hash.mjs';
 import { BASE_SHA, HEAD_SHA, NOW, rizzFixture, websiteFixture } from './fixtures.mjs';
 
 function expectCode(code, operation) {
@@ -13,7 +14,8 @@ function expectCode(code, operation) {
 
 test('complete website and Rizz fixtures pass', () => {
   for (const fixture of [websiteFixture(), rizzFixture()]) {
-    assert.doesNotThrow(() => validateArtifactSet(fixture, { headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW }));
+    const uiChanges = fixture.policy.profile === 'valoir-shiploop';
+    assert.doesNotThrow(() => validateArtifactSet(fixture, { headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges }));
   }
 });
 
@@ -118,5 +120,98 @@ test('modified mission, modified review, forged hash, and stale certificate fail
     const fixture = websiteFixture();
     mutate(fixture);
     expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW }));
+  }
+});
+
+test('policy requires a nonempty reviewer panel and approval requires actual reviewer coverage', () => {
+  const fixture = websiteFixture();
+  expectCode('invalid_type', () => validatePolicy({ ...fixture.policy, required_reviewers: [] }));
+  const emptyCoverage = websiteFixture();
+  emptyCoverage.policy.required_reviewers = [];
+  emptyCoverage.review.reviewers = [];
+  expectCode('missing_reviewer', () => validateReview(emptyCoverage.review, { mission: emptyCoverage.mission, policy: emptyCoverage.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+});
+
+test('finding buckets enforce statuses and globally unique stable IDs', () => {
+  const finding = { id: 'F-1', priority: 'P3', category: 'docs', file: 'src/a.ts', evidence: 'Typo.', required_change: 'Correct it.', status: 'resolved', adjudication_rationale: 'Fixed.' };
+  const wrongActive = websiteFixture();
+  wrongActive.review.findings = [finding];
+  expectCode('finding_bucket_mismatch', () => validateReview(wrongActive.review, { mission: wrongActive.mission, policy: wrongActive.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const wrongResolved = websiteFixture();
+  wrongResolved.review.resolved_findings = [{ ...finding, status: 'open' }];
+  expectCode('finding_bucket_mismatch', () => validateReview(wrongResolved.review, { mission: wrongResolved.mission, policy: wrongResolved.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const duplicate = websiteFixture();
+  duplicate.review.findings = [{ ...finding, status: 'open' }];
+  duplicate.review.resolved_findings = [finding];
+  duplicate.review.verdict = 'REQUEST_CHANGES';
+  expectCode('duplicate_finding_id', () => validateReview(duplicate.review, { mission: duplicate.mission, policy: duplicate.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+});
+
+test('preview evidence is derived from policy and UI-change applicability', () => {
+  const uiChange = websiteFixture();
+  uiChange.certificate.preview = { required: false, conclusion: 'not_required', sha: HEAD_SHA };
+  expectCode('preview_required', () => validateCertificate(uiChange.certificate, { mission: uiChange.mission, review: uiChange.review, policy: uiChange.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
+  const nonUi = websiteFixture();
+  nonUi.certificate.preview = { required: true, conclusion: 'success', sha: HEAD_SHA };
+  assert.doesNotThrow(() => validateCertificate(nonUi.certificate, { mission: nonUi.mission, review: nonUi.review, policy: nonUi.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: false }));
+});
+
+test('intent failure or uncertainty is allowed only for negative verdicts', () => {
+  for (const intent_alignment of ['fail', 'uncertain']) {
+    const negative = websiteFixture();
+    negative.review.intent_alignment = intent_alignment;
+    negative.review.verdict = 'BLOCKED';
+    assert.doesNotThrow(() => validateReview(negative.review, { mission: negative.mission, policy: negative.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+    const approved = websiteFixture();
+    approved.review.intent_alignment = intent_alignment;
+    expectCode('intent_misalignment', () => validateReview(approved.review, { mission: approved.mission, policy: approved.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  }
+});
+
+test('Rizz evidence is strict, typed, and rejects unknown fields', () => {
+  const unknown = rizzFixture();
+  unknown.review.rizz_evidence.secret = 'no';
+  expectCode('unknown_field', () => validateReview(unknown.review, { mission: unknown.mission, policy: unknown.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const badCount = rizzFixture();
+  badCount.review.rizz_evidence.true_positives = -1;
+  expectCode('invalid_rizz_evidence', () => validateReview(badCount.review, { mission: badCount.mission, policy: badCount.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const badPrompts = rizzFixture();
+  badPrompts.review.rizz_evidence.useful_prompts = [1];
+  expectCode('invalid_type', () => validateReview(badPrompts.review, { mission: badPrompts.mission, policy: badPrompts.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+});
+
+test('repository paths reject schemes, absolute paths, drive paths, and traversal', () => {
+  for (const unsafe of ['https://example.com/proof', 'file:///tmp/proof', '/tmp/proof', 'C:\\proof', '..\\proof']) {
+    const fixture = websiteFixture();
+    fixture.mission.expected_paths = [unsafe];
+    expectCode(unsafe.includes('..') ? 'path_traversal' : 'unsafe_path', () => validateMission(fixture.mission));
+  }
+});
+
+test('certificate time is causal and obeys review <= certificate <= now < expiry', () => {
+  const contexts = (fixture, now) => ({ mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now });
+  const invalidNow = websiteFixture();
+  expectCode('invalid_now', () => validateCertificate(invalidNow.certificate, contexts(invalidNow, 'not-a-time')));
+  const reviewAfterCertificate = websiteFixture();
+  reviewAfterCertificate.review.generated_at = '2026-07-11T09:31:00.000Z';
+  reviewAfterCertificate.certificate.review_artifact_hash = normalizedHash(reviewAfterCertificate.review);
+  reviewAfterCertificate.certificate.certificate_hash = certificateHash({ mission: reviewAfterCertificate.mission, review: reviewAfterCertificate.review, requiredChecks: reviewAfterCertificate.certificate.required_checks, reviewedSha: HEAD_SHA });
+  expectCode('noncausal_timestamp', () => validateCertificate(reviewAfterCertificate.certificate, contexts(reviewAfterCertificate, NOW)));
+  const futureCertificate = websiteFixture();
+  expectCode('noncausal_timestamp', () => validateCertificate(futureCertificate.certificate, contexts(futureCertificate, '2026-07-11T09:29:59.000Z')));
+  const expiryEquality = websiteFixture();
+  expectCode('certificate_expired', () => validateCertificate(expiryEquality.certificate, contexts(expiryEquality, expiryEquality.certificate.expires_at)));
+});
+
+test('identities must be trimmed and contain no surrounding whitespace', () => {
+  for (const mutate of [
+    (f) => { f.mission.approved_by = ' product-owner'; },
+    (f) => { f.review.implementation_owner = 'implementer-1 '; },
+    (f) => { f.review.adjudicator = '\tadjudicator-1'; },
+    (f) => { f.review.reviewers[0].id = ' reviewer-a '; },
+  ]) {
+    const fixture = websiteFixture();
+    mutate(fixture);
+    expectCode('invalid_identity', () => validateArtifactSet(fixture, { headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
   }
 });

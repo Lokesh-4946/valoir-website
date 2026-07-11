@@ -6,7 +6,7 @@ import { validateReview } from './review.mjs';
 
 const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'mission_contract_id', 'mission_contract_hash', 'review_artifact_hash', 'required_checks', 'preview', 'adjudicator', 'generated_at', 'expires_at', 'certificate_hash'];
 
-export function validateCertificate(certificate, { mission, review, policy, headSha, baseSha, now = new Date().toISOString() }) {
+export function validateCertificate(certificate, { mission, review, policy, headSha, baseSha, now = new Date().toISOString(), uiChanges }) {
   validateMission(mission);
   validatePolicy(policy);
   validateReview(review, { mission, policy, headSha, baseSha });
@@ -36,13 +36,18 @@ export function validateCertificate(certificate, { mission, review, policy, head
   requireObject(certificate.preview, '$.preview');
   rejectUnknownFields(certificate.preview, ['required', 'conclusion', 'sha'], '$.preview');
   requireBoolean(certificate.preview.required, '$.preview.required');
+  const previewRequired = policy.require_preview_when_ui_changes && uiChanges !== false;
+  if (previewRequired && !certificate.preview.required) fail('preview_required', '$.preview.required', 'policy and change applicability require preview evidence');
   if (certificate.preview.sha !== headSha) fail('preview_sha_mismatch', '$.preview.sha', 'preview is stale');
   if (certificate.preview.required && certificate.preview.conclusion !== 'success') fail('preview_failed', '$.preview.conclusion', 'required preview must succeed');
   requireTimestamp(certificate.generated_at, '$.generated_at');
   requireTimestamp(certificate.expires_at, '$.expires_at');
   const generated = Date.parse(certificate.generated_at);
   const expires = Date.parse(certificate.expires_at);
-  if (Date.parse(now) > expires) fail('certificate_expired', '$.expires_at', 'certificate has expired');
+  const current = Date.parse(now);
+  if (Number.isNaN(current)) fail('invalid_now', '$.now', 'must be a valid RFC3339 timestamp');
+  if (Date.parse(review.generated_at) > generated || generated > current) fail('noncausal_timestamp', '$.generated_at', 'must satisfy review <= certificate <= now');
+  if (current >= expires) fail('certificate_expired', '$.expires_at', 'certificate has expired');
   if (expires <= generated || expires - generated > policy.certificate_ttl_hours * 3_600_000) fail('certificate_ttl_exceeded', '$.expires_at', 'exceeds policy TTL');
   const expectedHash = certificateHash({ mission, review, requiredChecks: certificate.required_checks, reviewedSha: certificate.reviewed_sha });
   if (certificate.certificate_hash !== expectedHash) fail('forged_certificate_hash', '$.certificate_hash', 'does not match normalized evidence');
