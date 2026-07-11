@@ -65,7 +65,7 @@ export function websiteFixture() {
     unresolved_comment_count: 0,
     required_checks: ['build + typecheck', 'Vercel'],
     rizz_evidence: null,
-    publisher: { path: 'scripts/shiploop/publish-status.mjs', sha256: '1'.repeat(64) },
+    publisher: { entry_path: 'scripts/shiploop/publish-status.mjs', publisher_tree_sha: '1'.repeat(40) },
     verdict: 'APPROVE',
     generated_at: '2026-07-11T09:00:00.000Z',
   };

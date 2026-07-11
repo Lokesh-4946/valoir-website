@@ -63,9 +63,9 @@ test('standalone and composite mission authorization cardinality is explicit', (
   expectCode('invalid_intent_mode', () => validateMission(badMode.mission));
 });
 
-test('review binds the reviewed publisher path and SHA-256 hash', () => {
+test('review binds the trusted launcher and complete publisher tree SHA', () => {
   const fixture = websiteFixture();
-  fixture.review.publisher.sha256 = 'bad';
+  fixture.review.publisher.publisher_tree_sha = 'bad';
   expectCode('invalid_publisher_evidence', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
 });
 

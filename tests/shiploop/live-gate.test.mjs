@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { buildCertificate, requireExternalEvidencePath } from '../../scripts/shiploop/lib/runtime-evidence.mjs';
 import { validateLiveEvidence, validatePrNumber, verifyPublicationTarget } from '../../scripts/shiploop/lib/publication.mjs';
+import { verifyLauncherState } from '../../scripts/shiploop/publish-status.mjs';
 import { BASE_SHA, HEAD_SHA, NOW, WEBSITE_CHANGES, websiteFixture } from './fixtures.mjs';
 
 test('runtime certificate generation produces evidence that validates unchanged exact SHA', () => {
@@ -136,10 +137,24 @@ test('trusted duplicate evidence wins over an untrusted same-name record', () =>
 });
 
 test('publisher paginates all GitHub check and status evidence', async () => {
-  const source = await import('node:fs/promises').then(({ readFile }) => readFile('scripts/shiploop/publish-status.mjs', 'utf8'));
+  const source = await import('node:fs/promises').then(({ readFile }) => readFile('scripts/shiploop/publish-status-core.mjs', 'utf8'));
   assert.match(source, /check-runs[^\n]+--paginate/);
   assert.match(source, /statuses[^\n]+--paginate/);
   assert.match(source, /--slurp/);
+});
+
+test('trusted launcher rejects tracked and untracked dirt before privileged imports', () => {
+  const clean = { worktreeStatus: '', checkedOutSha: HEAD_SHA, remoteHeadSha: HEAD_SHA, reviewHeadSha: HEAD_SHA, actualTreeSha: BASE_SHA, reviewedTreeSha: BASE_SHA };
+  assert.equal(verifyLauncherState(clean), HEAD_SHA);
+  assert.throws(() => verifyLauncherState({ ...clean, worktreeStatus: ' M scripts/shiploop/lib/a.mjs' }), /dirty/);
+  assert.throws(() => verifyLauncherState({ ...clean, worktreeStatus: '?? scripts/shiploop/lib/evil.mjs' }), /dirty/);
+  assert.throws(() => verifyLauncherState({ ...clean, actualTreeSha: 'c'.repeat(40) }), /tree SHA/);
+});
+
+test('launcher has no repository imports before its guarded dynamic import', async () => {
+  const source = await import('node:fs/promises').then(({ readFile }) => readFile('scripts/shiploop/publish-status.mjs', 'utf8'));
+  assert.doesNotMatch(source, /^import .*from ['"]\.\//m);
+  assert.match(source, /verifyLauncherState[\s\S]+await import\(['"]\.\/publish-status-core\.mjs['"]\)/);
 });
 
 test('workflow checks out the immutable PR head instead of the synthetic merge ref', async () => {

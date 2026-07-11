@@ -116,9 +116,10 @@ export function validateReview(review, context) {
   requireStringArray(review.required_checks, '$.required_checks');
   rejectReservedCheckContexts(review.required_checks);
   requireObject(review.publisher, '$.publisher');
-  rejectUnknownFields(review.publisher, ['path', 'sha256'], '$.publisher');
-  requireSafePath(review.publisher.path, '$.publisher.path');
-  if (typeof review.publisher.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(review.publisher.sha256)) fail('invalid_publisher_evidence', '$.publisher.sha256', 'must be a lowercase SHA-256 hash');
+  rejectUnknownFields(review.publisher, ['entry_path', 'publisher_tree_sha'], '$.publisher');
+  requireSafePath(review.publisher.entry_path, '$.publisher.entry_path');
+  if (review.publisher.entry_path !== 'scripts/shiploop/publish-status.mjs') fail('invalid_publisher_evidence', '$.publisher.entry_path', 'must bind the trusted launcher');
+  if (typeof review.publisher.publisher_tree_sha !== 'string' || !/^[0-9a-f]{40}$/.test(review.publisher.publisher_tree_sha)) fail('invalid_publisher_evidence', '$.publisher.publisher_tree_sha', 'must be a lowercase Git tree SHA');
   for (const check of mission.required_checks) if (!review.required_checks.includes(check)) fail('missing_required_check', '$.required_checks', `missing ${check}`);
   if (!['APPROVE', 'REQUEST_CHANGES', 'BLOCKED'].includes(review.verdict)) fail('invalid_verdict', '$.verdict', 'is not allowed');
   if (review.verdict === 'BLOCKED') validateBlockedEvidence(review);

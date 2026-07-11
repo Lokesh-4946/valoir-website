@@ -44,8 +44,9 @@ commands from `package.json` and the checked-in scripts, then invoke them with `
    trusted check issuer/workflow provenance, and deterministic hash. Never substitute prose.
 9. Do not execute a pending-status publisher from PR-controlled code. The trusted orchestrator may
    publish `pending` directly with authenticated `gh` only after committed-gate validation. Invoke
-   the success publisher only after independent review, and require its repository path and SHA-256
-   hash in the reviewed evidence to match the exact reviewed head.
+   the success publisher only after independent review, and require its launcher path and complete
+   `scripts/shiploop` Git tree SHA in reviewed evidence. The builtins-only launcher must reject any
+   tracked or untracked dirt before dynamically importing privileged publisher modules.
 10. Report `merge-ready` only when the `valoir-shiploop` check and all certificate gates pass.
 
 Merge readiness is evidence, not authority to merge. After authorized merge, verify dev separately;
