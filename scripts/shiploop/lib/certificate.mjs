@@ -1,4 +1,4 @@
-import { fail, rejectUnknownFields, requireBoolean, requireObject, requireSchema, requireSha, requireString, requireTimestamp } from './errors.mjs';
+import { fail, rejectUnknownFields, requireBoolean, requireIdentity, requireObject, requireSchema, requireSha, requireString, requireTimestamp } from './errors.mjs';
 import { certificateHash, normalizedHash } from './hash.mjs';
 import { validateMission } from './mission.mjs';
 import { validatePolicy } from './policy.mjs';
@@ -20,7 +20,8 @@ export function validateCertificate(certificate, { mission, review, policy, head
   if (certificate.mission_contract_id !== mission.contract_id) fail('mission_contract_mismatch', '$.mission_contract_id', 'must match mission');
   if (certificate.mission_contract_hash !== normalizedHash(mission)) fail('mission_hash_mismatch', '$.mission_contract_hash', 'mission was modified');
   if (certificate.review_artifact_hash !== normalizedHash(review)) fail('review_hash_mismatch', '$.review_artifact_hash', 'review was modified');
-  if (certificate.adjudicator !== review.adjudicator) fail('adjudicator_mismatch', '$.adjudicator', 'must match independent adjudicator');
+  requireIdentity(certificate.adjudicator, '$.adjudicator');
+  if (certificate.adjudicator.toLowerCase() !== review.adjudicator.toLowerCase()) fail('adjudicator_mismatch', '$.adjudicator', 'must match independent adjudicator');
   if (!Array.isArray(certificate.required_checks)) fail('invalid_type', '$.required_checks', 'must be an array');
   const checkNames = new Set();
   for (const [index, check] of certificate.required_checks.entries()) {
@@ -36,10 +37,12 @@ export function validateCertificate(certificate, { mission, review, policy, head
   requireObject(certificate.preview, '$.preview');
   rejectUnknownFields(certificate.preview, ['required', 'conclusion', 'sha'], '$.preview');
   requireBoolean(certificate.preview.required, '$.preview.required');
+  if (!['success', 'failure', 'skipped', 'not_required'].includes(certificate.preview.conclusion)) fail('invalid_preview_conclusion', '$.preview.conclusion', 'must be success, failure, skipped, or not_required');
   const previewRequired = policy.require_preview_when_ui_changes && uiChanges !== false;
   if (previewRequired && !certificate.preview.required) fail('preview_required', '$.preview.required', 'policy and change applicability require preview evidence');
   if (certificate.preview.sha !== headSha) fail('preview_sha_mismatch', '$.preview.sha', 'preview is stale');
   if (certificate.preview.required && certificate.preview.conclusion !== 'success') fail('preview_failed', '$.preview.conclusion', 'required preview must succeed');
+  if (!certificate.preview.required && !['skipped', 'not_required'].includes(certificate.preview.conclusion)) fail('preview_state_mismatch', '$.preview.conclusion', 'non-required preview must be skipped or not_required');
   requireTimestamp(certificate.generated_at, '$.generated_at');
   requireTimestamp(certificate.expires_at, '$.expires_at');
   const generated = Date.parse(certificate.generated_at);

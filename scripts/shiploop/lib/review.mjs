@@ -1,7 +1,7 @@
-import { fail, rejectUnknownFields, requireIdentity, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
+import { fail, rejectUnknownFields, requireBoolean, requireIdentity, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
 import { normalizedHash } from './hash.mjs';
 
-const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
+const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'risk_level', 'ui_changes', 'security_sensitive', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
 const FINDING_FIELDS = ['id', 'priority', 'category', 'file', 'line_start', 'line_end', 'evidence', 'required_change', 'status', 'adjudication_rationale'];
 const RIZZ_EVIDENCE_FIELDS = ['cli_version', 'true_positives', 'false_positives', 'missed_findings', 'useful_prompts', 'investigation_minutes_saved'];
 
@@ -49,7 +49,7 @@ function validateBlockedEvidence(review) {
   if (review.escalation !== review.escalation.trim()) fail('invalid_type', '$.escalation', 'must not contain surrounding whitespace');
 }
 
-export function validateReview(review, { mission, policy, headSha, baseSha, uiChanges = true }) {
+export function validateReview(review, { mission, policy, headSha, baseSha, uiChanges = review.ui_changes }) {
   requireSchema(review);
   rejectUnknownFields(review, FIELDS);
   requireSha(review.reviewed_sha, '$.reviewed_sha');
@@ -62,7 +62,13 @@ export function validateReview(review, { mission, policy, headSha, baseSha, uiCh
   if (review.mission_contract_id !== mission.contract_id) fail('mission_contract_mismatch', '$.mission_contract_id', 'must match the mission');
   if (review.mission_contract_hash !== normalizedHash(mission)) fail('mission_hash_mismatch', '$.mission_contract_hash', 'mission changed after review');
   for (const field of ['implementation_owner', 'adjudicator']) requireIdentity(review[field], `$.${field}`);
-  if (review.implementation_owner === review.adjudicator) fail('self_review', '$.adjudicator', 'implementation owner cannot adjudicate');
+  const implementationOwner = review.implementation_owner.toLowerCase();
+  const adjudicator = review.adjudicator.toLowerCase();
+  if (implementationOwner === adjudicator) fail('self_review', '$.adjudicator', 'implementation owner cannot adjudicate');
+  if (!['low', 'medium', 'high'].includes(review.risk_level)) fail('invalid_risk_level', '$.risk_level', 'must be low, medium, or high');
+  requireBoolean(review.ui_changes, '$.ui_changes');
+  requireBoolean(review.security_sensitive, '$.security_sensitive');
+  if (review.ui_changes !== uiChanges) fail('applicability_mismatch', '$.ui_changes', 'must match independently supplied UI applicability');
   if (!Array.isArray(review.reviewers)) fail('invalid_type', '$.reviewers', 'must be an array');
   const reviewerRoles = new Set();
   const reviewerIdentities = new Set();
@@ -71,11 +77,14 @@ export function validateReview(review, { mission, policy, headSha, baseSha, uiCh
     rejectUnknownFields(reviewer, ['id', 'role'], `$.reviewers[${index}]`);
     requireIdentity(reviewer.id, `$.reviewers[${index}].id`);
     requireString(reviewer.role, `$.reviewers[${index}].role`);
-    if (reviewer.id === review.implementation_owner) fail('self_review', `$.reviewers[${index}].id`, 'implementation owner cannot review');
-    if (!policy.allow_multi_role_reviewer && reviewerIdentities.has(reviewer.id)) fail('duplicate_reviewer_identity', `$.reviewers[${index}].id`, 'one identity cannot fill multiple reviewer roles');
-    reviewerIdentities.add(reviewer.id);
+    const reviewerIdentity = reviewer.id.toLowerCase();
+    if (reviewerIdentity === implementationOwner) fail('self_review', `$.reviewers[${index}].id`, 'implementation owner cannot review');
+    if (!policy.allow_multi_role_reviewer && reviewerIdentities.has(reviewerIdentity)) fail('duplicate_reviewer_identity', `$.reviewers[${index}].id`, 'one identity cannot fill multiple reviewer roles');
+    reviewerIdentities.add(reviewerIdentity);
     reviewerRoles.add(reviewer.role);
   }
+  const hasMultiRoleReviewer = reviewerIdentities.size < review.reviewers.length;
+  if (hasMultiRoleReviewer && (review.risk_level !== 'low' || review.ui_changes || review.security_sensitive)) fail('multi_role_not_applicable', '$.reviewers', 'multi-role review is limited to low-risk, non-UI, non-security changes');
   if (review.verdict === 'APPROVE' && review.reviewers.length === 0) fail('missing_reviewer', '$.reviewers', 'approval requires reviewer evidence');
   const requiredRoles = new Set(policy.required_reviewers);
   if (uiChanges) requiredRoles.add('experience');

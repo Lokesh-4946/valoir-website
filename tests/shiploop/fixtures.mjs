@@ -41,6 +41,9 @@ export function websiteFixture() {
     mission_contract_hash: normalizedHash(mission),
     implementation_owner: 'implementer-1',
     adjudicator: 'adjudicator-1',
+    risk_level: 'medium',
+    ui_changes: true,
+    security_sensitive: false,
     reviewers: [
       { id: 'reviewer-a', role: 'intent-architecture' },
       { id: 'reviewer-b', role: 'correctness-risk' },
@@ -93,6 +96,8 @@ export function rizzFixture() {
     useful_prompts: ['Investigate dependency boundary.'],
     investigation_minutes_saved: 15,
   };
+  fixture.review.risk_level = 'low';
+  fixture.review.ui_changes = false;
   fixture.certificate.mission_contract_id = fixture.mission.contract_id;
   fixture.certificate.mission_contract_hash = normalizedHash(fixture.mission);
   fixture.certificate.review_artifact_hash = normalizedHash(fixture.review);
