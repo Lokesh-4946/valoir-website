@@ -39,10 +39,14 @@ commands from `package.json` and the checked-in scripts, then invoke them with `
 6. Stop with `BLOCKED` after five unsuccessful iterations. Record remaining findings and the next
    authorized actor; never approve because the cap was reached.
 7. Require CI and Vercel preview evidence for the same SHA when UI changes apply.
-8. Run the repository-provided validators for `.valoir/reviews/<head-sha>.json` and
-   `.valoir/merge-readiness.json`, including the exact SHA, current TTL, reviewer independence,
-   required checks, and deterministic hash. Never substitute a prose inspection for validators.
-9. Report `merge-ready` only when the `valoir-shiploop` check and all certificate gates pass.
+8. Store review and certificate evidence outside the reviewed Git tree. Run the repository
+   validators for those runtime paths, including exact SHA, current TTL, reviewer independence,
+   trusted check issuer/workflow provenance, and deterministic hash. Never substitute prose.
+9. Do not execute a pending-status publisher from PR-controlled code. The trusted orchestrator may
+   publish `pending` directly with authenticated `gh` only after committed-gate validation. Invoke
+   the success publisher only after independent review, and require its repository path and SHA-256
+   hash in the reviewed evidence to match the exact reviewed head.
+10. Report `merge-ready` only when the `valoir-shiploop` check and all certificate gates pass.
 
 Merge readiness is evidence, not authority to merge. After authorized merge, verify dev separately;
 production still requires explicit approval and observation.

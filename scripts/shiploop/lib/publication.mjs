@@ -11,14 +11,20 @@ export function validateRepository(value) {
   return value;
 }
 
-export function validateLiveEvidence({ requiredNames, reviewedSha, checkRuns, statuses, previewName }) {
+export function validateLiveEvidence({ requiredNames, trustedChecks, reviewedSha, checkRuns, statuses, previewName }) {
   requireSha(reviewedSha, '$.reviewedSha');
   const requiredChecks = [];
   for (const name of requiredNames) {
     if (isReservedCheckContext(name)) throw new Error(`${name} recursively requires Shiploop`);
+    const trusted = trustedChecks.find((item) => item.name === name);
+    if (!trusted) throw new Error(`missing trusted provenance for ${name}`);
     const run = checkRuns.find((item) => item.name === name && item.head_sha === reviewedSha && !isReservedCheckContext(item.name));
     const status = statuses.find((item) => item.context === name && item.sha === reviewedSha && !isReservedCheckContext(item.context));
     if (!run && !status) throw new Error(`missing live required check ${name} for exact SHA`);
+    const provenanceMatches = trusted.source === 'check_run'
+      ? run && run.app?.slug === trusted.app_slug && run.app?.id === trusted.app_id && run.workflow?.name === trusted.workflow_name && run.workflow?.path === trusted.workflow_path
+      : status && status.creator?.login === trusted.creator_login;
+    if (!provenanceMatches) throw new Error(`live required check ${name} lacks trusted provenance`);
     const conclusion = run?.conclusion ?? (status?.state === 'success' ? 'success' : status?.state);
     if (conclusion !== 'success') throw new Error(`live required check ${name} did not succeed`);
     requiredChecks.push({ name, conclusion: 'success', sha: reviewedSha });

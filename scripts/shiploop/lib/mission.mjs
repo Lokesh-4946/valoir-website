@@ -1,16 +1,41 @@
-import { fail, rejectUnknownFields, requireIdentity, requireSafePath, requireSchema, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
+import { fail, rejectUnknownFields, requireIdentity, requireObject, requireSafePath, requireSchema, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
 import { rejectReservedCheckContexts } from './check-contexts.mjs';
 
-const FIELDS = ['schema_version', 'contract_id', 'product', 'intent', 'approved_design', 'implementation_plan', 'expected_paths', 'forbidden_paths', 'acceptance_criteria', 'required_checks', 'created_at', 'approved_by'];
+const FIELDS = ['schema_version', 'contract_id', 'product', 'intent', 'approved_design', 'implementation_plan', 'authorization_sources', 'related_contract_ids', 'expected_paths', 'forbidden_paths', 'acceptance_criteria', 'required_checks', 'trusted_checks', 'created_at', 'approved_by'];
+
+function validateTrustedChecks(checks, requiredNames) {
+  if (!Array.isArray(checks) || checks.length !== requiredNames.length) fail('invalid_trusted_check', '$.trusted_checks', 'must describe every required check exactly once');
+  const seen = new Set();
+  checks.forEach((check, index) => {
+    const path = `$.trusted_checks[${index}]`;
+    requireObject(check, path);
+    requireString(check.name, `${path}.name`);
+    requireString(check.source, `${path}.source`);
+    if (seen.has(check.name) || !requiredNames.includes(check.name)) fail('invalid_trusted_check', `${path}.name`, 'must map uniquely to required_checks');
+    seen.add(check.name);
+    if (check.source === 'check_run') {
+      rejectUnknownFields(check, ['name', 'source', 'app_slug', 'app_id', 'workflow_name', 'workflow_path'], path);
+      requireString(check.app_slug, `${path}.app_slug`);
+      if (!Number.isInteger(check.app_id)) fail('invalid_trusted_check', `${path}.app_id`, 'must be an integer GitHub App id');
+      requireString(check.workflow_name, `${path}.workflow_name`);
+      requireSafePath(check.workflow_path, `${path}.workflow_path`);
+    } else if (check.source === 'status') {
+      rejectUnknownFields(check, ['name', 'source', 'creator_login'], path);
+      requireString(check.creator_login, `${path}.creator_login`);
+    } else fail('invalid_trusted_check', `${path}.source`, 'must be check_run or status');
+  });
+}
 
 export function validateMission(mission) {
   requireSchema(mission);
   rejectUnknownFields(mission, FIELDS);
   for (const field of ['contract_id', 'product', 'intent', 'approved_design', 'implementation_plan']) requireString(mission[field], `$.${field}`);
   requireIdentity(mission.approved_by, '$.approved_by');
-  for (const field of ['expected_paths', 'forbidden_paths', 'acceptance_criteria', 'required_checks']) requireStringArray(mission[field], `$.${field}`);
+  for (const field of ['authorization_sources', 'related_contract_ids', 'expected_paths', 'forbidden_paths', 'acceptance_criteria', 'required_checks']) requireStringArray(mission[field], `$.${field}`);
+  if (mission.authorization_sources.length < 2 || mission.related_contract_ids.length === 0) fail('invalid_authorization', '$.authorization_sources', 'combined work requires at least two authorization sources and a related contract');
   if (mission.required_checks.length === 0) fail('missing_required_check', '$.required_checks', 'CI baseline requires at least one check');
   rejectReservedCheckContexts(mission.required_checks);
+  validateTrustedChecks(mission.trusted_checks, mission.required_checks);
   for (const field of ['expected_paths', 'forbidden_paths']) mission[field].forEach((value, index) => requireSafePath(value, `$.${field}[${index}]`));
   requireTimestamp(mission.created_at, '$.created_at');
   return mission;

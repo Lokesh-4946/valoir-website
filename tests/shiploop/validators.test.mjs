@@ -40,8 +40,23 @@ test('malformed and unknown schemas fail', () => {
   expectCode('invalid_type', () => validatePolicy({ ...fixture.policy, max_iterations: '5' }));
 });
 
+test('mission requires combined authorization and trusted check provenance', () => {
+  const fixture = websiteFixture();
+  fixture.mission.authorization_sources = [];
+  expectCode('invalid_authorization', () => validateMission(fixture.mission));
+  const spoofable = websiteFixture();
+  delete spoofable.mission.trusted_checks[0].app_id;
+  expectCode('invalid_trusted_check', () => validateMission(spoofable.mission));
+});
+
+test('review binds the reviewed publisher path and SHA-256 hash', () => {
+  const fixture = websiteFixture();
+  fixture.review.publisher.sha256 = 'bad';
+  expectCode('invalid_publisher_evidence', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+});
+
 test('strict policy parser accepts the profile and rejects unknown or executable YAML', () => {
-  const yaml = `schema_version: 1\nprofile: valoir-shiploop\nmax_iterations: 5\nrequired_reviewers:\n  - intent-architecture\n  - correctness-risk\n  - experience\nallow_multi_role_reviewer: false\nblocking_priorities: [P0, P1, P2]\nrequire_zero_unresolved: true\nrequire_exact_head_sha: true\nrequire_ci_green: true\nrequire_preview_when_ui_changes: true\ncertificate_ttl_hours: 24\n`;
+  const yaml = `schema_version: 1\nprofile: valoir-shiploop\nmax_iterations: 5\nrequired_reviewers:\n  - intent-architecture\n  - correctness-risk\n  - experience\nallow_multi_role_reviewer: false\nblocking_priorities: [P0, P1, P2]\nrequire_zero_unresolved: true\nrequire_exact_head_sha: true\nrequire_ci_green: true\nrequire_preview_when_ui_changes: true\nrequire_trusted_check_provenance: true\ncertificate_ttl_hours: 24\n`;
   assert.equal(parsePolicy(yaml).profile, 'valoir-shiploop');
   expectCode('unknown_field', () => parsePolicy(`${yaml}privileged: true\n`));
   expectCode('invalid_yaml', () => parsePolicy(`${yaml}payload: !!js/function >\n  process.exit()\n`));

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { validateCertificate } from './lib/certificate.mjs';
 import { deriveChangedPaths } from './lib/git-changes.mjs';
 import { validateMission } from './lib/mission.mjs';
@@ -28,6 +29,9 @@ const [certificate, mission, review, policySource] = await Promise.all([
 ]);
 validateMission(mission);
 const policy = parsePolicy(policySource);
+const publisherSource = await readFile(review.publisher.path);
+const publisherHash = createHash('sha256').update(publisherSource).digest('hex');
+if (review.publisher.path !== 'scripts/shiploop/publish-status.mjs' || review.publisher.sha256 !== publisherHash) throw new Error('review does not bind this exact success publisher');
 const checkedOutSha = run('git', ['rev-parse', 'HEAD']);
 const repository = validateRepository(run('gh', ['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner']));
 const pr = JSON.parse(run('gh', ['pr', 'view', prNumber, '--repo', repository, '--json', 'baseRefOid,headRefOid,url']));
@@ -47,6 +51,13 @@ await verifyPublicationTarget({
 });
 const changedPaths = deriveChangedPaths({ baseSha: certificate.base_sha, headSha: certificate.reviewed_sha });
 const checkRuns = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/check-runs`, '--jq', '.check_runs']));
+for (const checkRun of checkRuns) {
+  const runId = checkRun.details_url?.match(/\/actions\/runs\/(\d+)/)?.[1];
+  if (checkRun.app?.slug === 'github-actions' && runId) {
+    const workflowRun = JSON.parse(run('gh', ['api', `repos/${repository}/actions/runs/${runId}`]));
+    checkRun.workflow = { name: workflowRun.name, path: workflowRun.path };
+  }
+}
 const statuses = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`]));
 const liveEvidence = validateLiveEvidence({
   requiredNames: mission.required_checks,
@@ -54,6 +65,7 @@ const liveEvidence = validateLiveEvidence({
   checkRuns,
   statuses,
   previewName: 'Vercel',
+  trustedChecks: mission.trusted_checks,
 });
 if (JSON.stringify(certificate.required_checks) !== JSON.stringify(liveEvidence.requiredChecks)) throw new Error('certificate required checks do not match live GitHub evidence');
 if (JSON.stringify(certificate.preview) !== JSON.stringify(liveEvidence.preview)) throw new Error('certificate preview does not match live GitHub evidence');

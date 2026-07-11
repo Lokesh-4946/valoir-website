@@ -1,6 +1,6 @@
 import { fail, rejectUnknownFields, requireBoolean, requireInteger, requireSchema, requireString, requireStringArray } from './errors.mjs';
 
-const FIELDS = ['schema_version', 'profile', 'max_iterations', 'required_reviewers', 'allow_multi_role_reviewer', 'blocking_priorities', 'require_zero_unresolved', 'require_exact_head_sha', 'require_ci_green', 'require_preview_when_ui_changes', 'certificate_ttl_hours'];
+const FIELDS = ['schema_version', 'profile', 'max_iterations', 'required_reviewers', 'allow_multi_role_reviewer', 'blocking_priorities', 'require_zero_unresolved', 'require_exact_head_sha', 'require_ci_green', 'require_preview_when_ui_changes', 'require_trusted_check_provenance', 'certificate_ttl_hours'];
 const REQUIRED_TRUE = ['require_zero_unresolved', 'require_exact_head_sha', 'require_ci_green'];
 
 function scalar(source) {
@@ -56,8 +56,8 @@ export function validatePolicy(policy) {
   if (policy.allow_multi_role_reviewer) fail('weakened_policy', '$.allow_multi_role_reviewer', 'schema v1 forbids multi-role reviewers');
   requireStringArray(policy.blocking_priorities, '$.blocking_priorities');
   for (const priority of ['P0', 'P1', 'P2']) if (!policy.blocking_priorities.includes(priority)) fail('weakened_policy', '$.blocking_priorities', `must include ${priority}`);
-  for (const field of [...REQUIRED_TRUE, 'require_preview_when_ui_changes']) requireBoolean(policy[field], `$.${field}`);
-  for (const field of REQUIRED_TRUE) if (!policy[field]) fail('weakened_policy', `$.${field}`, 'company requirement cannot be disabled');
+  for (const field of [...REQUIRED_TRUE, 'require_preview_when_ui_changes', 'require_trusted_check_provenance']) requireBoolean(policy[field], `$.${field}`);
+  for (const field of [...REQUIRED_TRUE, 'require_trusted_check_provenance']) if (!policy[field]) fail('weakened_policy', `$.${field}`, 'company requirement cannot be disabled');
   if (!policy.require_preview_when_ui_changes) fail('weakened_policy', '$.require_preview_when_ui_changes', 'company UI preview requirement cannot be disabled');
   requireInteger(policy.certificate_ttl_hours, '$.certificate_ttl_hours');
   if (policy.certificate_ttl_hours <= 0 || policy.certificate_ttl_hours > 24) fail('weakened_policy', '$.certificate_ttl_hours', 'must be between 1 and 24 hours');

@@ -10,7 +10,6 @@
     "lint": "next lint",
     "test:shiploop": "node --test tests/shiploop/*.test.mjs",
     "shiploop:validate-committed": "node scripts/shiploop/validate-committed-gate.mjs .valoir/mission-contract.json .valoir/review-policy.yml",
-    "shiploop:publish-pending": "node scripts/shiploop/publish-pending-status.mjs",
     "shiploop:publish": "node scripts/shiploop/publish-status.mjs",
     "test:ui": "playwright test"
   },

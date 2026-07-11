@@ -3,7 +3,7 @@ import { normalizedHash } from './hash.mjs';
 import { validateScopeExceptions } from './scope.mjs';
 import { rejectReservedCheckContexts } from './check-contexts.mjs';
 
-const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'risk_level', 'ui_changes', 'security_sensitive', 'scope_exceptions', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
+const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'risk_level', 'ui_changes', 'security_sensitive', 'scope_exceptions', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'publisher', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
 const FINDING_FIELDS = ['id', 'priority', 'category', 'file', 'line_start', 'line_end', 'evidence', 'required_change', 'status', 'adjudication_rationale'];
 const RIZZ_EVIDENCE_FIELDS = ['cli_version', 'true_positives', 'false_positives', 'missed_findings', 'useful_prompts', 'investigation_minutes_saved'];
 
@@ -115,6 +115,10 @@ export function validateReview(review, context) {
   if (policy.require_zero_unresolved && review.unresolved_comment_count > 0 && review.verdict === 'APPROVE') fail('unresolved_comments', '$.unresolved_comment_count', 'approval requires zero unresolved comments');
   requireStringArray(review.required_checks, '$.required_checks');
   rejectReservedCheckContexts(review.required_checks);
+  requireObject(review.publisher, '$.publisher');
+  rejectUnknownFields(review.publisher, ['path', 'sha256'], '$.publisher');
+  requireSafePath(review.publisher.path, '$.publisher.path');
+  if (typeof review.publisher.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(review.publisher.sha256)) fail('invalid_publisher_evidence', '$.publisher.sha256', 'must be a lowercase SHA-256 hash');
   for (const check of mission.required_checks) if (!review.required_checks.includes(check)) fail('missing_required_check', '$.required_checks', `missing ${check}`);
   if (!['APPROVE', 'REQUEST_CHANGES', 'BLOCKED'].includes(review.verdict)) fail('invalid_verdict', '$.verdict', 'is not allowed');
   if (review.verdict === 'BLOCKED') validateBlockedEvidence(review);

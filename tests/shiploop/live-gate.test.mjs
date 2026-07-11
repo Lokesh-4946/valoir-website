@@ -86,14 +86,15 @@ test('live GitHub evidence replaces untrusted check conclusions and excludes Shi
     requiredNames: fixture.mission.required_checks,
     reviewedSha: HEAD_SHA,
     checkRuns: [
-      { name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA },
+      { name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA, app: { slug: 'github-actions', id: 15368 }, workflow: { name: 'CI', path: '.github/workflows/ci.yml' } },
       { name: 'Valoir-Shiploop', conclusion: 'success', head_sha: HEAD_SHA },
     ],
     statuses: [
-      { context: 'Vercel', state: 'success', sha: HEAD_SHA },
+      { context: 'Vercel', state: 'success', sha: HEAD_SHA, creator: { login: 'vercel[bot]' } },
       { context: 'VALOIR-SHIPLOOP', state: 'success', sha: HEAD_SHA },
     ],
     previewName: 'Vercel',
+    trustedChecks: fixture.mission.trusted_checks,
   });
   assert.deepEqual(live.requiredChecks, fixture.certificate.required_checks);
   assert.deepEqual(live.preview, fixture.certificate.preview);
@@ -103,15 +104,17 @@ test('live GitHub evidence rejects missing, failed, stale, and recursively requi
   const base = {
     requiredNames: ['build + typecheck', 'Vercel'],
     reviewedSha: HEAD_SHA,
-    checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA }],
-    statuses: [{ context: 'Vercel', state: 'success', sha: HEAD_SHA }],
+    checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA, app: { slug: 'github-actions', id: 15368 }, workflow: { name: 'CI', path: '.github/workflows/ci.yml' } }],
+    statuses: [{ context: 'Vercel', state: 'success', sha: HEAD_SHA, creator: { login: 'vercel[bot]' } }],
     previewName: 'Vercel',
+    trustedChecks: websiteFixture().mission.trusted_checks,
   };
   assert.throws(() => validateLiveEvidence({ ...base, requiredNames: ['valoir-shiploop'] }), /recursively/);
   assert.throws(() => validateLiveEvidence({ ...base, requiredNames: ['Rizz-ReviewLoop'] }), /recursively/);
   assert.throws(() => validateLiveEvidence({ ...base, statuses: [] }), /missing live required check/);
-  assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'failure', head_sha: HEAD_SHA }] }), /did not succeed/);
+  assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ ...base.checkRuns[0], conclusion: 'failure' }] }), /did not succeed/);
   assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: BASE_SHA }] }), /missing live required check/);
+  assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA, app: { slug: 'attacker', id: 9 }, workflow: { name: 'CI', path: '.github/workflows/ci.yml' } }] }), /trusted provenance/);
 });
 
 test('workflow checks out the immutable PR head instead of the synthetic merge ref', async () => {

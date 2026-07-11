@@ -11,4 +11,5 @@ require_zero_unresolved: true
 require_exact_head_sha: true
 require_ci_green: true
 require_preview_when_ui_changes: true
+require_trusted_check_provenance: true
 certificate_ttl_hours: 24

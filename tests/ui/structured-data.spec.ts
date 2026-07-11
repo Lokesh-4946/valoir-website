@@ -15,3 +15,11 @@ test("lists every supported Rizz operating system", async ({ page }) => {
 
   expect(software?.operatingSystem).toBe("macOS, Linux, Windows");
 });
+
+test("metadata uses the source-backed Project Intelligence category", async ({ page }) => {
+  await page.goto("/");
+  const keywords = await page.locator('meta[name="keywords"]').getAttribute("content");
+  expect(keywords).toContain("Project Intelligence Engine");
+  expect(keywords).toContain("repository understanding");
+  expect(keywords).not.toContain("coding agent harness");
+});

@@ -13,10 +13,16 @@ export function websiteFixture() {
     intent: 'Update the website for Rizz 0.3.0.',
     approved_design: 'product-brain/specs/website.md',
     implementation_plan: 'product-brain/plans/website.md',
+    authorization_sources: ['product-brain/specs/website.md', 'product-brain/specs/shiploop.md'],
+    related_contract_ids: ['VAL-2026-001'],
     expected_paths: ['src/', 'tests/ui/'],
     forbidden_paths: ['secrets/'],
     acceptance_criteria: ['Build and UI tests pass.'],
     required_checks: ['build + typecheck', 'Vercel'],
+    trusted_checks: [
+      { name: 'build + typecheck', source: 'check_run', app_slug: 'github-actions', app_id: 15368, workflow_name: 'CI', workflow_path: '.github/workflows/ci.yml' },
+      { name: 'Vercel', source: 'status', creator_login: 'vercel[bot]' },
+    ],
     created_at: '2026-07-11T08:00:00.000Z',
     approved_by: 'product-owner',
   };
@@ -32,6 +38,7 @@ export function websiteFixture() {
     require_ci_green: true,
     require_preview_when_ui_changes: true,
     certificate_ttl_hours: 24,
+    require_trusted_check_provenance: true,
   };
   const review = {
     schema_version: 1,
@@ -57,6 +64,7 @@ export function websiteFixture() {
     unresolved_comment_count: 0,
     required_checks: ['build + typecheck', 'Vercel'],
     rizz_evidence: null,
+    publisher: { path: 'scripts/shiploop/publish-status.mjs', sha256: '1'.repeat(64) },
     verdict: 'APPROVE',
     generated_at: '2026-07-11T09:00:00.000Z',
   };
@@ -87,6 +95,7 @@ export function rizzFixture() {
   fixture.mission.contract_id = 'RIZZ-2026-001';
   fixture.mission.product = 'rizz';
   fixture.mission.required_checks = ['unit', 'PI-Bench', 'package', 'CLI smoke', 'cross-platform', 'footprint'];
+  fixture.mission.trusted_checks = fixture.mission.required_checks.map((name) => ({ name, source: 'check_run', app_slug: 'github-actions', app_id: 15368, workflow_name: 'Rizz CI', workflow_path: '.github/workflows/ci.yml' }));
   fixture.policy.profile = 'rizz-reviewloop';
   fixture.review.mission_contract_id = fixture.mission.contract_id;
   fixture.review.mission_contract_hash = normalizedHash(fixture.mission);
