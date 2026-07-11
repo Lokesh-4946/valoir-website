@@ -16,7 +16,6 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -41,60 +40,20 @@ export default function Nav() {
     if (!open) return;
 
     const previousOverflow = document.body.style.overflow;
-    const main = document.querySelector<HTMLElement>("main");
-    const previousMainInert = main?.inert ?? false;
-    const previousMainInertAttribute = main?.getAttribute("inert") ?? null;
     document.body.style.overflow = "hidden";
-    if (main) {
-      main.inert = true;
-    }
     firstMenuLinkRef.current?.focus();
 
-    function containMenuFocus(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-        menuButtonRef.current?.focus();
-        return;
-      }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
 
-      if (event.key !== "Tab") return;
-
-      const menu = mobileMenuRef.current;
-      if (!menu) return;
-
-      const focusableElements = Array.from(
-        menu.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
-      );
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-      if (!firstElement || !lastElement) return;
-
-      const activeElement = document.activeElement;
-      const focusIsOutsideMenu = !menu.contains(activeElement);
-      const leavingStart = event.shiftKey && activeElement === firstElement;
-      const leavingEnd = !event.shiftKey && activeElement === lastElement;
-      if (!focusIsOutsideMenu && !leavingStart && !leavingEnd) return;
-
-      event.preventDefault();
-      if (event.shiftKey) {
-        lastElement.focus();
-        return;
-      }
-      firstElement.focus();
+      setOpen(false);
+      menuButtonRef.current?.focus();
     }
 
-    window.addEventListener("keydown", containMenuFocus);
+    window.addEventListener("keydown", closeOnEscape);
     return () => {
       document.body.style.overflow = previousOverflow;
-      if (main) {
-        main.inert = previousMainInert;
-        if (previousMainInertAttribute === null) {
-          main.removeAttribute("inert");
-        } else {
-          main.setAttribute("inert", previousMainInertAttribute);
-        }
-      }
-      window.removeEventListener("keydown", containMenuFocus);
+      window.removeEventListener("keydown", closeOnEscape);
     };
   }, [open]);
 
@@ -168,11 +127,9 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            ref={mobileMenuRef}
             id="mobile-menu"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu"
+            role="navigation"
+            aria-label="Mobile menu"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

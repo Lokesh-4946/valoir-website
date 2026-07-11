@@ -20,8 +20,10 @@ for (const width of [360, 390]) {
 
       await page.getByRole("button", { name: "Menu" }).click();
 
-      const menu = page.getByRole("dialog", { name: "Menu" });
+      const menu = page.getByRole("navigation", { name: "Mobile menu" });
       await expect(menu).toBeVisible();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(menu).not.toHaveAttribute("aria-modal");
       await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
       await expect(menu.getByRole("link", { name: "Products" })).toBeVisible();
       await expect(menu.getByRole("link", { name: "Docs" })).toBeVisible();
@@ -49,48 +51,12 @@ test.describe("mobile menu keyboard behavior", () => {
 
     const trigger = page.locator('button[aria-controls="mobile-menu"]');
     await trigger.click();
-    await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Mobile menu" })).toBeVisible();
 
     await page.keyboard.press("Escape");
 
-    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(page.getByRole("navigation", { name: "Mobile menu" })).toBeHidden();
     await expect(trigger).toBeFocused();
-  });
-
-  test("contains forward and reverse keyboard focus", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: "Menu" }).click();
-
-    const menu = page.getByRole("dialog", { name: "Menu" });
-    const firstLink = menu.getByRole("link", { name: "Products" });
-    const lastLink = menu.getByRole("link", { name: "Install Rizz" });
-    await expect(firstLink).toBeFocused();
-
-    await page.keyboard.press("Shift+Tab");
-    await expect(lastLink).toBeFocused();
-
-    await page.keyboard.press("Tab");
-    await expect(firstLink).toBeFocused();
-  });
-
-  test("isolates background interaction and restores it after close", async ({ page }) => {
-    await page.goto("/");
-
-    const main = page.locator("main");
-    const exploreRizz = main.getByRole("link", { name: "Explore Rizz" });
-    const initialUrl = page.url();
-    await page.getByRole("button", { name: "Menu" }).click();
-
-    await expect(main).toHaveAttribute("inert", "");
-    await expect(exploreRizz.click({ timeout: 500 })).rejects.toThrow();
-    expect(page.url()).toBe(initialUrl);
-
-    await page.keyboard.press("Escape");
-
-    await expect(main).not.toHaveAttribute("inert", "");
-    await expect(exploreRizz).toBeVisible();
-    await exploreRizz.click();
-    await expect(page).toHaveURL(/#products$/);
   });
 
   test("closes and unlocks scrolling when crossing the desktop breakpoint", async ({ page }) => {
@@ -98,12 +64,12 @@ test.describe("mobile menu keyboard behavior", () => {
 
     const trigger = page.locator('button[aria-controls="mobile-menu"]');
     await trigger.click();
-    await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Mobile menu" })).toBeVisible();
     await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
 
     await page.setViewportSize({ width: 1280, height: 844 });
 
-    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(page.getByRole("navigation", { name: "Mobile menu" })).toBeHidden();
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
     await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
   });
