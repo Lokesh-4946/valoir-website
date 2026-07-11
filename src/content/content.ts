@@ -80,7 +80,7 @@ export const sections = {
     lanes: [
       {
         label: "Now",
-        title: "Rizz 0.3.0",
+        title: "Rizz 0.3.1",
         items: [
           "architecture causality",
           "database relationships",
@@ -89,6 +89,8 @@ export const sections = {
           "evidence scoring",
           "approval packets",
           "CLI signoff",
+          "signoff expiry and revocation",
+          "review precision",
         ],
       },
       {

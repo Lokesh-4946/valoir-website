@@ -68,14 +68,14 @@ export const products: Product[] = [
     by: "by Valoir",
     tagline: "Understand the system before changing it.",
     description:
-      "Rizz 0.3.0 is a local Project Intelligence Engine that maps architecture, evidence, and change impact before edits.",
+      "Rizz 0.3.1 is a local Project Intelligence Engine that maps architecture, evidence, and change impact before edits.",
     license: "unlicensed",
     licenseLabel: "License not declared",
     capabilities: [
       {
         title: "Architecture causality",
         detail:
-          "Trace routes, services, state and data dependencies, and database surfaces back to source evidence.",
+          "Trace routes, services, state and data dependencies, database surfaces, and evidence-backed Next.js route consumers.",
       },
       {
         title: "Database relationships",
@@ -90,13 +90,13 @@ export const products: Product[] = [
       {
         title: "Evidence and signoff",
         detail:
-          "Shipped deterministic verification plans, evidence scoring, approval packets, CLI signoff, and fingerprint-bound history reuse.",
+          "Shipped deterministic verification plans, evidence scoring, approval packets, CLI signoff, plus signoff expiry and revocation.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
     repoPrivate: false,
     installTitle: "Install Rizz",
-    installIntro: "Install Rizz 0.3.0 on macOS, Linux, or Windows PowerShell.",
+    installIntro: "Install Rizz 0.3.1 on macOS, Linux, or Windows PowerShell.",
     installRequirement: "Requires Node >= 22, npm, and git.",
     installOptions: [
       {
@@ -115,7 +115,7 @@ export const products: Product[] = [
     ],
     installNotes: [
       { label: "Package", value: "@valoir/rizz" },
-      { label: "Release", value: "0.3.0" },
+      { label: "Release", value: "0.3.1" },
       { label: "License", value: "License not declared" },
     ],
     usageSnippet: [
@@ -136,7 +136,7 @@ export const products: Product[] = [
     demoVideoUrl: null,
     tryItUrl: null,
     flagship: true,
-    status: "Rizz 0.3.0",
+    status: "Rizz 0.3.1",
   },
 ];
 

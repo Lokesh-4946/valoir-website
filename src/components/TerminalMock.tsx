@@ -56,7 +56,7 @@ export default function TerminalMock() {
       {/* status bar */}
       <div className="flex flex-wrap items-center gap-3 border-t border-line px-4 py-2 font-mono text-[11px] text-muted">
         <span>
-          <span className="text-accent">Rizz 0.3.0</span> · local
+          <span className="text-accent">Rizz 0.3.1</span> · local
         </span>
         <span className="text-faint">│</span>
         <span>evidence linked</span>

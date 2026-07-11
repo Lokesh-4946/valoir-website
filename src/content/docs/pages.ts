@@ -14,7 +14,7 @@ export const docsPages: DocPage[] = [
     blocks: [
       {
         type: "p",
-        text: "**Rizz 0.3.0 is a local Project Intelligence Engine.** It maps repository architecture, relationships, evidence, and change impact before edits.",
+        text: "**Rizz 0.3.1 is a local Project Intelligence Engine.** It maps repository architecture, relationships, evidence, and change impact before edits.",
       },
       { type: "h", level: 2, text: "Three principles" },
       {
@@ -34,7 +34,7 @@ export const docsPages: DocPage[] = [
   {
     slug: "quickstart",
     title: "Quickstart",
-    description: "Install the current Rizz 0.3.0 release with npm.",
+    description: "Install the current Rizz 0.3.1 release with npm.",
     order: 2,
     blocks: [
       { type: "h", level: 2, text: "Install", status: "now" },
@@ -47,7 +47,7 @@ export const docsPages: DocPage[] = [
         lang: "bash",
         code: "# macOS, Linux, or Windows PowerShell\nnpm install -g @valoir/rizz\nrizz understand",
       },
-      { type: "p", text: "Rizz 0.3.0 is the current release." },
+      { type: "p", text: "Rizz 0.3.1 is the current release." },
       { type: "p", text: "Requirements for all platforms: Node ≥ 22, npm, and git." },
       { type: "h", level: 2, text: "Understand a repository" },
       {
@@ -84,6 +84,8 @@ export const docsPages: DocPage[] = [
           "**Cross-table impact** [now] — foreign keys and relationship edges feed affected-flow and blast-radius analysis.",
           "**Relationship-aware review** [now] — review connects changed files to affected flows, data dependencies, and targeted verification.",
           "**Evidence governance** [now] — deterministic verification plans, evidence scoring, approval packets, CLI signoff, and fingerprint-bound signoff-history reuse.",
+          "**Review precision** [now] — generated `.rizz/**` intelligence stays separate from authored untracked work, secret detection distinguishes credential-shaped values from design-token documentation, and Explain/Ask surface evidence-backed Next.js route consumers.",
+          "**Approval lifecycle** [now] — exact ISO-8601 signoff expiry and auditable revocation prevent expired or revoked decisions from making a review merge/release-ready.",
         ],
       },
       {
@@ -266,7 +268,7 @@ export const docsPages: DocPage[] = [
       {
         type: "ul",
         items: [
-          "**Now** — Rizz 0.3.0, architecture/data causality, relationship-aware review, evidence scoring, verification plans, approval packets, and CLI signoff.",
+          "**Now** — Rizz 0.3.1, architecture/data causality, relationship-aware review, evidence scoring, verification plans, approval packets, CLI signoff, review precision, and signoff expiry/revocation.",
           "**Next** — native installers, complete direct-provider setup wiring, and fuller planning mode.",
           "**Later** — Workspace Mode, team features, hosted relay, and enterprise providers.",
           "**Valoir offering** — hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, custom QA/eval pipelines.",

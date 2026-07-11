@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage presents the source-backed Rizz 0.3 release", async ({ page }) => {
+test("homepage presents the source-backed Rizz 0.3.1 release", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByText("Rizz 0.3.0", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Rizz 0.3.1", { exact: true }).first()).toBeVisible();
   await expect(
     page.getByText("Requires Node >= 22, npm, and git.", { exact: true }),
   ).toBeVisible();
@@ -12,13 +12,15 @@ test("homepage presents the source-backed Rizz 0.3 release", async ({ page }) =>
   ).toBeVisible();
   await expect(page.getByText("cross-table blast radius", { exact: false })).toBeVisible();
   await expect(page.getByText("deterministic verification plans", { exact: false })).toBeVisible();
+  await expect(page.getByText("signoff expiry and revocation", { exact: true })).toBeVisible();
+  await expect(page.getByText("evidence-backed Next.js route consumers", { exact: false })).toBeVisible();
 });
 
-test("docs identify 0.3.0 and its complete public prerequisites", async ({ page }) => {
+test("docs identify 0.3.1 and its complete public prerequisites", async ({ page }) => {
   await page.goto("/docs/quickstart");
 
   await expect(
-    page.getByText("Rizz 0.3.0 is the current release.", { exact: true }).first(),
+    page.getByText("Rizz 0.3.1 is the current release.", { exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByText("Node ≥ 22, npm, and git", { exact: false })).toBeVisible();
 });
