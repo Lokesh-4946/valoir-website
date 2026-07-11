@@ -55,7 +55,7 @@ for (const checkRun of checkRuns) {
     checkRun.workflow = { name: workflowRun.name, path: workflowRun.path };
   }
 }
-const statuses = flattenStatusPages(JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`, '--paginate', '--slurp'])));
+const statuses = flattenStatusPages(JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`, '--paginate', '--slurp'])), certificate.reviewed_sha);
 const workflowBlobs = {};
 for (const trusted of mission.trusted_checks.filter(({ source }) => source === 'check_run')) {
   workflowBlobs[trusted.workflow_path] = {

@@ -152,13 +152,20 @@ test('GitHub page parsing flattens single and paginated API shapes', () => {
   assert.deepEqual(flattenCheckRunPages([{ total_count: 1, check_runs: [runA] }, { total_count: 1, check_runs: [runB] }]), [runA, runB]);
   const statusA = { context: 'a' };
   const statusB = { context: 'b' };
-  assert.deepEqual(flattenStatusPages([statusA]), [statusA]);
-  assert.deepEqual(flattenStatusPages([[statusA], [statusB]]), [statusA, statusB]);
+  assert.deepEqual(flattenStatusPages([statusA], HEAD_SHA), [{ ...statusA, sha: HEAD_SHA }]);
+  assert.deepEqual(flattenStatusPages([[statusA], [statusB]], HEAD_SHA), [{ ...statusA, sha: HEAD_SHA }, { ...statusB, sha: HEAD_SHA }]);
+});
+
+test('captured commit-status shape inherits only the independently requested exact SHA', () => {
+  const captured = [[{ context: 'Vercel', state: 'success', creator: { login: 'vercel[bot]' }, target_url: 'https://vercel.example' }]];
+  assert.deepEqual(flattenStatusPages(captured, HEAD_SHA)[0].sha, HEAD_SHA);
+  assert.throws(() => flattenStatusPages([[{ ...captured[0][0], sha: BASE_SHA }]], HEAD_SHA), /github_status_sha/);
+  assert.throws(() => flattenStatusPages([[{ ...captured[0][0], sha: 'invalid' }]], HEAD_SHA), /github_status_sha/);
 });
 
 test('GitHub page parsing rejects malformed and empty evidence explicitly', () => {
   for (const value of [null, {}, [], [{ total_count: 0, check_runs: [] }]]) assert.throws(() => flattenCheckRunPages(value), /github_check_pages/);
-  for (const value of [null, {}, [], [[]], [null]]) assert.throws(() => flattenStatusPages(value), /github_status_pages/);
+  for (const value of [null, {}, [], [[]], [null]]) assert.throws(() => flattenStatusPages(value, HEAD_SHA), /github_status_pages/);
 });
 
 test('trusted launcher rejects tracked and untracked dirt before privileged imports', () => {
