@@ -130,7 +130,7 @@ export default function Hero() {
               <CopyButton
                 text={hero.supporting.installCommand}
                 label="copy"
-                className="ml-2 rounded-full"
+                className="ml-2 min-h-11 rounded-full sm:min-h-0"
               />
             </div>
             <a

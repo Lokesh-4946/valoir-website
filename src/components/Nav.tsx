@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import { nav, site } from "@/content/content";
 
 function GitHubIcon({ className = "" }: { className?: string }) {
@@ -15,8 +15,11 @@ function GitHubIcon({ className = "" }: { className?: string }) {
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [portalElement, setPortalElement] = useState<HTMLDivElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useRef(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -26,10 +29,22 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
+    const element = document.createElement("div");
+    element.dataset.mobileMenuPortal = "";
+    document.body.appendChild(element);
+    setPortalElement(element);
+
+    return () => element.remove();
+  }, []);
+
+  useEffect(() => {
     const desktopQuery = window.matchMedia("(min-width: 1280px)");
 
     function closeMenuOnDesktop(event: MediaQueryListEvent) {
-      if (event.matches) setOpen(false);
+      if (!event.matches) return;
+
+      returnFocusRef.current = false;
+      setOpen(false);
     }
 
     desktopQuery.addEventListener("change", closeMenuOnDesktop);
@@ -37,25 +52,121 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !portalElement) return;
 
     const previousOverflow = document.body.style.overflow;
+    const menuButton = menuButtonRef.current;
+    const outsideElements = Array.from(document.body.children)
+      .filter((element): element is HTMLElement => {
+        return element instanceof HTMLElement && element !== portalElement;
+      })
+      .map((element) => ({
+        element,
+        inert: element.inert,
+        inertAttribute: element.getAttribute("inert"),
+      }));
     document.body.style.overflow = "hidden";
-    firstMenuLinkRef.current?.focus();
+    outsideElements.forEach(({ element }) => {
+      element.inert = true;
+    });
+    closeButtonRef.current?.focus();
 
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
+    function handleMenuKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        returnFocusRef.current = true;
+        setOpen(false);
+        return;
+      }
 
-      setOpen(false);
-      menuButtonRef.current?.focus();
+      if (event.key !== "Tab") return;
+
+      const focusableElements = Array.from(
+        mobileMenuRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled])',
+        ) ?? [],
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (!firstElement || !lastElement) return;
+
+      const leavingStart = event.shiftKey && document.activeElement === firstElement;
+      const leavingEnd = !event.shiftKey && document.activeElement === lastElement;
+      if (!leavingStart && !leavingEnd) return;
+
+      event.preventDefault();
+      if (event.shiftKey) {
+        lastElement.focus();
+        return;
+      }
+      firstElement.focus();
     }
 
-    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", handleMenuKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      outsideElements.forEach(({ element, inert, inertAttribute }) => {
+        element.inert = inert;
+        if (inertAttribute === null) {
+          element.removeAttribute("inert");
+        } else {
+          element.setAttribute("inert", inertAttribute);
+        }
+      });
+      window.removeEventListener("keydown", handleMenuKeyDown);
+      if (returnFocusRef.current) {
+        returnFocusRef.current = false;
+        menuButton?.focus();
+      }
     };
-  }, [open]);
+  }, [open, portalElement]);
+
+  function closeMenuAndRestoreFocus() {
+    returnFocusRef.current = true;
+    setOpen(false);
+  }
+
+  const mobileMenu = portalElement && open
+    ? createPortal(
+        <div
+          ref={mobileMenuRef}
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
+          className="fixed inset-0 z-[70] bg-bg xl:hidden"
+        >
+          <div className="shell flex min-h-full flex-col gap-1 py-4">
+            <button
+              ref={closeButtonRef}
+              type="button"
+              aria-label="Close menu"
+              onClick={closeMenuAndRestoreFocus}
+              className="ml-auto flex min-h-11 min-w-11 items-center justify-center font-mono text-sm text-fg"
+            >
+              Close
+            </button>
+            {nav.links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="flex min-h-11 items-center font-mono text-base text-fg"
+              >
+                {link.label}
+              </a>
+            ))}
+            <a
+              href={nav.cta.href}
+              onClick={() => setOpen(false)}
+              className="mt-2 flex min-h-11 items-center justify-center rounded-full bg-accent px-4 py-3 text-center font-mono text-sm font-semibold text-[var(--accent-ink)]"
+            >
+              {nav.cta.label}
+            </a>
+          </div>
+        </div>,
+        portalElement,
+      )
+    : null;
 
   return (
     <header
@@ -124,41 +235,7 @@ export default function Nav() {
         </button>
       </nav>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="mobile-menu"
-            role="navigation"
-            aria-label="Mobile menu"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-t border-line glass-strong backdrop-blur-md xl:hidden"
-          >
-            <div className="shell flex flex-col gap-1 py-4">
-              {nav.links.map((l) => (
-                <a
-                  key={l.label}
-                  ref={l === nav.links[0] ? firstMenuLinkRef : undefined}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="flex min-h-11 items-center font-mono text-base text-fg"
-                >
-                  {l.label}
-                </a>
-              ))}
-              <a
-                href={nav.cta.href}
-                onClick={() => setOpen(false)}
-                className="mt-2 flex min-h-11 items-center justify-center rounded-full bg-accent px-4 py-3 text-center font-mono text-sm font-semibold text-[var(--accent-ink)]"
-              >
-                {nav.cta.label}
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {mobileMenu}
     </header>
   );
 }

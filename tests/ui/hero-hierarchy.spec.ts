@@ -22,3 +22,15 @@ test("keeps install and GitHub discoverable as supporting actions", async ({ pag
   await expect(supportingActions.getByRole("link", { name: "GitHub" })).toBeVisible();
   await expect(page.locator("html")).toHaveJSProperty("scrollWidth", 390);
 });
+
+for (const width of [360, 390]) {
+  test(`keeps the hero copy control touch-friendly at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/");
+
+    const copyButton = page.locator("#top").getByRole("button", { name: "Copy to clipboard" });
+    const box = await copyButton.boundingBox();
+
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+  });
+}
