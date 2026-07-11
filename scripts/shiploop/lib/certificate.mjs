@@ -33,11 +33,14 @@ export function validateCertificate(certificate, context) {
   const checkNames = new Set();
   for (const [index, check] of certificate.required_checks.entries()) {
     requireObject(check, `$.required_checks[${index}]`);
-    rejectUnknownFields(check, ['name', 'conclusion', 'sha'], `$.required_checks[${index}]`);
+    rejectUnknownFields(check, ['name', 'conclusion', 'sha', 'workflow_base_blob_sha'], `$.required_checks[${index}]`);
     requireString(check.name, `$.required_checks[${index}].name`);
     if (isReservedCheckContext(check.name)) fail('recursive_check', `$.required_checks[${index}].name`, 'Shiploop cannot require itself');
     if (check.conclusion !== 'success') fail('failed_required_check', `$.required_checks[${index}].conclusion`, `${check.name} did not succeed`);
     if (check.sha !== headSha) fail('check_sha_mismatch', `$.required_checks[${index}].sha`, `${check.name} is stale`);
+    const trusted = mission.trusted_checks.find(({ name }) => name === check.name);
+    if (trusted?.source === 'check_run') requireSha(check.workflow_base_blob_sha, `$.required_checks[${index}].workflow_base_blob_sha`);
+    if (trusted?.source !== 'check_run' && check.workflow_base_blob_sha !== undefined) fail('invalid_trusted_check', `$.required_checks[${index}].workflow_base_blob_sha`, 'is only valid for trusted Actions checks');
     checkNames.add(check.name);
   }
   for (const name of review.required_checks) if (!checkNames.has(name)) fail('missing_required_check', '$.required_checks', `missing ${name}`);

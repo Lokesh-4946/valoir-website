@@ -11,6 +11,7 @@ export function websiteFixture() {
     contract_id: 'VAL-2026-001',
     product: 'valoir-website',
     intent: 'Update the website for Rizz 0.3.0.',
+    intent_mode: 'composite',
     approved_design: 'product-brain/specs/website.md',
     implementation_plan: 'product-brain/plans/website.md',
     authorization_sources: ['product-brain/specs/website.md', 'product-brain/specs/shiploop.md'],
@@ -69,7 +70,7 @@ export function websiteFixture() {
     generated_at: '2026-07-11T09:00:00.000Z',
   };
   const requiredChecks = [
-    { name: 'build + typecheck', conclusion: 'success', sha: HEAD_SHA },
+    { name: 'build + typecheck', conclusion: 'success', sha: HEAD_SHA, workflow_base_blob_sha: 'd'.repeat(40) },
     { name: 'Vercel', conclusion: 'success', sha: HEAD_SHA },
   ];
   const certificate = {
@@ -113,7 +114,7 @@ export function rizzFixture() {
   fixture.certificate.mission_contract_id = fixture.mission.contract_id;
   fixture.certificate.mission_contract_hash = normalizedHash(fixture.mission);
   fixture.certificate.review_artifact_hash = normalizedHash(fixture.review);
-  fixture.certificate.required_checks = fixture.mission.required_checks.map((name) => ({ name, conclusion: 'success', sha: HEAD_SHA }));
+  fixture.certificate.required_checks = fixture.mission.required_checks.map((name) => ({ name, conclusion: 'success', sha: HEAD_SHA, workflow_base_blob_sha: 'd'.repeat(40) }));
   fixture.certificate.preview = { required: false, conclusion: 'not_required', sha: HEAD_SHA };
   fixture.certificate.certificate_hash = certificateHash({ mission: fixture.mission, review: fixture.review, requiredChecks: fixture.certificate.required_checks, reviewedSha: HEAD_SHA, changedPaths: WEBSITE_CHANGES });
   return fixture;

@@ -95,6 +95,7 @@ test('live GitHub evidence replaces untrusted check conclusions and excludes Shi
     ],
     previewName: 'Vercel',
     trustedChecks: fixture.mission.trusted_checks,
+    workflowBlobs: { '.github/workflows/ci.yml': { base: 'd'.repeat(40), head: 'd'.repeat(40), local: 'd'.repeat(40) } },
   });
   assert.deepEqual(live.requiredChecks, fixture.certificate.required_checks);
   assert.deepEqual(live.preview, fixture.certificate.preview);
@@ -108,6 +109,7 @@ test('live GitHub evidence rejects missing, failed, stale, and recursively requi
     statuses: [{ context: 'Vercel', state: 'success', sha: HEAD_SHA, creator: { login: 'vercel[bot]' } }],
     previewName: 'Vercel',
     trustedChecks: websiteFixture().mission.trusted_checks,
+    workflowBlobs: { '.github/workflows/ci.yml': { base: 'd'.repeat(40), head: 'd'.repeat(40), local: 'd'.repeat(40) } },
   };
   assert.throws(() => validateLiveEvidence({ ...base, requiredNames: ['valoir-shiploop'] }), /recursively/);
   assert.throws(() => validateLiveEvidence({ ...base, requiredNames: ['Rizz-ReviewLoop'] }), /recursively/);
@@ -115,6 +117,29 @@ test('live GitHub evidence rejects missing, failed, stale, and recursively requi
   assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ ...base.checkRuns[0], conclusion: 'failure' }] }), /did not succeed/);
   assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: BASE_SHA }] }), /missing live required check/);
   assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA, app: { slug: 'attacker', id: 9 }, workflow: { name: 'CI', path: '.github/workflows/ci.yml' } }] }), /trusted provenance/);
+  assert.throws(() => validateLiveEvidence({ ...base, workflowBlobs: { '.github/workflows/ci.yml': { base: 'd'.repeat(40), head: 'e'.repeat(40), local: 'e'.repeat(40) } } }), /workflow definition changed/);
+});
+
+test('trusted duplicate evidence wins over an untrusted same-name record', () => {
+  const fixture = websiteFixture();
+  const trusted = { name: 'build + typecheck', conclusion: 'success', head_sha: HEAD_SHA, app: { slug: 'github-actions', id: 15368 }, workflow: { name: 'CI', path: '.github/workflows/ci.yml' } };
+  const result = validateLiveEvidence({
+    requiredNames: fixture.mission.required_checks,
+    trustedChecks: fixture.mission.trusted_checks,
+    reviewedSha: HEAD_SHA,
+    checkRuns: [{ ...trusted, app: { slug: 'attacker', id: 9 } }, trusted],
+    statuses: [{ context: 'Vercel', state: 'success', sha: HEAD_SHA, creator: { login: 'vercel[bot]' } }],
+    previewName: 'Vercel',
+    workflowBlobs: { '.github/workflows/ci.yml': { base: 'd'.repeat(40), head: 'd'.repeat(40), local: 'd'.repeat(40) } },
+  });
+  assert.equal(result.requiredChecks[0].workflow_base_blob_sha, 'd'.repeat(40));
+});
+
+test('publisher paginates all GitHub check and status evidence', async () => {
+  const source = await import('node:fs/promises').then(({ readFile }) => readFile('scripts/shiploop/publish-status.mjs', 'utf8'));
+  assert.match(source, /check-runs[^\n]+--paginate/);
+  assert.match(source, /statuses[^\n]+--paginate/);
+  assert.match(source, /--slurp/);
 });
 
 test('workflow checks out the immutable PR head instead of the synthetic merge ref', async () => {

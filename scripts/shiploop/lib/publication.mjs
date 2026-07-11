@@ -11,23 +11,33 @@ export function validateRepository(value) {
   return value;
 }
 
-export function validateLiveEvidence({ requiredNames, trustedChecks, reviewedSha, checkRuns, statuses, previewName }) {
+export function validateLiveEvidence({ requiredNames, trustedChecks, reviewedSha, checkRuns, statuses, previewName, workflowBlobs }) {
   requireSha(reviewedSha, '$.reviewedSha');
   const requiredChecks = [];
   for (const name of requiredNames) {
     if (isReservedCheckContext(name)) throw new Error(`${name} recursively requires Shiploop`);
     const trusted = trustedChecks.find((item) => item.name === name);
     if (!trusted) throw new Error(`missing trusted provenance for ${name}`);
-    const run = checkRuns.find((item) => item.name === name && item.head_sha === reviewedSha && !isReservedCheckContext(item.name));
-    const status = statuses.find((item) => item.context === name && item.sha === reviewedSha && !isReservedCheckContext(item.context));
-    if (!run && !status) throw new Error(`missing live required check ${name} for exact SHA`);
-    const provenanceMatches = trusted.source === 'check_run'
-      ? run && run.app?.slug === trusted.app_slug && run.app?.id === trusted.app_id && run.workflow?.name === trusted.workflow_name && run.workflow?.path === trusted.workflow_path
-      : status && status.creator?.login === trusted.creator_login;
-    if (!provenanceMatches) throw new Error(`live required check ${name} lacks trusted provenance`);
+    const run = checkRuns.find((item) => item.name === name && item.head_sha === reviewedSha && !isReservedCheckContext(item.name)
+      && trusted.source === 'check_run' && item.app?.slug === trusted.app_slug && item.app?.id === trusted.app_id
+      && item.workflow?.name === trusted.workflow_name && item.workflow?.path === trusted.workflow_path);
+    const status = statuses.find((item) => item.context === name && item.sha === reviewedSha && !isReservedCheckContext(item.context)
+      && trusted.source === 'status' && item.creator?.login === trusted.creator_login);
+    if (!run && !status) {
+      const sameName = checkRuns.some((item) => item.name === name && item.head_sha === reviewedSha)
+        || statuses.some((item) => item.context === name && item.sha === reviewedSha);
+      if (sameName) throw new Error(`live required check ${name} lacks trusted provenance`);
+      throw new Error(`missing live required check ${name} for exact SHA`);
+    }
     const conclusion = run?.conclusion ?? (status?.state === 'success' ? 'success' : status?.state);
     if (conclusion !== 'success') throw new Error(`live required check ${name} did not succeed`);
-    requiredChecks.push({ name, conclusion: 'success', sha: reviewedSha });
+    const checkEvidence = { name, conclusion: 'success', sha: reviewedSha };
+    if (trusted.source === 'check_run') {
+      const blobs = workflowBlobs?.[trusted.workflow_path];
+      if (!blobs || blobs.base !== blobs.head || blobs.base !== blobs.local) throw new Error(`trusted workflow definition changed for ${name}`);
+      checkEvidence.workflow_base_blob_sha = blobs.base;
+    }
+    requiredChecks.push(checkEvidence);
   }
   const previewCheck = requiredChecks.find(({ name }) => name === previewName);
   if (!previewCheck) throw new Error(`missing live preview evidence ${previewName}`);

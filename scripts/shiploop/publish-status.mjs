@@ -50,7 +50,7 @@ await verifyPublicationTarget({
   baseIsAncestor,
 });
 const changedPaths = deriveChangedPaths({ baseSha: certificate.base_sha, headSha: certificate.reviewed_sha });
-const checkRuns = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/check-runs`, '--jq', '.check_runs']));
+const checkRuns = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/check-runs`, '--paginate', '--slurp', '--jq', 'map(.check_runs) | add']));
 for (const checkRun of checkRuns) {
   const runId = checkRun.details_url?.match(/\/actions\/runs\/(\d+)/)?.[1];
   if (checkRun.app?.slug === 'github-actions' && runId) {
@@ -58,7 +58,15 @@ for (const checkRun of checkRuns) {
     checkRun.workflow = { name: workflowRun.name, path: workflowRun.path };
   }
 }
-const statuses = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`]));
+const statuses = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`, '--paginate', '--slurp', '--jq', 'add']));
+const workflowBlobs = {};
+for (const trusted of mission.trusted_checks.filter(({ source }) => source === 'check_run')) {
+  workflowBlobs[trusted.workflow_path] = {
+    base: run('git', ['rev-parse', `${certificate.base_sha}:${trusted.workflow_path}`]),
+    head: run('git', ['rev-parse', `${certificate.reviewed_sha}:${trusted.workflow_path}`]),
+    local: run('git', ['hash-object', trusted.workflow_path]),
+  };
+}
 const liveEvidence = validateLiveEvidence({
   requiredNames: mission.required_checks,
   reviewedSha: certificate.reviewed_sha,
@@ -66,6 +74,7 @@ const liveEvidence = validateLiveEvidence({
   statuses,
   previewName: 'Vercel',
   trustedChecks: mission.trusted_checks,
+  workflowBlobs,
 });
 if (JSON.stringify(certificate.required_checks) !== JSON.stringify(liveEvidence.requiredChecks)) throw new Error('certificate required checks do not match live GitHub evidence');
 if (JSON.stringify(certificate.preview) !== JSON.stringify(liveEvidence.preview)) throw new Error('certificate preview does not match live GitHub evidence');

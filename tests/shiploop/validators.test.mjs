@@ -49,6 +49,20 @@ test('mission requires combined authorization and trusted check provenance', () 
   expectCode('invalid_trusted_check', () => validateMission(spoofable.mission));
 });
 
+test('standalone and composite mission authorization cardinality is explicit', () => {
+  const standalone = websiteFixture();
+  standalone.mission.intent_mode = 'standalone';
+  standalone.mission.authorization_sources = ['product-brain/specs/one.md'];
+  standalone.mission.related_contract_ids = [];
+  assert.doesNotThrow(() => validateMission(standalone.mission));
+  const composite = websiteFixture();
+  composite.mission.authorization_sources = ['product-brain/specs/one.md'];
+  expectCode('invalid_authorization', () => validateMission(composite.mission));
+  const badMode = websiteFixture();
+  badMode.mission.intent_mode = 'implicit';
+  expectCode('invalid_intent_mode', () => validateMission(badMode.mission));
+});
+
 test('review binds the reviewed publisher path and SHA-256 hash', () => {
   const fixture = websiteFixture();
   fixture.review.publisher.sha256 = 'bad';

@@ -3,6 +3,7 @@
   "contract_id": "VAL-2026-002",
   "product": "valoir-website",
   "intent": "Complete source-backed Rizz 0.3.1 website readiness and establish the Valoir Shiploop exact-SHA shipping gate together on PR #14.",
+  "intent_mode": "composite",
   "approved_design": "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/specs/2026-07-11-valoir-shiploop-rizz-reviewloop-design.md",
   "implementation_plan": "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/plans/2026-07-11-valoir-shiploop-core.md",
   "authorization_sources": [
