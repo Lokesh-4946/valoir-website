@@ -16,6 +16,7 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -26,23 +27,60 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 1280px)");
+
+    function closeMenuOnDesktop(event: MediaQueryListEvent) {
+      if (event.matches) setOpen(false);
+    }
+
+    desktopQuery.addEventListener("change", closeMenuOnDesktop);
+    return () => desktopQuery.removeEventListener("change", closeMenuOnDesktop);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     firstMenuLinkRef.current?.focus();
 
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
+    function containMenuFocus(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+        return;
+      }
 
-      setOpen(false);
-      menuButtonRef.current?.focus();
+      if (event.key !== "Tab") return;
+
+      const menu = mobileMenuRef.current;
+      if (!menu) return;
+
+      const focusableElements = Array.from(
+        menu.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (!firstElement || !lastElement) return;
+
+      const activeElement = document.activeElement;
+      const focusIsOutsideMenu = !menu.contains(activeElement);
+      const leavingStart = event.shiftKey && activeElement === firstElement;
+      const leavingEnd = !event.shiftKey && activeElement === lastElement;
+      if (!focusIsOutsideMenu && !leavingStart && !leavingEnd) return;
+
+      event.preventDefault();
+      if (event.shiftKey) {
+        lastElement.focus();
+        return;
+      }
+      firstElement.focus();
     }
 
-    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", containMenuFocus);
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", containMenuFocus);
     };
   }, [open]);
 
@@ -116,6 +154,7 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
+            ref={mobileMenuRef}
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
@@ -140,7 +179,6 @@ export default function Nav() {
               ))}
               <a
                 href={nav.cta.href}
-                aria-label="See Rizz"
                 onClick={() => setOpen(false)}
                 className="mt-2 flex min-h-11 items-center justify-center rounded-full bg-accent px-4 py-3 text-center font-mono text-sm font-semibold text-[var(--accent-ink)]"
               >

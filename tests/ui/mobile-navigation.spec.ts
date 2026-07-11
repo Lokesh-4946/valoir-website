@@ -25,13 +25,13 @@ for (const width of [360, 390]) {
       await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
       await expect(menu.getByRole("link", { name: "Products" })).toBeVisible();
       await expect(menu.getByRole("link", { name: "Docs" })).toBeVisible();
-      await expect(menu.getByRole("link", { name: "See Rizz" })).toBeVisible();
+      await expect(menu.getByRole("link", { name: "Install Rizz" })).toBeVisible();
 
       const targets = [
         page.getByRole("button", { name: "Menu" }),
         menu.getByRole("link", { name: "Products" }),
         menu.getByRole("link", { name: "Docs" }),
-        menu.getByRole("link", { name: "See Rizz" }),
+        menu.getByRole("link", { name: "Install Rizz" }),
       ];
       for (const target of targets) {
         const box = await target.boundingBox();
@@ -47,7 +47,7 @@ test.describe("mobile menu keyboard behavior", () => {
   test("closes with Escape and returns focus to the trigger", async ({ page }) => {
     await page.goto("/");
 
-    const trigger = page.getByRole("button", { name: "Menu" });
+    const trigger = page.locator('button[aria-controls="mobile-menu"]');
     await trigger.click();
     await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
 
@@ -55,5 +55,36 @@ test.describe("mobile menu keyboard behavior", () => {
 
     await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
     await expect(trigger).toBeFocused();
+  });
+
+  test("contains forward and reverse keyboard focus", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Menu" }).click();
+
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    const firstLink = menu.getByRole("link", { name: "Products" });
+    const lastLink = menu.getByRole("link", { name: "Install Rizz" });
+    await expect(firstLink).toBeFocused();
+
+    await page.keyboard.press("Shift+Tab");
+    await expect(lastLink).toBeFocused();
+
+    await page.keyboard.press("Tab");
+    await expect(firstLink).toBeFocused();
+  });
+
+  test("closes and unlocks scrolling when crossing the desktop breakpoint", async ({ page }) => {
+    await page.goto("/");
+
+    const trigger = page.locator('button[aria-controls="mobile-menu"]');
+    await trigger.click();
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+    await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+
+    await page.setViewportSize({ width: 1280, height: 844 });
+
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
   });
 });
