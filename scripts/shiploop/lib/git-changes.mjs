@@ -32,11 +32,13 @@ function git(args, cwd) {
 
 function kindAt(sha, path, cwd) {
   const record = git(['ls-tree', '-z', sha, '--', path], cwd);
-  if (!record) return 'file';
+  if (!record) return 'missing';
   const mode = record.split(' ', 1)[0];
   if (mode === '120000') return 'symlink';
+  if (mode === '160000') return 'gitlink';
   if (mode === '040000') return 'directory';
-  return 'file';
+  if (mode.startsWith('100')) return 'file';
+  return 'nonregular';
 }
 
 export function deriveChangedPaths({ baseSha, headSha, cwd = process.cwd() }) {
@@ -48,6 +50,8 @@ export function deriveChangedPaths({ baseSha, headSha, cwd = process.cwd() }) {
   const changes = parseNameStatus(execFileSync('git', ['diff', '--name-status', '-z', baseSha, headSha], { cwd, encoding: 'utf8' }));
   return changes.map((change) => {
     const treeSha = change.status === 'D' ? baseSha : headSha;
-    return { ...change, kind: kindAt(treeSha, change.path, cwd) };
+    const enriched = { ...change, kind: kindAt(treeSha, change.path, cwd) };
+    if (['T', 'R', 'C'].includes(change.status)) enriched.oldKind = kindAt(baseSha, change.oldPath ?? change.path, cwd);
+    return enriched;
   });
 }

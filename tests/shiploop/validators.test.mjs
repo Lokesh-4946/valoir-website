@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, symlink, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -472,6 +472,49 @@ test('Git derivation rejects nonexistent and stale SHAs and detects symlinks', a
     expectCode('stale_head_sha', () => deriveChangedPaths({ baseSha, headSha: staleHead, cwd }));
     const changes = deriveChangedPaths({ baseSha, headSha, cwd });
     assert.equal(changes.find(({ path }) => path === 'linked.txt')?.kind, 'symlink');
+  } finally {
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
+test('scope rejects gitlinks and unsafe old endpoints for type, rename, and copy changes', () => {
+  const fixture = websiteFixture();
+  for (const [code, change] of [
+    ['unsupported_object_kind', { status: 'A', path: 'src/module', kind: 'gitlink' }],
+    ['symlink_change', { status: 'T', path: 'src/a.ts', oldKind: 'symlink', kind: 'file' }],
+    ['symlink_change', { status: 'R', oldPath: 'src/old.ts', path: 'src/new.ts', oldKind: 'symlink', kind: 'file' }],
+    ['unsupported_object_kind', { status: 'C', oldPath: 'src/old.ts', path: 'src/new.ts', oldKind: 'gitlink', kind: 'file' }],
+  ]) expectCode(code, () => validateChangedPaths([change], fixture.mission, fixture.review));
+});
+
+test('Git derivation inspects both modes for type changes and classifies gitlinks', async () => {
+  const cwd = await mkdtemp(join(tmpdir(), 'shiploop-modes-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const commit = (message) => git('-c', 'user.name=Shiploop', '-c', 'user.email=shiploop@example.invalid', 'commit', '-qam', message);
+  try {
+    git('init', '-q');
+    await writeFile(join(cwd, 'target.txt'), 'target\n');
+    await symlink('target.txt', join(cwd, 'flip'));
+    git('add', '.');
+    git('-c', 'user.name=Shiploop', '-c', 'user.email=shiploop@example.invalid', 'commit', '-qm', 'symlink base');
+    const symlinkBase = git('rev-parse', 'HEAD');
+    await unlink(join(cwd, 'flip'));
+    await writeFile(join(cwd, 'flip'), 'regular\n');
+    commit('symlink to file');
+    const fileHead = git('rev-parse', 'HEAD');
+    const toFile = deriveChangedPaths({ baseSha: symlinkBase, headSha: fileHead, cwd }).find(({ path }) => path === 'flip');
+    assert.deepEqual({ status: toFile.status, oldKind: toFile.oldKind, kind: toFile.kind }, { status: 'T', oldKind: 'symlink', kind: 'file' });
+    await unlink(join(cwd, 'flip'));
+    await symlink('target.txt', join(cwd, 'flip'));
+    commit('file to symlink');
+    const symlinkHead = git('rev-parse', 'HEAD');
+    const toSymlink = deriveChangedPaths({ baseSha: fileHead, headSha: symlinkHead, cwd }).find(({ path }) => path === 'flip');
+    assert.deepEqual({ status: toSymlink.status, oldKind: toSymlink.oldKind, kind: toSymlink.kind }, { status: 'T', oldKind: 'file', kind: 'symlink' });
+    git('update-index', '--add', '--cacheinfo', `160000,${symlinkBase},module`);
+    git('-c', 'user.name=Shiploop', '-c', 'user.email=shiploop@example.invalid', 'commit', '-qm', 'gitlink');
+    const gitlinkHead = git('rev-parse', 'HEAD');
+    const gitlink = deriveChangedPaths({ baseSha: symlinkHead, headSha: gitlinkHead, cwd }).find(({ path }) => path === 'module');
+    assert.equal(gitlink.kind, 'gitlink');
   } finally {
     await rm(cwd, { recursive: true, force: true });
   }

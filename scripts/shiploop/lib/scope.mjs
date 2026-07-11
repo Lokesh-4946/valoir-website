@@ -10,10 +10,14 @@ export function validateChangedPaths(changes, mission, review) {
   for (const [index, change] of changes.entries()) {
     const path = `$.changedPaths[${index}]`;
     requireObject(change, path);
-    rejectUnknownFields(change, ['status', 'path', 'oldPath', 'kind'], path);
+    rejectUnknownFields(change, ['status', 'path', 'oldPath', 'kind', 'oldKind'], path);
     if (!['A', 'M', 'D', 'R', 'C', 'T'].includes(change.status)) fail('invalid_change_status', `${path}.status`, 'is not a supported Git change status');
-    if (!['file', 'directory', 'symlink'].includes(change.kind)) fail('invalid_type', `${path}.kind`, 'must identify file, directory, or symlink');
-    if (change.kind === 'symlink') fail('symlink_change', `${path}.kind`, 'changed symlinks are not accepted as scope proof');
+    for (const [field, kind] of [['kind', change.kind], ['oldKind', change.oldKind]]) {
+      if (kind === undefined) continue;
+      if (!['file', 'directory', 'symlink', 'gitlink', 'nonregular', 'missing'].includes(kind)) fail('invalid_type', `${path}.${field}`, 'is not a recognized Git object kind');
+      if (kind === 'symlink') fail('symlink_change', `${path}.${field}`, 'changed symlinks are not accepted as scope proof');
+      if (kind !== 'file') fail('unsupported_object_kind', `${path}.${field}`, `schema v1 rejects ${kind} changes`);
+    }
     const actualPaths = change.oldPath ? [change.oldPath, change.path] : [change.path];
     if (change.status === 'R' && !change.oldPath) fail('invalid_change_status', path, 'renames require oldPath');
     for (const actualPath of actualPaths) {
