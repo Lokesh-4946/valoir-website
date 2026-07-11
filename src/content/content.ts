@@ -32,7 +32,11 @@ export const hero = {
   headline: ["Valoir builds", "open-core agent", "infrastructure."],
   subhead: "Infrastructure for local-first coding agents and the teams that run them.",
   primary: { label: "Explore Rizz", href: "#products" },
-  secondary: { label: "View on GitHub", href: "https://github.com/Lokesh-4946/rizz" },
+  secondary: { label: "Read docs", href: "/docs" },
+  supporting: {
+    installCommand: "npm install -g @valoir/rizz",
+    github: { label: "GitHub", href: "https://github.com/Lokesh-4946/rizz" },
+  },
 };
 
 export const manifesto = {

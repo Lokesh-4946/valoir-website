@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { hero } from "@/content/content";
+import CopyButton from "./CopyButton";
 import MagneticButton from "./MagneticButton";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useMediaQuery } from "@/lib/useMediaQuery";
@@ -89,18 +90,55 @@ export default function Hero() {
         <p
           data-h-fade
           data-hero-subhead
-          className="mt-6 max-w-2xl text-base leading-7 text-muted sm:text-lg"
+          className="mt-6 max-w-2xl text-base leading-7 text-bone sm:text-lg sm:leading-8"
         >
           {hero.subhead}
         </p>
 
-        <div data-h-fade className="mt-10 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
-          <MagneticButton href={hero.primary.href} variant="accent">
-            {hero.primary.label}
-          </MagneticButton>
-          <MagneticButton href={hero.secondary.href} variant="line" external>
-            {hero.secondary.label} <ArrowOut />
-          </MagneticButton>
+        <div data-h-fade className="mt-10">
+          <div
+            data-hero-actions
+            className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <MagneticButton
+              href={hero.primary.href}
+              variant="accent"
+              className="justify-center"
+            >
+              <span data-action-priority="primary">{hero.primary.label}</span>
+            </MagneticButton>
+            <MagneticButton
+              href={hero.secondary.href}
+              variant="line"
+              className="justify-center"
+            >
+              <span data-action-priority="secondary">{hero.secondary.label}</span>
+            </MagneticButton>
+          </div>
+
+          <div
+            data-hero-supporting-actions
+            className="mt-4 flex max-w-full flex-col items-stretch gap-3 font-mono text-sm leading-6 text-muted sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <div className="flex min-w-0 max-w-full items-center rounded-full border border-line bg-[var(--bg-2)] py-1 pl-4 pr-1">
+              <code className="min-w-0 flex-1 truncate text-bone">
+                {hero.supporting.installCommand}
+              </code>
+              <CopyButton
+                text={hero.supporting.installCommand}
+                label="copy"
+                className="ml-2 rounded-full"
+              />
+            </div>
+            <a
+              href={hero.supporting.github.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 px-3 text-muted transition-colors hover:text-fg sm:justify-start"
+            >
+              {hero.supporting.github.label} <ArrowOut />
+            </a>
+          </div>
         </div>
       </div>
 
