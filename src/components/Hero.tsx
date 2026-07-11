@@ -35,18 +35,19 @@ export default function Hero() {
     const lines = el.querySelectorAll<HTMLElement>("[data-h-line]");
     const rest = el.querySelectorAll<HTMLElement>("[data-h-fade]");
 
-    if (reduced) {
-      gsap.set(lines, { yPercent: 0 });
-      gsap.set(rest, { opacity: 1, y: 0 });
-      return;
-    }
+    if (reduced) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-      gsap.set(lines, { yPercent: 115 });
-      gsap.set(rest, { opacity: 0, y: 18 });
-      tl.to(lines, { yPercent: 0, duration: 1.1, stagger: 0.1 }, 0.15)
-        .to(rest, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08 }, 0.6);
+      tl.from(
+        lines,
+        { yPercent: 115, duration: 1.1, stagger: 0.1, immediateRender: false },
+        0.15,
+      ).from(
+        rest,
+        { opacity: 0, y: 18, duration: 0.8, stagger: 0.08, immediateRender: false },
+        0.6,
+      );
     }, el);
     return () => ctx.revert();
   }, [reduced]);
@@ -85,7 +86,7 @@ export default function Hero() {
           ))}
         </h1>
 
-        <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4 opacity-0">
+        <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4">
           <MagneticButton href={hero.primary.href} variant="accent">
             {hero.primary.label}
           </MagneticButton>
@@ -98,7 +99,7 @@ export default function Hero() {
       {/* scroll cue */}
       <div
         data-h-fade
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-mono text-[10px] uppercase tracking-eyebrow text-faint opacity-0"
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-mono text-[10px] uppercase tracking-eyebrow text-faint"
       >
         scroll
       </div>
