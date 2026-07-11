@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { hero } from "@/content/content";
+import CopyButton from "./CopyButton";
 import MagneticButton from "./MagneticButton";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useMediaQuery } from "@/lib/useMediaQuery";
@@ -35,18 +36,22 @@ export default function Hero() {
     const lines = el.querySelectorAll<HTMLElement>("[data-h-line]");
     const rest = el.querySelectorAll<HTMLElement>("[data-h-fade]");
 
-    if (reduced) {
-      gsap.set(lines, { yPercent: 0 });
-      gsap.set(rest, { opacity: 1, y: 0 });
-      return;
-    }
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced || prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-      gsap.set(lines, { yPercent: 115 });
-      gsap.set(rest, { opacity: 0, y: 18 });
-      tl.to(lines, { yPercent: 0, duration: 1.1, stagger: 0.1 }, 0.15)
-        .to(rest, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08 }, 0.6);
+      tl.from(
+        lines,
+        { yPercent: 18, duration: 1.1, stagger: 0.1, immediateRender: false },
+        0.15,
+      ).from(
+        rest,
+        { opacity: 0.7, y: 8, duration: 0.8, stagger: 0.08, immediateRender: false },
+        0.6,
+      );
     }, el);
     return () => ctx.revert();
   }, [reduced]);
@@ -85,20 +90,65 @@ export default function Hero() {
           ))}
         </h1>
 
-        <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4 opacity-0">
-          <MagneticButton href={hero.primary.href} variant="accent">
-            {hero.primary.label}
-          </MagneticButton>
-          <MagneticButton href={hero.secondary.href} variant="line" external>
-            {hero.secondary.label} <ArrowOut />
-          </MagneticButton>
+        <p
+          data-h-fade
+          data-hero-subhead
+          className="mt-6 max-w-2xl text-base leading-7 text-bone sm:text-lg sm:leading-8"
+        >
+          {hero.subhead}
+        </p>
+
+        <div data-h-fade className="mt-10">
+          <div
+            data-hero-actions
+            className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <MagneticButton
+              href={hero.primary.href}
+              variant="accent"
+              className="justify-center"
+            >
+              <span data-action-priority="primary">{hero.primary.label}</span>
+            </MagneticButton>
+            <MagneticButton
+              href={hero.secondary.href}
+              variant="line"
+              className="justify-center"
+            >
+              <span data-action-priority="secondary">{hero.secondary.label}</span>
+            </MagneticButton>
+          </div>
+
+          <div
+            data-hero-supporting-actions
+            className="mt-4 flex max-w-full flex-col items-stretch gap-3 font-mono text-sm leading-6 text-muted sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <div className="flex min-w-0 max-w-full items-center rounded-full border border-line bg-[var(--bg-2)] py-1 pl-4 pr-1">
+              <code className="min-w-0 flex-1 truncate text-bone">
+                {hero.supporting.installCommand}
+              </code>
+              <CopyButton
+                text={hero.supporting.installCommand}
+                label="copy"
+                className="ml-2 min-h-11 rounded-full sm:min-h-0"
+              />
+            </div>
+            <a
+              href={hero.supporting.github.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 px-3 text-muted transition-colors hover:text-fg sm:justify-start"
+            >
+              {hero.supporting.github.label} <ArrowOut />
+            </a>
+          </div>
         </div>
       </div>
 
       {/* scroll cue */}
       <div
         data-h-fade
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-mono text-[10px] uppercase tracking-eyebrow text-faint opacity-0"
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 font-mono text-[10px] uppercase tracking-eyebrow text-faint"
       >
         scroll
       </div>

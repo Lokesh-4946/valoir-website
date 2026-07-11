@@ -38,21 +38,18 @@ export function Reveal({
     gsap.registerPlugin(ScrollTrigger);
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      gsap.set(el, { opacity: 1, y: 0 });
-      return;
-    }
+    if (reduced) return;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
+      gsap.from(
         el,
-        { opacity: 0, y },
         {
-          opacity: 1,
-          y: 0,
+          opacity: 0.7,
+          y: Math.min(y, 8),
           duration: 0.9,
           delay,
           ease: "power3.out",
+          immediateRender: false,
           scrollTrigger: { trigger: el, start: "top 85%" },
         },
       );
@@ -61,7 +58,7 @@ export function Reveal({
   }, [delay, y]);
 
   return (
-    <Tag ref={ref as never} data-reveal className={className} style={{ opacity: 0 }}>
+    <Tag ref={ref as never} data-reveal className={className}>
       {children}
     </Tag>
   );
@@ -95,25 +92,23 @@ export function MaskReveal({
     const targets = root.querySelectorAll<HTMLElement>("[data-line-inner]");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (reduced) {
-      gsap.set(targets, { yPercent: 0, opacity: 1 });
-      return;
-    }
+    if (reduced) return;
 
     let tween: gsap.core.Tween | undefined;
     let observer: IntersectionObserver | undefined;
-    const ctx = gsap.context(() => {
-      gsap.set(targets, { yPercent: 110 });
-    }, root);
+    let ctx: gsap.Context | undefined;
 
     const play = () => {
       if (tween) return;
-      tween = gsap.to(targets, {
-        yPercent: 0,
-        duration: 1,
-        ease: "power4.out",
-        stagger: 0.09,
-      });
+      ctx = gsap.context(() => {
+        tween = gsap.from(targets, {
+          yPercent: 18,
+          duration: 1,
+          ease: "power4.out",
+          stagger: 0.09,
+          immediateRender: false,
+        });
+      }, root);
       observer?.disconnect();
     };
 
@@ -128,7 +123,7 @@ export function MaskReveal({
     return () => {
       observer?.disconnect();
       tween?.kill();
-      ctx.revert();
+      ctx?.revert();
     };
   }, [start]);
 

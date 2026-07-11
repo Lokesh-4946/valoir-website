@@ -7,7 +7,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:shiploop": "node --test tests/shiploop/*.test.mjs",
+    "shiploop:validate-committed": "node scripts/shiploop/validate-committed-gate.mjs .valoir/mission-contract.json .valoir/review-policy.yml",
+    "shiploop:publish": "node scripts/shiploop/publish-status.mjs",
+    "test:ui": "playwright test"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
@@ -21,11 +25,14 @@
     "three": "^0.169.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/node": "^20.16.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/three": "^0.169.0",
     "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.35",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3"

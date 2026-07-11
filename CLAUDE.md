@@ -20,7 +20,7 @@ vault — **not in this repo**. Load these first:
   notes/brand-tokens.md           locked palette / type / motion
   context/claude-code-context.md  how Claude Code works in this repo
   handoffs/                       dated tasks to pick up (work the latest open one)
-  runbooks/                       repo setup · dev loop · greploop · deploy
+  runbooks/                       repo setup · dev loop · shiploop · deploy
 ```
 
 **Rule:** every fact on the site traces to `knowledge/rizz-facts.md`. If it isn't there or in the
@@ -38,13 +38,16 @@ Three skills are bundled in `.claude/skills/` and are **required**, not optional
 2. **code-simplifier** — run after every logical chunk of code. Clarity over brevity. No nested
    ternaries (use `if`/`switch`). Preserve functionality exactly. Don't delete helpful
    abstractions.
-3. **greploop** — every PR is driven to **Greptile 5/5, zero unresolved comments** (max 5
-   iterations) before merge. Requires the Greptile GitHub app installed on the repo + `gh`
-   authenticated. See `runbooks/greploop.md` in the brain.
+3. **shiploop** — every PR receives exact-head-SHA independent review, deterministic CI and
+   preview validation, zero unresolved blocking findings, and a valid merge-readiness certificate.
+   Repairs are bounded to five iterations; an unclean fifth iteration is `BLOCKED`, never approved.
+   See `runbooks/shiploop.md` in the brain.
 
 **Dev loop for every task:** plan → branch (`feature/*`) → build → **code-structure** check →
-**code-simplifier** pass → `npm run build` green → open PR via `gh` → **greploop to 5/5** → merge
-to `main`. Write a dated handoff note back to the brain at the end of each task.
+**code-simplifier** pass → `npm run build` green → open PR via `gh` → **Shiploop APPROVE for the
+exact PR head SHA** → verify a current merge-readiness certificate → authorized merge to `main`.
+Any new commit invalidates prior review and certification. Write a dated handoff note back to the
+brain at the end of each task.
 
 ## Stack & conventions
 
@@ -71,4 +74,8 @@ to `main`. Write a dated handoff note back to the brain at the end of each task.
 
 - **Conventional commits** (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `style:`).
 - Branches: `feature/*`, `fix/*` off `main`. `main` protected + always deployable.
-- One logical change per PR. PR description states what changed and why; greploop runs before merge.
+- One logical change per PR. PR description states what changed and why; Shiploop runs before merge.
+- Implementation agents cannot approve their own work. Reviewer reports are evidence, not merge
+  authority; an independent adjudicator owns the final review artifact.
+- Merge readiness does not authorize merge or deployment. Dev verification and production approval
+  remain separate post-merge gates.

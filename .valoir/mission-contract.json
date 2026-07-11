@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "contract_id": "VAL-2026-002",
+  "product": "valoir-website",
+  "intent": "Complete source-backed Rizz 0.3.1 website readiness and establish the Valoir Shiploop exact-SHA shipping gate together on PR #14.",
+  "intent_mode": "composite",
+  "approved_design": "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/specs/2026-07-11-valoir-shiploop-rizz-reviewloop-design.md",
+  "implementation_plan": "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/plans/2026-07-11-valoir-shiploop-core.md",
+  "authorization_sources": [
+    "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/planning/product-planner.md#val-2026-002",
+    "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/specs/2026-07-11-valoir-shiploop-rizz-reviewloop-design.md",
+    "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/plans/2026-07-11-rizz-0.3-website-refresh.md",
+    "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/plans/2026-07-11-valoir-shiploop-core.md"
+  ],
+  "related_contract_ids": ["VAL-2026-001"],
+  "expected_paths": [
+    ".claude/skills/",
+    ".eslintrc.json",
+    ".github/workflows/",
+    ".valoir/",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "package.json",
+    "package-lock.json",
+    "playwright.config.ts",
+    "scripts/shiploop/",
+    "src/",
+    "tests/"
+  ],
+  "forbidden_paths": [
+    ".env",
+    ".env.local",
+    "node_modules/"
+  ],
+  "acceptance_criteria": [
+    "Website copy reflects source-backed current Rizz capabilities.",
+    "Responsive, reduced-motion, keyboard, and progressive-enhancement UI tests pass.",
+    "Shiploop derives scope from Git and rejects stale or forged exact-SHA evidence.",
+    "Runtime review and certificate evidence remain outside the reviewed Git tree.",
+    "A trusted publisher refuses any checked-out or remote PR-head SHA mismatch."
+  ],
+  "required_checks": [
+    "build + typecheck",
+    "Vercel"
+  ],
+  "trusted_checks": [
+    {
+      "name": "build + typecheck",
+      "source": "check_run",
+      "app_slug": "github-actions",
+      "app_id": 15368,
+      "workflow_name": "CI",
+      "workflow_path": ".github/workflows/ci.yml"
+    },
+    {
+      "name": "Vercel",
+      "source": "status",
+      "creator_login": "vercel[bot]"
+    }
+  ],
+  "created_at": "2026-07-11T08:00:00.000Z",
+  "approved_by": "product-owner"
+}

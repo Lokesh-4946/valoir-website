@@ -15,13 +15,12 @@ export const metadata: Metadata = {
   keywords: [
     "Valoir",
     "Rizz",
-    "coding agent harness",
-    "lightweight coding agent",
-    "CLI coding agent loop",
-    "provider-agnostic AI agent",
-    "open-source coding agent",
+    "Project Intelligence Engine",
+    "repository understanding",
+    "Project Knowledge Store",
+    "relationship-aware blast radius",
+    "local project intelligence",
     "developer tools",
-    "open-core",
   ],
   alternates: { canonical: "/" },
   openGraph: {

@@ -2,7 +2,7 @@ import type { DocPage } from "./types";
 
 /**
  * The Rizz documentation, authored from `knowledge/docs-content.md`.
- * Honesty rule: Rizz is preview software — features carry [now] / [preview] / [planned]
+ * Honesty rule: features carry [now] / [preview] / [planned]
  * status; never present planned features as shipped.
  */
 export const docsPages: DocPage[] = [
@@ -14,27 +14,27 @@ export const docsPages: DocPage[] = [
     blocks: [
       {
         type: "p",
-        text: "**Rizz is a local coding-agent harness.** It wraps setup, model routing, tool calls, visible status, and an inspectable CLI/TUI loop.",
+        text: "**Rizz 0.3.1 is a local Project Intelligence Engine.** It maps repository architecture, relationships, evidence, and change impact before edits.",
       },
       { type: "h", level: 2, text: "Three principles" },
       {
         type: "ul",
         items: [
-          "**Small harness** — local CLI, small TUI, visible setup checks, and a footprint budget.",
-          "**Visible routing** — the active route and cost signals stay inspectable.",
-          "**Opt-in power** — larger workspace features stay out of the default path.",
+          "**Understand first** — connect routes, services, state, data, and dependencies before changing code.",
+          "**Evidence-backed** — keep claims tied to files, flows, tests, configs, and risks.",
+          "**Local-first** — keep the Project Knowledge Store and reports under `.rizz/` by default.",
         ],
       },
       {
         type: "p",
-        text: "Open-core: Rizz Core is separate from Valoir's later hosted and enterprise layer.",
+        text: "Rizz runs locally by default. Valoir's later hosted and enterprise layer remains separate from the current install.",
       },
     ],
   },
   {
     slug: "quickstart",
     title: "Quickstart",
-    description: "Install Rizz with npm and launch the current preview.",
+    description: "Install the current Rizz 0.3.1 release with npm.",
     order: 2,
     blocks: [
       { type: "h", level: 2, text: "Install", status: "now" },
@@ -45,55 +45,58 @@ export const docsPages: DocPage[] = [
       {
         type: "code",
         lang: "bash",
-        code: "# macOS, Linux, or Windows PowerShell\nnpm install -g @valoir/rizz\nrizz setup\nrizz",
+        code: "# macOS, Linux, or Windows PowerShell\nnpm install -g @valoir/rizz\nrizz understand",
       },
-      { type: "p", text: "Requirement for all: Node ≥ 22 and npm." },
-      { type: "h", level: 2, text: "Setup" },
+      { type: "p", text: "Rizz 0.3.1 is the current release." },
+      { type: "p", text: "Requirements for all platforms: Node ≥ 22, npm, and git." },
+      { type: "h", level: 2, text: "Understand a repository" },
       {
         type: "p",
-        text: "Run `rizz setup` once to choose a model route and handle credentials explicitly. `rizz` launches the TUI.",
+        text: "Run `rizz understand` inside a repository. Rizz writes the Project Knowledge Store under `.rizz/brain`, research artifacts under `.rizz/research`, and Mission Control at `.rizz/reports/index.html`.",
       },
       {
         type: "p",
         text: "Provider details live in Model providers. Rizz setup keeps credential handling explicit.",
       },
-      { type: "h", level: 2, text: "Inside the TUI", status: "now" },
+      { type: "h", level: 2, text: "Inspect and review", status: "now" },
       {
         type: "code",
         lang: "text",
-        code: "/status           # readiness, route, and cost signals\n/model            # switch route/profile\n/workspace        # visible stub; future Workspace Mode\n/help",
+        code: "rizz explain <target>\nrizz explain flow <id>\nrizz review\nrizz review --json",
       },
     ],
   },
   {
     slug: "core-concepts",
     title: "Core concepts",
-    description: "The Rizz loop, visible controls, and planned workspace power.",
+    description: "Project architecture, evidence, relationships, and review impact.",
     order: 3,
     blocks: [
-      { type: "h", level: 2, text: "The loop" },
+      { type: "h", level: 2, text: "Architecture and data causality" },
       {
         type: "p",
-        text: "Each turn: call the model → dispatch any tool calls → feed results back → repeat, until done or a limit hits. Built in for reliability:",
+        text: "Rizz connects entrypoints and routes through services, state/data operations, dependencies, and database surfaces, with evidence attached to the resulting project graph.",
       },
       {
         type: "ul",
         items: [
-          "**Interrupt** [now] — `esc` (or Ctrl+C) stops a running turn; typing mid-stream queues a redirect (the loop finishes the current tool, then takes the new instruction).",
-          "**Visible cost** [now] — the active route and cost/budget signals are visible in the TUI.",
-          "**Compression** [planned] — auxiliary-model summarization that protects head & tail context; never silently drops critical info.",
-          "**Fallback** [planned] — on rate-limit / outage, fall to the next model in the chain, shown to you, with a manual override.",
+          "**Named database support** [now] — SQLAlchemy, Alembic, raw SQL, and Mongoose schema relationships.",
+          "**Cross-table impact** [now] — foreign keys and relationship edges feed affected-flow and blast-radius analysis.",
+          "**Relationship-aware review** [now] — review connects changed files to affected flows, data dependencies, and targeted verification.",
+          "**Evidence governance** [now] — deterministic verification plans, evidence scoring, approval packets, CLI signoff, and fingerprint-bound signoff-history reuse.",
+          "**Review precision** [now] — generated `.rizz/**` intelligence stays separate from authored untracked work, secret detection distinguishes credential-shaped values from design-token documentation, and Explain/Ask surface evidence-backed Next.js route consumers.",
+          "**Approval lifecycle** [now] — exact ISO-8601 signoff expiry and auditable revocation prevent expired or revoked decisions from making a review merge/release-ready.",
         ],
       },
       {
         type: "callout",
         tone: "note",
-        text: "**Reliability rule (binding):** every edit is verified after write — the apply path re-reads and confirms the change landed byte-for-byte before reporting success. A write that can't be verified is a failure, not a warning.",
+        text: "Coverage is specific, not universal: current database relationship claims apply to SQLAlchemy, Alembic, raw SQL, and Mongoose. Rizz does not claim support for every ORM.",
       },
       { type: "h", level: 2, text: "Current surface now, Workspace later" },
       {
         type: "p",
-        text: "`/workspace` is visible but not connected. Workspace Mode, Repo Brain, and OS/Jarvis connectors are later tracks.",
+        text: "The Project Knowledge Store ships under `.rizz/brain`. Workspace Mode, team features, hosted relay, and enterprise provider setup remain later tracks.",
       },
     ],
   },
@@ -170,7 +173,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "p",
-        text: "`/workspace` is visible today as an honest stub. Later tracks include Workspace Mode, Repo Brain, OS/Jarvis connectors, and enterprise providers.",
+        text: "`/workspace` is visible today as an honest stub. Later tracks include Workspace Mode, team features, hosted relay, and enterprise providers.",
       },
     ],
   },
@@ -265,9 +268,9 @@ export const docsPages: DocPage[] = [
       {
         type: "ul",
         items: [
-          "**Now** — Agent Light, local CLI, setup flow, route picker, visible status.",
-          "**Next** — preview dogfood, release tag, native installers.",
-          "**Later** — Workspace Mode, Repo Brain, OS/Jarvis connectors, enterprise providers.",
+          "**Now** — Rizz 0.3.1, architecture/data causality, relationship-aware review, evidence scoring, verification plans, approval packets, CLI signoff, review precision, and signoff expiry/revocation.",
+          "**Next** — native installers, complete direct-provider setup wiring, and fuller planning mode.",
+          "**Later** — Workspace Mode, team features, hosted relay, and enterprise providers.",
           "**Valoir offering** — hosted relay, approval inbox, team audit logs, enterprise provider setup, workflow packs, custom QA/eval pipelines.",
         ],
       },
