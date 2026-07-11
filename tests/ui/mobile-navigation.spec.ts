@@ -73,6 +73,26 @@ test.describe("mobile menu keyboard behavior", () => {
     await expect(firstLink).toBeFocused();
   });
 
+  test("isolates background interaction and restores it after close", async ({ page }) => {
+    await page.goto("/");
+
+    const main = page.locator("main");
+    const exploreRizz = main.getByRole("link", { name: "Explore Rizz" });
+    const initialUrl = page.url();
+    await page.getByRole("button", { name: "Menu" }).click();
+
+    await expect(main).toHaveAttribute("inert", "");
+    await expect(exploreRizz.click({ timeout: 500 })).rejects.toThrow();
+    expect(page.url()).toBe(initialUrl);
+
+    await page.keyboard.press("Escape");
+
+    await expect(main).not.toHaveAttribute("inert", "");
+    await expect(exploreRizz).toBeVisible();
+    await exploreRizz.click();
+    await expect(page).toHaveURL(/#products$/);
+  });
+
   test("closes and unlocks scrolling when crossing the desktop breakpoint", async ({ page }) => {
     await page.goto("/");
 

@@ -41,7 +41,13 @@ export default function Nav() {
     if (!open) return;
 
     const previousOverflow = document.body.style.overflow;
+    const main = document.querySelector<HTMLElement>("main");
+    const previousMainInert = main?.inert ?? false;
+    const previousMainInertAttribute = main?.getAttribute("inert") ?? null;
     document.body.style.overflow = "hidden";
+    if (main) {
+      main.inert = true;
+    }
     firstMenuLinkRef.current?.focus();
 
     function containMenuFocus(event: KeyboardEvent) {
@@ -80,6 +86,14 @@ export default function Nav() {
     window.addEventListener("keydown", containMenuFocus);
     return () => {
       document.body.style.overflow = previousOverflow;
+      if (main) {
+        main.inert = previousMainInert;
+        if (previousMainInertAttribute === null) {
+          main.removeAttribute("inert");
+        } else {
+          main.setAttribute("inert", previousMainInertAttribute);
+        }
+      }
       window.removeEventListener("keydown", containMenuFocus);
     };
   }, [open]);
