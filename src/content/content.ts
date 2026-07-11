@@ -42,35 +42,35 @@ export const hero = {
 export const manifesto = {
   label: "01 — Manifesto",
   lines: [
-    "Small by default.",
-    "Routes you can see.",
-    "Power only when asked.",
+    "Trace the architecture.",
+    "Follow the evidence.",
+    "Review the whole impact.",
   ],
-  body: "The default view should stay quiet. Routing, cost, and workspace power stay visible without turning the harness into the product.",
+  body: "Rizz connects routes, services, state, data, and source evidence so a change starts with the system around it.",
 };
 
 export const sections = {
   products: { label: "02 — Products", title: "Products" },
   whyRizz: {
     label: "03 — Why Rizz",
-    title: "Why Rizz feels easier to trust.",
-    body: "A small local harness. Clear state. No surprise power mode.",
+    title: "See beyond the changed file.",
+    body: "Local architecture intelligence turns repository evidence into a reviewable change surface.",
     items: [
       {
-        title: "Stays light",
-        text: "One local CLI/TUI for the current project.",
+        title: "Maps causality",
+        text: "Routes, services, state, data, and dependencies stay connected.",
       },
       {
-        title: "Shows state",
-        text: "Route, approvals, and budget stay visible.",
+        title: "Understands relationships",
+        text: "SQLAlchemy, Alembic, raw SQL, and Mongoose links reveal cross-table impact.",
       },
       {
-        title: "Keeps choice",
-        text: "Routing stays explicit, not locked away.",
+        title: "Reviews blast radius",
+        text: "Changed files lead to affected flows, data dependencies, and targeted tests.",
       },
       {
-        title: "Adds power carefully",
-        text: "Workspace and team features stay opt-in.",
+        title: "Keeps evidence inspectable",
+        text: "Verification plans, approval packets, and signoff stay tied to local artifacts.",
       },
     ],
   },
@@ -80,18 +80,23 @@ export const sections = {
     lanes: [
       {
         label: "Now",
-        title: "Agent Light",
-        items: ["local CLI", "setup flow", "route picker", "visible status"],
+        title: "Rizz 0.3.0",
+        items: [
+          "architecture causality",
+          "relationship-aware review",
+          "evidence scoring",
+          "CLI signoff",
+        ],
       },
       {
         label: "Next",
-        title: "Release path",
-        items: ["preview dogfood", "release tag", "native installers"],
+        title: "Distribution polish",
+        items: ["native installers", "provider setup wiring", "planning mode"],
       },
       {
         label: "Later",
         title: "Opt-in power",
-        items: ["Workspace Mode", "Repo Brain", "OS/Jarvis connectors", "enterprise providers"],
+        items: ["Workspace Mode", "team layer", "hosted relay", "enterprise providers"],
       },
     ],
   },

@@ -53,14 +53,9 @@ test("keeps reveal content visible when animation never starts", async ({ page }
 
   await page.goto("/");
 
-  const manifestoHeading = page.getByRole("heading", {
-    level: 2,
-    name: "Small by default. Routes you can see. Power only when asked.",
-  });
-  const revealedBody = page.locator("[data-reveal]").filter({
-    hasText:
-      "The default view should stay quiet. Routing, cost, and workspace power stay visible without turning the harness into the product.",
-  });
+  const manifesto = page.locator("#manifesto");
+  const manifestoHeading = manifesto.getByRole("heading", { level: 2 });
+  const revealedBody = manifesto.locator("[data-reveal]");
 
   await expect(manifestoHeading.locator("[data-line-inner]").first()).toHaveCSS("transform", "none");
   await expect(revealedBody).toHaveCSS("opacity", "1");

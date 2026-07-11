@@ -33,22 +33,22 @@ export default function TerminalMock() {
       {/* transcript */}
       <div className="space-y-1 p-5 font-mono text-[12.5px] leading-relaxed">
         <Line who="you" whoClass="text-accent">
-          rizz setup
+          rizz understand
         </Line>
         <Line who="rizz" whoClass="text-teal">
-          <span className="text-muted">doctor passed · choose a model route</span>
+          <span className="text-muted">project brain refreshed · evidence linked</span>
         </Line>
-        <Tool verb="setup" path="OpenRouter direct" meta="BYOK primary" ok />
-        <Tool verb="setup" path="Codex local CLI" meta="secondary" />
+        <Tool verb="map" path="routes → services → data" meta="evidence" ok />
+        <Tool verb="db" path="relationships and foreign keys" meta="linked" ok />
         <Line who="rizz" whoClass="text-teal">
-          OpenRouter key stored in the keychain. Launching Agent Light.
+          Mission Control written to .rizz/reports/index.html
         </Line>
-        <Tool verb="/status" path="route openrouter · cost visible" meta="ready" ok />
-        <Tool verb="/model" path="switch route/profile" meta="no restart" />
-        <Tool verb="/workspace" path="future Workspace Mode" meta="stub" />
+        <Tool verb="review" path="relationship-aware blast radius" meta="ready" ok />
+        <Tool verb="verify" path="targeted test plan" meta="evidence" />
+        <Tool verb="signoff" path="fingerprint-bound history" meta="local" />
         <div className="flex items-center gap-2 pt-2">
           <span className="text-accent">›</span>
-          <span className="text-bone">/status</span>
+          <span className="text-bone">rizz review --json</span>
           <span className="inline-block h-3.5 w-2 animate-blink bg-accent align-middle" />
         </div>
       </div>
@@ -56,12 +56,12 @@ export default function TerminalMock() {
       {/* status bar */}
       <div className="flex flex-wrap items-center gap-3 border-t border-line px-4 py-2 font-mono text-[11px] text-muted">
         <span>
-          <span className="text-accent">Agent Light</span> · preview
+          <span className="text-accent">Rizz 0.3.0</span> · local
         </span>
         <span className="text-faint">│</span>
-        <span>Codex secondary</span>
+        <span>evidence linked</span>
         <span className="ml-auto">
-          cost visible · <span className="text-accent">approvals on</span>
+          blast radius · <span className="text-accent">verification ready</span>
         </span>
         <span className="text-faint">│</span>
         <span>⎇ main</span>

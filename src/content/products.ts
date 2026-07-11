@@ -66,72 +66,68 @@ export const products: Product[] = [
     slug: "rizz",
     name: "Rizz",
     by: "by Valoir",
-    tagline: "The lightest, most connectable coding agent harness.",
+    tagline: "Understand the system before changing it.",
     description:
-      "Rizz is the first product: a local Agent Light harness for setup, routing, and an inspectable CLI/TUI loop.",
+      "Rizz 0.3.0 is a local Project Intelligence Engine that maps architecture, evidence, and change impact before edits.",
     license: "open-core",
     licenseLabel: "Open-core Rizz Core",
     capabilities: [
       {
-        title: "Small harness",
+        title: "Architecture causality",
         detail:
-          "The current surface is a local CLI/TUI wrapped around setup, one active route, and the agent loop.",
+          "Trace routes, services, state and data dependencies, and database surfaces back to source evidence.",
       },
       {
-        title: "Provider-agnostic",
+        title: "Database relationships",
         detail:
-          "OpenRouter BYOK is the fast path. Codex is available as a secondary local route through the signed-in Codex CLI/app.",
+          "Recognizes SQLAlchemy, Alembic, raw SQL, and Mongoose relationships, including foreign keys and cross-table impact.",
       },
       {
-        title: "Visible control loop",
+        title: "Relationship-aware review",
         detail:
-          "`/status`, `/model`, `/workspace`, and setup checks keep routing, readiness, and limits visible.",
+          "Review follows project and data relationships into affected flows, cross-table blast radius, and targeted verification.",
       },
       {
-        title: "Local review-loop",
+        title: "Evidence and signoff",
         detail:
-          "The current discipline is local verification and review-loop dogfood. Custom QA/eval pipelines belong in the later Valoir layer.",
+          "Shipped deterministic verification plans, evidence scoring, approval packets, CLI signoff, and fingerprint-bound history reuse.",
       },
     ],
     repoUrl: "https://github.com/Lokesh-4946/rizz",
-    repoPrivate: true,
+    repoPrivate: false,
     installTitle: "Install Rizz",
-    installIntro: "Run the current Rizz preview on macOS, Linux, or Windows PowerShell.",
-    installRequirement: "Requires Node >= 22 and npm.",
+    installIntro: "Install Rizz 0.3.0 on macOS, Linux, or Windows PowerShell.",
+    installRequirement: "Requires Node >= 22, npm, and git.",
     installOptions: [
       {
         platform: "macOS",
-        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "rizz understand"].join("\n"),
       },
       {
         platform: "Linux",
-        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "rizz understand"].join("\n"),
       },
       {
         platform: "Windows PowerShell",
         tabLabel: "Windows",
-        command: ["npm install -g @valoir/rizz", "rizz setup", "rizz"].join("\n"),
+        command: ["npm install -g @valoir/rizz", "rizz understand"].join("\n"),
       },
     ],
     installNotes: [
       { label: "Package", value: "@valoir/rizz" },
-      { label: "Source", value: "opens as the core hardens" },
+      { label: "Release", value: "0.3.0" },
       { label: "Native installers", value: "planned" },
     ],
     usageSnippet: [
       "# install",
       "npm install -g @valoir/rizz",
       "",
-      "# setup and launch",
-      "rizz setup",
-      "rizz",
+      "# understand the current repository",
+      "rizz understand",
       "",
-      "# inside the TUI",
-      "/status             # readiness, route, and cost signals",
-      "/model              # switch route/profile",
-      "/workspace          # visible stub; future Workspace Mode",
-      "",
-      "pnpm check          # local review-loop gate",
+      "# inspect and review with local evidence",
+      "rizz explain flow <id>",
+      "rizz review --json",
     ].join("\n"),
     docsUrl: "https://valoir.space/docs",
     // Repo has no public star count yet.
@@ -140,7 +136,7 @@ export const products: Product[] = [
     demoVideoUrl: null,
     tryItUrl: null,
     flagship: true,
-    status: "Preview · Agent Light",
+    status: "Rizz 0.3.0",
   },
 ];
 
