@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests/ui",
   outputDir: ".next/playwright-test-results",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3107",
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
   },
@@ -15,8 +15,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    command: "npm run dev -- --port 3107",
+    url: "http://127.0.0.1:3107",
+    reuseExistingServer: false,
   },
 });

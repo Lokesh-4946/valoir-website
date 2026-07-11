@@ -30,6 +30,7 @@ export const nav = {
 
 export const hero = {
   headline: ["Valoir builds", "open-core agent", "infrastructure."],
+  subhead: "Infrastructure for local-first coding agents and the teams that run them.",
   primary: { label: "Explore Rizz", href: "#products" },
   secondary: { label: "View on GitHub", href: "https://github.com/Lokesh-4946/rizz" },
 };

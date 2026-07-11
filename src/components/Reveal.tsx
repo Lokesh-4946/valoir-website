@@ -44,8 +44,8 @@ export function Reveal({
       gsap.from(
         el,
         {
-          opacity: 0,
-          y,
+          opacity: 0.7,
+          y: Math.min(y, 8),
           duration: 0.9,
           delay,
           ease: "power3.out",
@@ -102,7 +102,7 @@ export function MaskReveal({
       if (tween) return;
       ctx = gsap.context(() => {
         tween = gsap.from(targets, {
-          yPercent: 110,
+          yPercent: 18,
           duration: 1,
           ease: "power4.out",
           stagger: 0.09,

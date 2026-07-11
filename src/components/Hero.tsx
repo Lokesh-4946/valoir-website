@@ -41,11 +41,11 @@ export default function Hero() {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
       tl.from(
         lines,
-        { yPercent: 115, duration: 1.1, stagger: 0.1, immediateRender: false },
+        { yPercent: 18, duration: 1.1, stagger: 0.1, immediateRender: false },
         0.15,
       ).from(
         rest,
-        { opacity: 0, y: 18, duration: 0.8, stagger: 0.08, immediateRender: false },
+        { opacity: 0.7, y: 8, duration: 0.8, stagger: 0.08, immediateRender: false },
         0.6,
       );
     }, el);
@@ -85,6 +85,14 @@ export default function Hero() {
             </span>
           ))}
         </h1>
+
+        <p
+          data-h-fade
+          data-hero-subhead
+          className="mt-6 max-w-2xl text-base leading-7 text-muted sm:text-lg"
+        >
+          {hero.subhead}
+        </p>
 
         <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4">
           <MagneticButton href={hero.primary.href} variant="accent">
