@@ -53,6 +53,7 @@ export function validatePolicy(policy) {
     if (!policy.required_reviewers.includes(role)) fail('weakened_policy', '$.required_reviewers', `must include company reviewer role ${role}`);
   }
   requireBoolean(policy.allow_multi_role_reviewer, '$.allow_multi_role_reviewer');
+  if (policy.allow_multi_role_reviewer) fail('weakened_policy', '$.allow_multi_role_reviewer', 'schema v1 forbids multi-role reviewers');
   requireStringArray(policy.blocking_priorities, '$.blocking_priorities');
   for (const priority of ['P0', 'P1', 'P2']) if (!policy.blocking_priorities.includes(priority)) fail('weakened_policy', '$.blocking_priorities', `must include ${priority}`);
   for (const field of [...REQUIRED_TRUE, 'require_preview_when_ui_changes']) requireBoolean(policy[field], `$.${field}`);

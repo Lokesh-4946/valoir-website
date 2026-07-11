@@ -275,14 +275,12 @@ test('company policy cannot disable UI preview and UI applicability always activ
   expectCode('missing_reviewer', () => validateReview(review, { mission: fixture.mission, policy: weakened, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: true }));
 });
 
-test('multi-role reviewer identities require an explicit policy opt-in', () => {
+test('multi-role reviewer identities and policy opt-ins are rejected', () => {
   const fixture = websiteFixture();
   fixture.review.reviewers[1].id = fixture.review.reviewers[0].id;
   expectCode('duplicate_reviewer_identity', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
   const optedIn = { ...fixture.policy, allow_multi_role_reviewer: true };
-  fixture.review.risk_level = 'low';
-  fixture.review.ui_changes = false;
-  assert.doesNotThrow(() => validateReview(fixture.review, { mission: fixture.mission, policy: optedIn, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: false }));
+  expectCode('weakened_policy', () => validatePolicy(optedIn));
   expectCode('invalid_type', () => validatePolicy({ ...fixture.policy, allow_multi_role_reviewer: undefined }));
 });
 
@@ -320,7 +318,7 @@ test('CI baseline requires nonempty mission checks and certificate cross-enforce
   expectCode('missing_required_check', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
 });
 
-test('multi-role review requires explicit low-risk non-UI non-security evidence', () => {
+test('multi-role review remains forbidden across every applicability class', () => {
   for (const evidence of [
     { risk_level: 'medium', ui_changes: false, security_sensitive: false },
     { risk_level: 'low', ui_changes: true, security_sensitive: false },
@@ -330,7 +328,7 @@ test('multi-role review requires explicit low-risk non-UI non-security evidence'
     fixture.policy.allow_multi_role_reviewer = true;
     fixture.review.reviewers[1].id = fixture.review.reviewers[0].id;
     Object.assign(fixture.review, evidence);
-    expectCode('multi_role_not_applicable', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: evidence.ui_changes }));
+    expectCode('duplicate_reviewer_identity', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: evidence.ui_changes }));
   }
   const mismatch = websiteFixture();
   mismatch.review.ui_changes = false;
@@ -359,4 +357,45 @@ test('preview conclusions are strict and consistent with required state', () => 
     fixture.certificate.preview = preview;
     expectCode(code, () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges }));
   }
+});
+
+test('schema v1 forbids multi-role reviewers even when low risk', () => {
+  const fixture = websiteFixture();
+  expectCode('weakened_policy', () => validatePolicy({ ...fixture.policy, allow_multi_role_reviewer: true }));
+  fixture.review.risk_level = 'low';
+  fixture.review.ui_changes = false;
+  fixture.review.reviewers[1].id = fixture.review.reviewers[0].id;
+  expectCode('duplicate_reviewer_identity', () => validateReview(fixture.review, { mission: fixture.mission, policy: { ...fixture.policy, allow_multi_role_reviewer: true }, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: false }));
+});
+
+test('now must be strict canonical RFC3339', () => {
+  for (const now of ['July 11 2026 10:00 UTC', '2026-02-30T10:00:00.000Z', '2026-07-11T10:00:00+00:00']) {
+    const fixture = websiteFixture();
+    expectCode('invalid_now', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now, uiChanges: true }));
+  }
+});
+
+test('null artifacts produce structured schema errors before field or context reads', () => {
+  const fixture = websiteFixture();
+  expectCode('invalid_type', () => validateReview(null, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  expectCode('invalid_type', () => validateCertificate(null, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
+});
+
+test('proof paths reject ASCII control characters', () => {
+  for (const unsafe of ['src/proof\0.json', 'src/proof\nother.json', 'src/proof\t.json']) {
+    const fixture = websiteFixture();
+    fixture.mission.expected_paths = [unsafe];
+    expectCode('unsafe_path', () => validateMission(fixture.mission));
+  }
+});
+
+test('artifact timestamps enforce mission <= review <= certificate <= now < expiry', () => {
+  const reviewBeforeMission = websiteFixture();
+  reviewBeforeMission.mission.created_at = '2026-07-11T09:01:00.000Z';
+  reviewBeforeMission.review.mission_contract_hash = normalizedHash(reviewBeforeMission.mission);
+  expectCode('noncausal_timestamp', () => validateReview(reviewBeforeMission.review, { mission: reviewBeforeMission.mission, policy: reviewBeforeMission.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const missionEqualsReview = websiteFixture();
+  missionEqualsReview.mission.created_at = missionEqualsReview.review.generated_at;
+  missionEqualsReview.review.mission_contract_hash = normalizedHash(missionEqualsReview.mission);
+  assert.doesNotThrow(() => validateReview(missionEqualsReview.review, { mission: missionEqualsReview.mission, policy: missionEqualsReview.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
 });

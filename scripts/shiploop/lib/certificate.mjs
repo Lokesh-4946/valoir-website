@@ -1,4 +1,4 @@
-import { fail, rejectUnknownFields, requireBoolean, requireIdentity, requireObject, requireSchema, requireSha, requireString, requireTimestamp } from './errors.mjs';
+import { fail, isValidTimestamp, rejectUnknownFields, requireBoolean, requireIdentity, requireObject, requireSchema, requireSha, requireString, requireTimestamp } from './errors.mjs';
 import { certificateHash, normalizedHash } from './hash.mjs';
 import { validateMission } from './mission.mjs';
 import { validatePolicy } from './policy.mjs';
@@ -6,11 +6,14 @@ import { validateReview } from './review.mjs';
 
 const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'mission_contract_id', 'mission_contract_hash', 'review_artifact_hash', 'required_checks', 'preview', 'adjudicator', 'generated_at', 'expires_at', 'certificate_hash'];
 
-export function validateCertificate(certificate, { mission, review, policy, headSha, baseSha, now = new Date().toISOString(), uiChanges }) {
+export function validateCertificate(certificate, context) {
+  requireSchema(certificate);
+  requireObject(context, '$.context');
+  const { mission, review, policy, headSha, baseSha, uiChanges } = context;
+  const now = context.now ?? new Date().toISOString();
   validateMission(mission);
   validatePolicy(policy);
   validateReview(review, { mission, policy, headSha, baseSha, uiChanges });
-  requireSchema(certificate);
   rejectUnknownFields(certificate, FIELDS);
   requireSha(certificate.reviewed_sha, '$.reviewed_sha');
   requireSha(certificate.base_sha, '$.base_sha');
@@ -47,8 +50,8 @@ export function validateCertificate(certificate, { mission, review, policy, head
   requireTimestamp(certificate.expires_at, '$.expires_at');
   const generated = Date.parse(certificate.generated_at);
   const expires = Date.parse(certificate.expires_at);
+  if (!isValidTimestamp(now)) fail('invalid_now', '$.now', 'must be a real canonical RFC3339 UTC timestamp');
   const current = Date.parse(now);
-  if (Number.isNaN(current)) fail('invalid_now', '$.now', 'must be a valid RFC3339 timestamp');
   if (Date.parse(review.generated_at) > generated || generated > current) fail('noncausal_timestamp', '$.generated_at', 'must satisfy review <= certificate <= now');
   if (current >= expires) fail('certificate_expired', '$.expires_at', 'certificate has expired');
   if (expires <= generated || expires - generated > policy.certificate_ttl_hours * 3_600_000) fail('certificate_ttl_exceeded', '$.expires_at', 'exceeds policy TTL');

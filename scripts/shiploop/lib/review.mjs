@@ -49,8 +49,11 @@ function validateBlockedEvidence(review) {
   if (review.escalation !== review.escalation.trim()) fail('invalid_type', '$.escalation', 'must not contain surrounding whitespace');
 }
 
-export function validateReview(review, { mission, policy, headSha, baseSha, uiChanges = review.ui_changes }) {
+export function validateReview(review, context) {
   requireSchema(review);
+  requireObject(context, '$.context');
+  const { mission, policy, headSha, baseSha } = context;
+  const uiChanges = context.uiChanges ?? review.ui_changes;
   rejectUnknownFields(review, FIELDS);
   requireSha(review.reviewed_sha, '$.reviewed_sha');
   requireSha(review.base_sha, '$.base_sha');
@@ -61,6 +64,7 @@ export function validateReview(review, { mission, policy, headSha, baseSha, uiCh
   requireString(review.mission_contract_id, '$.mission_contract_id');
   if (review.mission_contract_id !== mission.contract_id) fail('mission_contract_mismatch', '$.mission_contract_id', 'must match the mission');
   if (review.mission_contract_hash !== normalizedHash(mission)) fail('mission_hash_mismatch', '$.mission_contract_hash', 'mission changed after review');
+  if (Date.parse(mission.created_at) > Date.parse(review.generated_at)) fail('noncausal_timestamp', '$.generated_at', 'review cannot predate the mission');
   for (const field of ['implementation_owner', 'adjudicator']) requireIdentity(review[field], `$.${field}`);
   const implementationOwner = review.implementation_owner.toLowerCase();
   const adjudicator = review.adjudicator.toLowerCase();
@@ -79,12 +83,10 @@ export function validateReview(review, { mission, policy, headSha, baseSha, uiCh
     requireString(reviewer.role, `$.reviewers[${index}].role`);
     const reviewerIdentity = reviewer.id.toLowerCase();
     if (reviewerIdentity === implementationOwner) fail('self_review', `$.reviewers[${index}].id`, 'implementation owner cannot review');
-    if (!policy.allow_multi_role_reviewer && reviewerIdentities.has(reviewerIdentity)) fail('duplicate_reviewer_identity', `$.reviewers[${index}].id`, 'one identity cannot fill multiple reviewer roles');
+    if (reviewerIdentities.has(reviewerIdentity)) fail('duplicate_reviewer_identity', `$.reviewers[${index}].id`, 'schema v1 forbids one identity from filling multiple reviewer roles');
     reviewerIdentities.add(reviewerIdentity);
     reviewerRoles.add(reviewer.role);
   }
-  const hasMultiRoleReviewer = reviewerIdentities.size < review.reviewers.length;
-  if (hasMultiRoleReviewer && (review.risk_level !== 'low' || review.ui_changes || review.security_sensitive)) fail('multi_role_not_applicable', '$.reviewers', 'multi-role review is limited to low-risk, non-UI, non-security changes');
   if (review.verdict === 'APPROVE' && review.reviewers.length === 0) fail('missing_reviewer', '$.reviewers', 'approval requires reviewer evidence');
   const requiredRoles = new Set(policy.required_reviewers);
   if (uiChanges) requiredRoles.add('experience');

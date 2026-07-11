@@ -44,11 +44,14 @@ export function requireSha(value, path) {
   if (typeof value !== 'string' || !/^[0-9a-f]{40}$/.test(value)) fail('invalid_sha', path, 'must be a lowercase 40-character Git SHA');
 }
 
-export function requireTimestamp(value, path) {
-  requireString(value, path);
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) || Number.isNaN(Date.parse(value))) fail('invalid_timestamp', path, 'must be an RFC3339 UTC timestamp');
+export function isValidTimestamp(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) || Number.isNaN(Date.parse(value))) return false;
   const canonicalInput = value.includes('.') ? value : value.replace('Z', '.000Z');
-  if (new Date(value).toISOString() !== canonicalInput) fail('invalid_timestamp', path, 'must represent a real calendar date exactly');
+  return new Date(value).toISOString() === canonicalInput;
+}
+
+export function requireTimestamp(value, path) {
+  if (!isValidTimestamp(value)) fail('invalid_timestamp', path, 'must be a real canonical RFC3339 UTC timestamp');
 }
 
 export function rejectUnknownFields(value, allowed, path = '$') {
@@ -59,6 +62,7 @@ export function rejectUnknownFields(value, allowed, path = '$') {
 
 export function requireSafePath(value, path) {
   requireString(value, path);
+  if (/[\u0000-\u001f\u007f]/.test(value)) fail('unsafe_path', path, 'must not contain ASCII control characters');
   if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(value) || value.startsWith('/') || value.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(value)) fail('unsafe_path', path, 'must be repository-relative and contain no URL or file scheme');
   if (value.split(/[\\/]/).includes('..')) fail('path_traversal', path, 'must not traverse outside the repository');
 }
