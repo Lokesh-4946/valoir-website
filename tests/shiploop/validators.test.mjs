@@ -35,7 +35,7 @@ test('malformed and unknown schemas fail', () => {
 });
 
 test('strict policy parser accepts the profile and rejects unknown or executable YAML', () => {
-  const yaml = `schema_version: 1\nprofile: valoir-shiploop\nmax_iterations: 5\nrequired_reviewers:\n  - intent-architecture\n  - correctness-risk\n  - experience\nblocking_priorities: [P0, P1, P2]\nrequire_zero_unresolved: true\nrequire_exact_head_sha: true\nrequire_ci_green: true\nrequire_preview_when_ui_changes: true\ncertificate_ttl_hours: 24\n`;
+  const yaml = `schema_version: 1\nprofile: valoir-shiploop\nmax_iterations: 5\nrequired_reviewers:\n  - intent-architecture\n  - correctness-risk\n  - experience\nallow_multi_role_reviewer: false\nblocking_priorities: [P0, P1, P2]\nrequire_zero_unresolved: true\nrequire_exact_head_sha: true\nrequire_ci_green: true\nrequire_preview_when_ui_changes: true\ncertificate_ttl_hours: 24\n`;
   assert.equal(parsePolicy(yaml).profile, 'valoir-shiploop');
   expectCode('unknown_field', () => parsePolicy(`${yaml}privileged: true\n`));
   expectCode('invalid_yaml', () => parsePolicy(`${yaml}payload: !!js/function >\n  process.exit()\n`));
@@ -260,5 +260,49 @@ test('RFC3339 timestamps reject impossible calendar dates by exact roundtrip', (
     const fixture = websiteFixture();
     fixture.mission.created_at = impossible;
     expectCode('invalid_timestamp', () => validateMission(fixture.mission));
+  }
+});
+
+test('company policy cannot disable UI preview and UI applicability always activates experience', () => {
+  const fixture = websiteFixture();
+  expectCode('weakened_policy', () => validatePolicy({ ...fixture.policy, require_preview_when_ui_changes: false }));
+  const weakened = { ...fixture.policy, require_preview_when_ui_changes: false, required_reviewers: ['intent-architecture', 'correctness-risk'] };
+  const review = { ...fixture.review, reviewers: fixture.review.reviewers.filter(({ role }) => role !== 'experience') };
+  expectCode('missing_reviewer', () => validateReview(review, { mission: fixture.mission, policy: weakened, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: true }));
+});
+
+test('multi-role reviewer identities require an explicit policy opt-in', () => {
+  const fixture = websiteFixture();
+  fixture.review.reviewers[1].id = fixture.review.reviewers[0].id;
+  expectCode('duplicate_reviewer_identity', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const optedIn = { ...fixture.policy, allow_multi_role_reviewer: true };
+  assert.doesNotThrow(() => validateReview(fixture.review, { mission: fixture.mission, policy: optedIn, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  expectCode('invalid_type', () => validatePolicy({ ...fixture.policy, allow_multi_role_reviewer: undefined }));
+});
+
+test('blocker and escalation metadata is forbidden outside BLOCKED verdicts', () => {
+  for (const verdict of ['APPROVE', 'REQUEST_CHANGES']) {
+    const fixture = websiteFixture();
+    fixture.review.verdict = verdict;
+    fixture.review.blockers = [{ code: 'stale', evidence: 'Must not survive verdict transition.' }];
+    fixture.review.next_authorized_actor = 'product-owner';
+    fixture.review.escalation = 'Repair the review.';
+    expectCode('unexpected_blocker_evidence', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  }
+});
+
+test('finding line ranges are positive atomic pairs or null pairs', () => {
+  const baseFinding = { id: 'F-1', priority: 'P3', category: 'docs', file: 'src/a.ts', evidence: 'Typo.', required_change: 'Correct it.', status: 'open', adjudication_rationale: 'Confirmed.' };
+  for (const lines of [{ line_start: 0, line_end: 1 }, { line_start: 2 }, { line_start: null, line_end: 2 }, { line_start: 4, line_end: 3 }]) {
+    const fixture = websiteFixture();
+    fixture.review.findings = [{ ...baseFinding, ...lines }];
+    fixture.review.verdict = 'REQUEST_CHANGES';
+    expectCode('invalid_line_range', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  }
+  for (const lines of [{ line_start: null, line_end: null }, { line_start: 2, line_end: 3 }]) {
+    const fixture = websiteFixture();
+    fixture.review.findings = [{ ...baseFinding, ...lines }];
+    fixture.review.verdict = 'REQUEST_CHANGES';
+    assert.doesNotThrow(() => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
   }
 });

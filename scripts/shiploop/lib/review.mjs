@@ -12,9 +12,16 @@ function validateFinding(finding, path) {
   requireSafePath(finding.file, `${path}.file`);
   if (!['P0', 'P1', 'P2', 'P3'].includes(finding.priority)) fail('invalid_priority', `${path}.priority`, 'must be P0, P1, P2, or P3');
   if (!['open', 'resolved', 'rejected'].includes(finding.status)) fail('invalid_status', `${path}.status`, 'must be open, resolved, or rejected');
-  if (finding.line_start !== undefined) requireInteger(finding.line_start, `${path}.line_start`);
-  if (finding.line_end !== undefined) requireInteger(finding.line_end, `${path}.line_end`);
-  if (finding.line_start !== undefined && finding.line_end !== undefined && finding.line_end < finding.line_start) fail('invalid_line_range', path, 'line_end must not precede line_start');
+  const startPresent = finding.line_start !== undefined;
+  const endPresent = finding.line_end !== undefined;
+  if (startPresent !== endPresent) fail('invalid_line_range', path, 'line_start and line_end must be supplied together');
+  if (!startPresent) return;
+  const bothNull = finding.line_start === null && finding.line_end === null;
+  if (bothNull) return;
+  if (finding.line_start === null || finding.line_end === null) fail('invalid_line_range', path, 'line_start and line_end must both be null or both be integers');
+  requireInteger(finding.line_start, `${path}.line_start`);
+  requireInteger(finding.line_end, `${path}.line_end`);
+  if (finding.line_start < 1 || finding.line_end < 1 || finding.line_end < finding.line_start) fail('invalid_line_range', path, 'line range must contain positive ascending integers');
 }
 
 function validateRizzEvidence(evidence) {
@@ -58,17 +65,20 @@ export function validateReview(review, { mission, policy, headSha, baseSha, uiCh
   if (review.implementation_owner === review.adjudicator) fail('self_review', '$.adjudicator', 'implementation owner cannot adjudicate');
   if (!Array.isArray(review.reviewers)) fail('invalid_type', '$.reviewers', 'must be an array');
   const reviewerRoles = new Set();
+  const reviewerIdentities = new Set();
   for (const [index, reviewer] of review.reviewers.entries()) {
     requireObject(reviewer, `$.reviewers[${index}]`);
     rejectUnknownFields(reviewer, ['id', 'role'], `$.reviewers[${index}]`);
     requireIdentity(reviewer.id, `$.reviewers[${index}].id`);
     requireString(reviewer.role, `$.reviewers[${index}].role`);
     if (reviewer.id === review.implementation_owner) fail('self_review', `$.reviewers[${index}].id`, 'implementation owner cannot review');
+    if (!policy.allow_multi_role_reviewer && reviewerIdentities.has(reviewer.id)) fail('duplicate_reviewer_identity', `$.reviewers[${index}].id`, 'one identity cannot fill multiple reviewer roles');
+    reviewerIdentities.add(reviewer.id);
     reviewerRoles.add(reviewer.role);
   }
   if (review.verdict === 'APPROVE' && review.reviewers.length === 0) fail('missing_reviewer', '$.reviewers', 'approval requires reviewer evidence');
   const requiredRoles = new Set(policy.required_reviewers);
-  if (policy.require_preview_when_ui_changes && uiChanges) requiredRoles.add('experience');
+  if (uiChanges) requiredRoles.add('experience');
   const missingRoles = [...requiredRoles].filter((role) => !reviewerRoles.has(role));
   if (missingRoles.length > 0 && review.verdict !== 'BLOCKED') fail('missing_reviewer', '$.reviewers', `missing required reviewer role ${missingRoles[0]}`);
   if (!['pass', 'fail', 'uncertain'].includes(review.intent_alignment)) fail('invalid_intent_alignment', '$.intent_alignment', 'must be pass, fail, or uncertain');
@@ -94,6 +104,7 @@ export function validateReview(review, { mission, policy, headSha, baseSha, uiCh
   if (review.required_checks.some((name) => ['valoir-shiploop', 'rizz-reviewloop'].includes(name))) fail('recursive_check', '$.required_checks', 'Shiploop cannot require itself');
   if (!['APPROVE', 'REQUEST_CHANGES', 'BLOCKED'].includes(review.verdict)) fail('invalid_verdict', '$.verdict', 'is not allowed');
   if (review.verdict === 'BLOCKED') validateBlockedEvidence(review);
+  if (review.verdict !== 'BLOCKED' && [review.blockers, review.next_authorized_actor, review.escalation].some((value) => value !== undefined)) fail('unexpected_blocker_evidence', '$', 'blocker and escalation fields are only valid for BLOCKED');
   if (review.iteration === policy.max_iterations && review.verdict === 'REQUEST_CHANGES') fail('iteration_cap_requires_blocked', '$.verdict', 'the final unsuccessful iteration must be BLOCKED');
   requireTimestamp(review.generated_at, '$.generated_at');
   if (policy.profile === 'rizz-reviewloop') validateRizzEvidence(review.rizz_evidence);

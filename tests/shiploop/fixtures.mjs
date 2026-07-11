@@ -24,6 +24,7 @@ export function websiteFixture() {
     profile: 'valoir-shiploop',
     max_iterations: 5,
     required_reviewers: ['intent-architecture', 'correctness-risk', 'experience'],
+    allow_multi_role_reviewer: false,
     blocking_priorities: ['P0', 'P1', 'P2'],
     require_zero_unresolved: true,
     require_exact_head_sha: true,
