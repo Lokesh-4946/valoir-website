@@ -94,7 +94,7 @@ export default function Hero() {
           {hero.subhead}
         </p>
 
-        <div data-h-fade className="mt-10 flex flex-wrap items-center gap-4">
+        <div data-h-fade className="mt-10 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <MagneticButton href={hero.primary.href} variant="accent">
             {hero.primary.label}
           </MagneticButton>

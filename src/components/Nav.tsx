@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { nav, site } from "@/content/content";
 
@@ -15,6 +15,8 @@ function GitHubIcon({ className = "" }: { className?: string }) {
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -22,6 +24,27 @@ export default function Nav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    firstMenuLinkRef.current?.focus();
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+
+      setOpen(false);
+      menuButtonRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
 
   return (
     <header
@@ -68,10 +91,12 @@ export default function Nav() {
         </div>
 
         <button
+          ref={menuButtonRef}
           aria-label="Menu"
           aria-expanded={open}
+          aria-controls="mobile-menu"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center xl:hidden"
+          className="flex h-11 w-11 items-center justify-center xl:hidden"
         >
           <div className="space-y-1.5">
             <span
@@ -91,6 +116,10 @@ export default function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -101,17 +130,19 @@ export default function Nav() {
               {nav.links.map((l) => (
                 <a
                   key={l.label}
+                  ref={l === nav.links[0] ? firstMenuLinkRef : undefined}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="py-3 font-mono text-base text-fg"
+                  className="flex min-h-11 items-center font-mono text-base text-fg"
                 >
                   {l.label}
                 </a>
               ))}
               <a
                 href={nav.cta.href}
+                aria-label="See Rizz"
                 onClick={() => setOpen(false)}
-                className="mt-2 rounded-full bg-accent px-4 py-3 text-center font-mono text-sm font-semibold text-[var(--accent-ink)]"
+                className="mt-2 flex min-h-11 items-center justify-center rounded-full bg-accent px-4 py-3 text-center font-mono text-sm font-semibold text-[var(--accent-ink)]"
               >
                 {nav.cta.label}
               </a>
