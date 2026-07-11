@@ -1,14 +1,36 @@
-import { isAbsolute, relative, resolve } from 'node:path';
+import { realpath } from 'node:fs/promises';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { certificateHash, changedPathsHash, normalizedHash } from './hash.mjs';
 import { validateMission } from './mission.mjs';
 import { validatePolicy } from './policy.mjs';
 import { validateReview } from './review.mjs';
 import { validateChangedPaths } from './scope.mjs';
 
-export function requireExternalEvidencePath(outputPath, repositoryRoot = process.cwd()) {
+function isInside(parent, candidate) {
+  const child = relative(parent, candidate);
+  return child === '' || (!isAbsolute(child) && child !== '..' && !child.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`));
+}
+
+async function effectivePath(path, mustExist) {
+  if (mustExist) return realpath(path);
+  let ancestor = path;
+  while (true) {
+    try {
+      const resolvedAncestor = await realpath(ancestor);
+      return resolve(resolvedAncestor, relative(ancestor, path));
+    } catch (error) {
+      if (error?.code !== 'ENOENT') throw error;
+      const parent = dirname(ancestor);
+      if (parent === ancestor) throw error;
+      ancestor = parent;
+    }
+  }
+}
+
+export async function requireExternalEvidencePath(outputPath, repositoryRoot = process.cwd(), { mustExist = false } = {}) {
   const absoluteOutput = resolve(outputPath);
-  const relativeOutput = relative(resolve(repositoryRoot), absoluteOutput);
-  if (!isAbsolute(relativeOutput) && relativeOutput !== '..' && !relativeOutput.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`)) {
+  const [realRepository, effectiveOutput] = await Promise.all([realpath(resolve(repositoryRoot)), effectivePath(absoluteOutput, mustExist)]);
+  if (isInside(realRepository, effectiveOutput)) {
     throw new Error('runtime evidence output must be outside the reviewed repository');
   }
   return absoluteOutput;
