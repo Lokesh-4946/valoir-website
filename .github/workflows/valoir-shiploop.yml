@@ -1,0 +1,40 @@
+name: Valoir Shiploop
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: valoir-shiploop-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  committed-gate:
+    name: committed gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Validate hostile fixtures
+        run: npm run test:shiploop
+
+      - name: Validate committed mission, policy, and Git scope
+        run: >-
+          node scripts/shiploop/validate-committed-gate.mjs
+          .valoir/mission-contract.json
+          .valoir/review-policy.yml
+          "${{ github.event.pull_request.base.sha }}"
+          "${{ github.event.pull_request.head.sha }}"
+
+      - name: Keep merge readiness pending independent review
+        run: echo "Deterministic core passed; exact-SHA runtime review and certificate publication remain pending."

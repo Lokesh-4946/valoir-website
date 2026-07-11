@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "contract_id": "VAL-2026-001",
+  "product": "valoir-website",
+  "intent": "Update the Valoir website for the current Rizz release, repair audited UI defects, and establish the Valoir Shiploop gate.",
+  "approved_design": "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/specs/2026-07-11-valoir-shiploop-rizz-reviewloop-design.md",
+  "implementation_plan": "/Users/lokesh/Documents/Personal/My Labs/Valoir/product-brain/plans/2026-07-11-valoir-shiploop-core.md",
+  "expected_paths": [
+    ".claude/skills/",
+    ".eslintrc.json",
+    ".github/workflows/",
+    ".valoir/",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "package.json",
+    "package-lock.json",
+    "playwright.config.ts",
+    "scripts/shiploop/",
+    "src/",
+    "tests/"
+  ],
+  "forbidden_paths": [
+    ".env",
+    ".env.local",
+    "node_modules/"
+  ],
+  "acceptance_criteria": [
+    "Website copy reflects source-backed current Rizz capabilities.",
+    "Responsive, reduced-motion, keyboard, and progressive-enhancement UI tests pass.",
+    "Shiploop derives scope from Git and rejects stale or forged exact-SHA evidence.",
+    "Runtime review and certificate evidence remain outside the reviewed Git tree.",
+    "A trusted publisher refuses any checked-out or remote PR-head SHA mismatch."
+  ],
+  "required_checks": [
+    "build + typecheck",
+    "Vercel"
+  ],
+  "created_at": "2026-07-11T08:00:00.000Z",
+  "approved_by": "product-owner"
+}
