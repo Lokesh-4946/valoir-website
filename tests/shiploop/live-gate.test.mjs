@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import { buildCertificate, requireExternalEvidencePath } from '../../scripts/shiploop/lib/runtime-evidence.mjs';
 import { validateLiveEvidence, validatePrNumber, verifyPublicationTarget } from '../../scripts/shiploop/lib/publication.mjs';
 import { verifyLauncherState } from '../../scripts/shiploop/publish-status.mjs';
+import { flattenCheckRunPages, flattenStatusPages } from '../../scripts/shiploop/lib/github-pages.mjs';
 import { BASE_SHA, HEAD_SHA, NOW, WEBSITE_CHANGES, websiteFixture } from './fixtures.mjs';
 
 test('runtime certificate generation produces evidence that validates unchanged exact SHA', () => {
@@ -141,6 +142,23 @@ test('publisher paginates all GitHub check and status evidence', async () => {
   assert.match(source, /check-runs[^\n]+--paginate/);
   assert.match(source, /statuses[^\n]+--paginate/);
   assert.match(source, /--slurp/);
+  assert.doesNotMatch(source, /--paginate[^\n]+--jq|--jq[^\n]+--paginate/);
+});
+
+test('GitHub page parsing flattens single and paginated API shapes', () => {
+  const runA = { name: 'a' };
+  const runB = { name: 'b' };
+  assert.deepEqual(flattenCheckRunPages({ total_count: 1, check_runs: [runA] }), [runA]);
+  assert.deepEqual(flattenCheckRunPages([{ total_count: 1, check_runs: [runA] }, { total_count: 1, check_runs: [runB] }]), [runA, runB]);
+  const statusA = { context: 'a' };
+  const statusB = { context: 'b' };
+  assert.deepEqual(flattenStatusPages([statusA]), [statusA]);
+  assert.deepEqual(flattenStatusPages([[statusA], [statusB]]), [statusA, statusB]);
+});
+
+test('GitHub page parsing rejects malformed and empty evidence explicitly', () => {
+  for (const value of [null, {}, [], [{ total_count: 0, check_runs: [] }]]) assert.throws(() => flattenCheckRunPages(value), /github_check_pages/);
+  for (const value of [null, {}, [], [[]], [null]]) assert.throws(() => flattenStatusPages(value), /github_status_pages/);
 });
 
 test('trusted launcher rejects tracked and untracked dirt before privileged imports', () => {

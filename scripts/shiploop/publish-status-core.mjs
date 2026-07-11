@@ -7,6 +7,7 @@ import { validateMission } from './lib/mission.mjs';
 import { parsePolicy } from './lib/policy.mjs';
 import { validateLiveEvidence, validatePrNumber, validateRepository, verifyPublicationTarget } from './lib/publication.mjs';
 import { requireExternalEvidencePath } from './lib/runtime-evidence.mjs';
+import { flattenCheckRunPages, flattenStatusPages } from './lib/github-pages.mjs';
 
 function run(command, args) {
   return execFileSync(command, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }).trim();
@@ -46,7 +47,7 @@ await verifyPublicationTarget({
   baseIsAncestor,
 });
 const changedPaths = deriveChangedPaths({ baseSha: certificate.base_sha, headSha: certificate.reviewed_sha });
-const checkRuns = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/check-runs`, '--paginate', '--slurp', '--jq', 'map(.check_runs) | add']));
+const checkRuns = flattenCheckRunPages(JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/check-runs`, '--paginate', '--slurp'])));
 for (const checkRun of checkRuns) {
   const runId = checkRun.details_url?.match(/\/actions\/runs\/(\d+)/)?.[1];
   if (checkRun.app?.slug === 'github-actions' && runId) {
@@ -54,7 +55,7 @@ for (const checkRun of checkRuns) {
     checkRun.workflow = { name: workflowRun.name, path: workflowRun.path };
   }
 }
-const statuses = JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`, '--paginate', '--slurp', '--jq', 'add']));
+const statuses = flattenStatusPages(JSON.parse(run('gh', ['api', `repos/${repository}/commits/${certificate.reviewed_sha}/statuses`, '--paginate', '--slurp'])));
 const workflowBlobs = {};
 for (const trusted of mission.trusted_checks.filter(({ source }) => source === 'check_run')) {
   workflowBlobs[trusted.workflow_path] = {
