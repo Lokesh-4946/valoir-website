@@ -13,7 +13,7 @@
  * undecided in those files it is marked [NEEDS INPUT].
  */
 
-export type License = "open-source" | "premium" | "open-core";
+export type License = "unlicensed" | "premium";
 
 export type Capability = {
   title: string;
@@ -69,8 +69,8 @@ export const products: Product[] = [
     tagline: "Understand the system before changing it.",
     description:
       "Rizz 0.3.0 is a local Project Intelligence Engine that maps architecture, evidence, and change impact before edits.",
-    license: "open-core",
-    licenseLabel: "Open-core Rizz Core",
+    license: "unlicensed",
+    licenseLabel: "License not declared",
     capabilities: [
       {
         title: "Architecture causality",
@@ -116,7 +116,7 @@ export const products: Product[] = [
     installNotes: [
       { label: "Package", value: "@valoir/rizz" },
       { label: "Release", value: "0.3.0" },
-      { label: "Native installers", value: "planned" },
+      { label: "License", value: "License not declared" },
     ],
     usageSnippet: [
       "# install",

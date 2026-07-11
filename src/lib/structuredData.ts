@@ -34,7 +34,7 @@ function website(): Json {
   };
 }
 
-// Rizz as both a developer application and a source-code project (open-core).
+// Rizz as both a developer application and a source-code project.
 function software(): Json {
   return {
     "@type": ["SoftwareApplication", "SoftwareSourceCode"],
@@ -44,7 +44,6 @@ function software(): Json {
     operatingSystem: "macOS, Linux",
     programmingLanguage: flagship.language,
     codeRepository: flagship.repoUrl,
-    license: "https://opensource.org/license/mit",
     author: { "@id": ORG_ID },
     publisher: { "@id": ORG_ID },
     url: `${site.url}/docs`,

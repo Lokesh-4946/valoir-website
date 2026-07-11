@@ -19,9 +19,8 @@ export const metadata: Metadata = {
     "lightweight coding agent",
     "CLI coding agent loop",
     "provider-agnostic AI agent",
-    "open-source coding agent",
+    "project intelligence",
     "developer tools",
-    "open-core",
   ],
   alternates: { canonical: "/" },
   openGraph: {

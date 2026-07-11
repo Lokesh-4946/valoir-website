@@ -23,12 +23,32 @@ test("docs identify 0.3.0 and its complete public prerequisites", async ({ page 
   await expect(page.getByText("Node ≥ 22, npm, and git", { exact: false })).toBeVisible();
 });
 
-test("roadmap keeps shipped review evidence out of Next", async ({ page }) => {
+test("roadmap places the complete shipped intelligence set in Now, not Next", async ({ page }) => {
   await page.goto("/");
 
   const roadmap = page.locator("#roadmap");
+  const nowLane = roadmap.getByText("Now", { exact: true }).locator("..");
   const nextLane = roadmap.getByText("Next", { exact: true }).locator("..");
-  await expect(nextLane.getByText("evidence scoring", { exact: true })).toHaveCount(0);
-  await expect(nextLane.getByText("relationship-aware review", { exact: true })).toHaveCount(0);
+  const shippedCapabilities = [
+    "database relationships",
+    "relationship-aware review",
+    "verification plans",
+    "evidence scoring",
+    "approval packets",
+    "CLI signoff",
+  ];
+
+  for (const capability of shippedCapabilities) {
+    await expect(nowLane.getByText(capability, { exact: true })).toBeVisible();
+    await expect(nextLane.getByText(capability, { exact: true })).toHaveCount(0);
+  }
+
   await expect(roadmap).not.toContainText("Repo Brain");
+});
+
+test("site does not assert an undeclared Rizz license", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByText("License not declared", { exact: true })).toBeVisible();
+  await expect(page.getByText("open-core", { exact: false })).toHaveCount(0);
 });

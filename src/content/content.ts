@@ -6,8 +6,8 @@
 export const site = {
   name: "Valoir",
   wordmark: "Valoir",
-  tagline: "Open-core agent infrastructure.",
-  description: "Infrastructure for local-first coding agents and the teams that run them.",
+  tagline: "Applied AI systems for real workflows.",
+  description: "Developer tools for understanding real systems before changing them.",
   url: "https://valoir.space", // production domain (owned; registered at Namecheap, 2026-06-14)
   github: "https://github.com/Lokesh-4946",
   socials: [
@@ -29,8 +29,8 @@ export const nav = {
 };
 
 export const hero = {
-  headline: ["Valoir builds", "open-core agent", "infrastructure."],
-  subhead: "Infrastructure for local-first coding agents and the teams that run them.",
+  headline: ["Valoir builds", "applied AI", "for real workflows."],
+  subhead: "Developer tools for understanding real systems before changing them.",
   primary: { label: "Explore Rizz", href: "#products" },
   secondary: { label: "Read docs", href: "/docs" },
   supporting: {
@@ -83,8 +83,11 @@ export const sections = {
         title: "Rizz 0.3.0",
         items: [
           "architecture causality",
+          "database relationships",
           "relationship-aware review",
+          "verification plans",
           "evidence scoring",
+          "approval packets",
           "CLI signoff",
         ],
       },

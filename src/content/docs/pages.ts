@@ -27,7 +27,7 @@ export const docsPages: DocPage[] = [
       },
       {
         type: "p",
-        text: "Open-core: Rizz Core is separate from Valoir's later hosted and enterprise layer.",
+        text: "Rizz runs locally by default. Valoir's later hosted and enterprise layer remains separate from the current install.",
       },
     ],
   },
