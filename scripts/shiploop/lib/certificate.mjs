@@ -9,7 +9,7 @@ const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'mission_contract_
 export function validateCertificate(certificate, { mission, review, policy, headSha, baseSha, now = new Date().toISOString(), uiChanges }) {
   validateMission(mission);
   validatePolicy(policy);
-  validateReview(review, { mission, policy, headSha, baseSha });
+  validateReview(review, { mission, policy, headSha, baseSha, uiChanges });
   requireSchema(certificate);
   rejectUnknownFields(certificate, FIELDS);
   requireSha(certificate.reviewed_sha, '$.reviewed_sha');

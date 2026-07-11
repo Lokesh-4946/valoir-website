@@ -49,6 +49,9 @@ export function validatePolicy(policy) {
   if (policy.max_iterations !== 5) fail('weakened_policy', '$.max_iterations', 'company maximum must equal 5');
   requireStringArray(policy.required_reviewers, '$.required_reviewers');
   if (policy.required_reviewers.length === 0) fail('invalid_type', '$.required_reviewers', 'must contain at least one reviewer role');
+  for (const role of ['intent-architecture', 'correctness-risk']) {
+    if (!policy.required_reviewers.includes(role)) fail('weakened_policy', '$.required_reviewers', `must include company reviewer role ${role}`);
+  }
   requireStringArray(policy.blocking_priorities, '$.blocking_priorities');
   for (const priority of ['P0', 'P1', 'P2']) if (!policy.blocking_priorities.includes(priority)) fail('weakened_policy', '$.blocking_priorities', `must include ${priority}`);
   for (const field of [...REQUIRED_TRUE, 'require_preview_when_ui_changes']) requireBoolean(policy[field], `$.${field}`);

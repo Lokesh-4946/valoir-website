@@ -1,7 +1,7 @@
 import { fail, rejectUnknownFields, requireIdentity, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
 import { normalizedHash } from './hash.mjs';
 
-const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at'];
+const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
 const FINDING_FIELDS = ['id', 'priority', 'category', 'file', 'line_start', 'line_end', 'evidence', 'required_change', 'status', 'adjudication_rationale'];
 const RIZZ_EVIDENCE_FIELDS = ['cli_version', 'true_positives', 'false_positives', 'missed_findings', 'useful_prompts', 'investigation_minutes_saved'];
 
@@ -28,7 +28,21 @@ function validateRizzEvidence(evidence) {
   requireStringArray(evidence.useful_prompts, '$.rizz_evidence.useful_prompts');
 }
 
-export function validateReview(review, { mission, policy, headSha, baseSha }) {
+function validateBlockedEvidence(review) {
+  if (!Array.isArray(review.blockers) || review.blockers.length === 0) fail('missing_blocker_evidence', '$.blockers', 'BLOCKED requires at least one structured blocker');
+  review.blockers.forEach((blocker, index) => {
+    const path = `$.blockers[${index}]`;
+    requireObject(blocker, path);
+    rejectUnknownFields(blocker, ['code', 'evidence'], path);
+    requireString(blocker.code, `${path}.code`);
+    requireString(blocker.evidence, `${path}.evidence`);
+  });
+  requireIdentity(review.next_authorized_actor, '$.next_authorized_actor');
+  requireString(review.escalation, '$.escalation');
+  if (review.escalation !== review.escalation.trim()) fail('invalid_type', '$.escalation', 'must not contain surrounding whitespace');
+}
+
+export function validateReview(review, { mission, policy, headSha, baseSha, uiChanges = true }) {
   requireSchema(review);
   rejectUnknownFields(review, FIELDS);
   requireSha(review.reviewed_sha, '$.reviewed_sha');
@@ -53,7 +67,10 @@ export function validateReview(review, { mission, policy, headSha, baseSha }) {
     reviewerRoles.add(reviewer.role);
   }
   if (review.verdict === 'APPROVE' && review.reviewers.length === 0) fail('missing_reviewer', '$.reviewers', 'approval requires reviewer evidence');
-  for (const role of policy.required_reviewers) if (!reviewerRoles.has(role)) fail('missing_reviewer', '$.reviewers', `missing required reviewer role ${role}`);
+  const requiredRoles = new Set(policy.required_reviewers);
+  if (policy.require_preview_when_ui_changes && uiChanges) requiredRoles.add('experience');
+  const missingRoles = [...requiredRoles].filter((role) => !reviewerRoles.has(role));
+  if (missingRoles.length > 0 && review.verdict !== 'BLOCKED') fail('missing_reviewer', '$.reviewers', `missing required reviewer role ${missingRoles[0]}`);
   if (!['pass', 'fail', 'uncertain'].includes(review.intent_alignment)) fail('invalid_intent_alignment', '$.intent_alignment', 'must be pass, fail, or uncertain');
   if (review.verdict === 'APPROVE' && review.intent_alignment !== 'pass') fail('intent_misalignment', '$.intent_alignment', 'must pass before approval');
   const findingIds = new Set();
@@ -76,6 +93,7 @@ export function validateReview(review, { mission, policy, headSha, baseSha }) {
   for (const check of mission.required_checks) if (!review.required_checks.includes(check)) fail('missing_required_check', '$.required_checks', `missing ${check}`);
   if (review.required_checks.some((name) => ['valoir-shiploop', 'rizz-reviewloop'].includes(name))) fail('recursive_check', '$.required_checks', 'Shiploop cannot require itself');
   if (!['APPROVE', 'REQUEST_CHANGES', 'BLOCKED'].includes(review.verdict)) fail('invalid_verdict', '$.verdict', 'is not allowed');
+  if (review.verdict === 'BLOCKED') validateBlockedEvidence(review);
   if (review.iteration === policy.max_iterations && review.verdict === 'REQUEST_CHANGES') fail('iteration_cap_requires_blocked', '$.verdict', 'the final unsuccessful iteration must be BLOCKED');
   requireTimestamp(review.generated_at, '$.generated_at');
   if (policy.profile === 'rizz-reviewloop') validateRizzEvidence(review.rizz_evidence);

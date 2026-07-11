@@ -47,6 +47,8 @@ export function requireSha(value, path) {
 export function requireTimestamp(value, path) {
   requireString(value, path);
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) || Number.isNaN(Date.parse(value))) fail('invalid_timestamp', path, 'must be an RFC3339 UTC timestamp');
+  const canonicalInput = value.includes('.') ? value : value.replace('Z', '.000Z');
+  if (new Date(value).toISOString() !== canonicalInput) fail('invalid_timestamp', path, 'must represent a real calendar date exactly');
 }
 
 export function rejectUnknownFields(value, allowed, path = '$') {

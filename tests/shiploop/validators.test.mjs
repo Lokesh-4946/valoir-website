@@ -161,6 +161,9 @@ test('intent failure or uncertainty is allowed only for negative verdicts', () =
     const negative = websiteFixture();
     negative.review.intent_alignment = intent_alignment;
     negative.review.verdict = 'BLOCKED';
+    negative.review.blockers = [{ code: 'intent_alignment', evidence: `Intent alignment is ${intent_alignment}.` }];
+    negative.review.next_authorized_actor = 'product-owner';
+    negative.review.escalation = 'Clarify or repair intent alignment.';
     assert.doesNotThrow(() => validateReview(negative.review, { mission: negative.mission, policy: negative.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
     const approved = websiteFixture();
     approved.review.intent_alignment = intent_alignment;
@@ -213,5 +216,49 @@ test('identities must be trimmed and contain no surrounding whitespace', () => {
     const fixture = websiteFixture();
     mutate(fixture);
     expectCode('invalid_identity', () => validateArtifactSet(fixture, { headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true }));
+  }
+});
+
+test('company reviewer roles are mandatory and experience is additive for UI changes', () => {
+  const fixture = websiteFixture();
+  expectCode('weakened_policy', () => validatePolicy({ ...fixture.policy, required_reviewers: ['experience'] }));
+  const uiPolicy = { ...fixture.policy, required_reviewers: ['intent-architecture', 'correctness-risk'] };
+  const uiReview = { ...fixture.review, reviewers: fixture.review.reviewers.filter(({ role }) => role !== 'experience') };
+  expectCode('missing_reviewer', () => validateReview(uiReview, { mission: fixture.mission, policy: uiPolicy, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: true }));
+  assert.doesNotThrow(() => validateReview(uiReview, { mission: fixture.mission, policy: uiPolicy, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: false }));
+});
+
+test('terminal BLOCKED reviews require strict blocker evidence and escalation ownership', () => {
+  const missing = websiteFixture();
+  missing.review.iteration = 5;
+  missing.review.verdict = 'BLOCKED';
+  expectCode('missing_blocker_evidence', () => validateReview(missing.review, { mission: missing.mission, policy: missing.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+  const malformed = websiteFixture();
+  malformed.review.iteration = 5;
+  malformed.review.verdict = 'BLOCKED';
+  malformed.review.blockers = [{ code: 'reviewer_unavailable', evidence: 'Experience reviewer unavailable.', secret: true }];
+  malformed.review.next_authorized_actor = 'product-owner';
+  malformed.review.escalation = 'Assign an independent reviewer.';
+  expectCode('unknown_field', () => validateReview(malformed.review, { mission: malformed.mission, policy: malformed.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+});
+
+test('BLOCKED may document missing reviewer roles but APPROVE requires full coverage', () => {
+  const fixture = websiteFixture();
+  fixture.review.iteration = 5;
+  fixture.review.verdict = 'BLOCKED';
+  fixture.review.reviewers = fixture.review.reviewers.filter(({ role }) => role !== 'experience');
+  fixture.review.blockers = [{ code: 'missing_reviewer', evidence: 'No independent experience reviewer is available.' }];
+  fixture.review.next_authorized_actor = 'product-owner';
+  fixture.review.escalation = 'Assign an experience reviewer and start a new authorized run.';
+  assert.doesNotThrow(() => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: true }));
+  fixture.review.verdict = 'APPROVE';
+  expectCode('missing_reviewer', () => validateReview(fixture.review, { mission: fixture.mission, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, uiChanges: true }));
+});
+
+test('RFC3339 timestamps reject impossible calendar dates by exact roundtrip', () => {
+  for (const impossible of ['2026-02-30T08:00:00.000Z', '2026-04-31T08:00:00Z']) {
+    const fixture = websiteFixture();
+    fixture.mission.created_at = impossible;
+    expectCode('invalid_timestamp', () => validateMission(fixture.mission));
   }
 });
