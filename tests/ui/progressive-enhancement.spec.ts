@@ -1,5 +1,62 @@
 import { expect, test } from "@playwright/test";
 
+test("does not start hero motion for reduced-motion users", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    window.matchMedia = (query) => {
+      const mediaQuery = nativeMatchMedia(query);
+      const calledFromMediaHook = new Error().stack?.includes("useMediaQuery");
+      if (query !== "(prefers-reduced-motion: reduce)" || !calledFromMediaHook) {
+        return mediaQuery;
+      }
+
+      // Model the hydration window where the React hook still exposes its
+      // server fallback even though the browser preference already matches.
+      return new Proxy(mediaQuery, {
+        get(target, property) {
+          if (property === "matches") return false;
+          const value = Reflect.get(target, property, target);
+          return typeof value === "function" ? value.bind(target) : value;
+        },
+      });
+    };
+    Object.assign(window, { heroTransformMutations: 0 });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (!(mutation.target instanceof HTMLElement)) continue;
+          if (!mutation.target.matches("[data-h-line]")) continue;
+          if (!mutation.target.style.transform) continue;
+
+          const animationWindow = window as typeof window & {
+            heroTransformMutations: number;
+          };
+          animationWindow.heroTransformMutations += 1;
+        }
+      });
+
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["style"],
+        subtree: true,
+      });
+    });
+  });
+
+  await page.goto("/");
+  await page.waitForTimeout(2_000);
+
+  const transformMutations = await page.evaluate(() => {
+    const animationWindow = window as typeof window & {
+      heroTransformMutations: number;
+    };
+    return animationWindow.heroTransformMutations;
+  });
+  expect(transformMutations).toBe(0);
+});
+
 test("keeps hero content visible when animation freezes after starting", async ({ page }) => {
   await page.addInitScript(() => {
     const requestFrame = window.requestAnimationFrame.bind(window);

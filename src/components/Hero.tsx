@@ -36,7 +36,10 @@ export default function Hero() {
     const lines = el.querySelectorAll<HTMLElement>("[data-h-line]");
     const rest = el.querySelectorAll<HTMLElement>("[data-h-fade]");
 
-    if (reduced) return;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced || prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
