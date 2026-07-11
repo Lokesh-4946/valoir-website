@@ -1,6 +1,5 @@
 import { requireSha } from './errors.mjs';
-
-const SHIPLOOP_CONTEXTS = new Set(['valoir-shiploop', 'rizz-reviewloop']);
+import { isReservedCheckContext } from './check-contexts.mjs';
 
 export function validatePrNumber(value) {
   if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) throw new Error('PR number must be a canonical positive integer');
@@ -16,9 +15,9 @@ export function validateLiveEvidence({ requiredNames, reviewedSha, checkRuns, st
   requireSha(reviewedSha, '$.reviewedSha');
   const requiredChecks = [];
   for (const name of requiredNames) {
-    if (SHIPLOOP_CONTEXTS.has(name.toLowerCase())) throw new Error(`${name} recursively requires Shiploop`);
-    const run = checkRuns.find((item) => item.name === name && item.head_sha === reviewedSha && !SHIPLOOP_CONTEXTS.has(item.name.toLowerCase()));
-    const status = statuses.find((item) => item.context === name && item.sha === reviewedSha && !SHIPLOOP_CONTEXTS.has(item.context.toLowerCase()));
+    if (isReservedCheckContext(name)) throw new Error(`${name} recursively requires Shiploop`);
+    const run = checkRuns.find((item) => item.name === name && item.head_sha === reviewedSha && !isReservedCheckContext(item.name));
+    const status = statuses.find((item) => item.context === name && item.sha === reviewedSha && !isReservedCheckContext(item.context));
     if (!run && !status) throw new Error(`missing live required check ${name} for exact SHA`);
     const conclusion = run?.conclusion ?? (status?.state === 'success' ? 'success' : status?.state);
     if (conclusion !== 'success') throw new Error(`live required check ${name} did not succeed`);

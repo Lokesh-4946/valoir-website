@@ -1,4 +1,5 @@
 import { fail, rejectUnknownFields, requireIdentity, requireSafePath, requireSchema, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
+import { rejectReservedCheckContexts } from './check-contexts.mjs';
 
 const FIELDS = ['schema_version', 'contract_id', 'product', 'intent', 'approved_design', 'implementation_plan', 'expected_paths', 'forbidden_paths', 'acceptance_criteria', 'required_checks', 'created_at', 'approved_by'];
 
@@ -9,6 +10,7 @@ export function validateMission(mission) {
   requireIdentity(mission.approved_by, '$.approved_by');
   for (const field of ['expected_paths', 'forbidden_paths', 'acceptance_criteria', 'required_checks']) requireStringArray(mission[field], `$.${field}`);
   if (mission.required_checks.length === 0) fail('missing_required_check', '$.required_checks', 'CI baseline requires at least one check');
+  rejectReservedCheckContexts(mission.required_checks);
   for (const field of ['expected_paths', 'forbidden_paths']) mission[field].forEach((value, index) => requireSafePath(value, `$.${field}[${index}]`));
   requireTimestamp(mission.created_at, '$.created_at');
   return mission;

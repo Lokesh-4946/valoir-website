@@ -1,6 +1,7 @@
 import { fail, rejectUnknownFields, requireBoolean, requireIdentity, requireInteger, requireObject, requireSafePath, requireSchema, requireSha, requireString, requireStringArray, requireTimestamp } from './errors.mjs';
 import { normalizedHash } from './hash.mjs';
 import { validateScopeExceptions } from './scope.mjs';
+import { rejectReservedCheckContexts } from './check-contexts.mjs';
 
 const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'iteration', 'mission_contract_id', 'mission_contract_hash', 'implementation_owner', 'adjudicator', 'risk_level', 'ui_changes', 'security_sensitive', 'scope_exceptions', 'reviewers', 'intent_alignment', 'findings', 'resolved_findings', 'unresolved_comment_count', 'required_checks', 'rizz_evidence', 'verdict', 'generated_at', 'blockers', 'next_authorized_actor', 'escalation'];
 const FINDING_FIELDS = ['id', 'priority', 'category', 'file', 'line_start', 'line_end', 'evidence', 'required_change', 'status', 'adjudication_rationale'];
@@ -113,8 +114,8 @@ export function validateReview(review, context) {
   if (review.unresolved_comment_count < 0) fail('invalid_type', '$.unresolved_comment_count', 'must be non-negative');
   if (policy.require_zero_unresolved && review.unresolved_comment_count > 0 && review.verdict === 'APPROVE') fail('unresolved_comments', '$.unresolved_comment_count', 'approval requires zero unresolved comments');
   requireStringArray(review.required_checks, '$.required_checks');
+  rejectReservedCheckContexts(review.required_checks);
   for (const check of mission.required_checks) if (!review.required_checks.includes(check)) fail('missing_required_check', '$.required_checks', `missing ${check}`);
-  if (review.required_checks.some((name) => ['valoir-shiploop', 'rizz-reviewloop'].includes(name))) fail('recursive_check', '$.required_checks', 'Shiploop cannot require itself');
   if (!['APPROVE', 'REQUEST_CHANGES', 'BLOCKED'].includes(review.verdict)) fail('invalid_verdict', '$.verdict', 'is not allowed');
   if (review.verdict === 'BLOCKED') validateBlockedEvidence(review);
   if (review.verdict !== 'BLOCKED' && [review.blockers, review.next_authorized_actor, review.escalation].some((value) => value !== undefined)) fail('unexpected_blocker_evidence', '$', 'blocker and escalation fields are only valid for BLOCKED');

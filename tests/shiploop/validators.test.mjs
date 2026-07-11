@@ -106,6 +106,22 @@ test('missing, failed, stale, or recursive checks fail', () => {
   }
 });
 
+test('reserved Shiploop contexts are rejected case-insensitively in committed and runtime artifacts', () => {
+  for (const reserved of ['VALOIR-SHIPLOOP', 'Rizz-ReviewLoop']) {
+    const mission = websiteFixture();
+    mission.mission.required_checks = [reserved];
+    expectCode('recursive_check', () => validateMission(mission.mission));
+
+    const review = websiteFixture();
+    review.review.required_checks = [...review.review.required_checks, reserved];
+    expectCode('recursive_check', () => validateReview(review.review, { mission: review.mission, policy: review.policy, headSha: HEAD_SHA, baseSha: BASE_SHA }));
+
+    const certificate = websiteFixture();
+    certificate.certificate.required_checks.push({ name: reserved, conclusion: 'success', sha: HEAD_SHA });
+    expectCode('recursive_check', () => validateCertificate(certificate.certificate, { mission: certificate.mission, review: certificate.review, policy: certificate.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, changedPaths: WEBSITE_CHANGES }));
+  }
+});
+
 test('expired or overlong certificates fail', () => {
   const expired = websiteFixture();
   expired.certificate.expires_at = '2026-07-11T09:59:59.000Z';

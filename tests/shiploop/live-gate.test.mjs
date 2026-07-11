@@ -108,6 +108,7 @@ test('live GitHub evidence rejects missing, failed, stale, and recursively requi
     previewName: 'Vercel',
   };
   assert.throws(() => validateLiveEvidence({ ...base, requiredNames: ['valoir-shiploop'] }), /recursively/);
+  assert.throws(() => validateLiveEvidence({ ...base, requiredNames: ['Rizz-ReviewLoop'] }), /recursively/);
   assert.throws(() => validateLiveEvidence({ ...base, statuses: [] }), /missing live required check/);
   assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'failure', head_sha: HEAD_SHA }] }), /did not succeed/);
   assert.throws(() => validateLiveEvidence({ ...base, checkRuns: [{ name: 'build + typecheck', conclusion: 'success', head_sha: BASE_SHA }] }), /missing live required check/);

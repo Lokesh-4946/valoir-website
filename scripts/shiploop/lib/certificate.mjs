@@ -4,6 +4,7 @@ import { validateMission } from './mission.mjs';
 import { validatePolicy } from './policy.mjs';
 import { validateReview } from './review.mjs';
 import { validateChangedPaths } from './scope.mjs';
+import { isReservedCheckContext } from './check-contexts.mjs';
 
 const FIELDS = ['schema_version', 'reviewed_sha', 'base_sha', 'mission_contract_id', 'mission_contract_hash', 'review_artifact_hash', 'required_checks', 'preview', 'adjudicator', 'generated_at', 'expires_at', 'changed_paths_hash', 'certificate_hash'];
 
@@ -34,7 +35,7 @@ export function validateCertificate(certificate, context) {
     requireObject(check, `$.required_checks[${index}]`);
     rejectUnknownFields(check, ['name', 'conclusion', 'sha'], `$.required_checks[${index}]`);
     requireString(check.name, `$.required_checks[${index}].name`);
-    if (['valoir-shiploop', 'rizz-reviewloop'].includes(check.name)) fail('recursive_check', `$.required_checks[${index}].name`, 'Shiploop cannot require itself');
+    if (isReservedCheckContext(check.name)) fail('recursive_check', `$.required_checks[${index}].name`, 'Shiploop cannot require itself');
     if (check.conclusion !== 'success') fail('failed_required_check', `$.required_checks[${index}].conclusion`, `${check.name} did not succeed`);
     if (check.sha !== headSha) fail('check_sha_mismatch', `$.required_checks[${index}].sha`, `${check.name} is stale`);
     checkNames.add(check.name);
