@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test:shiploop": "node --test tests/shiploop/*.test.mjs",
     "test:ui": "playwright test"
   },
   "dependencies": {
