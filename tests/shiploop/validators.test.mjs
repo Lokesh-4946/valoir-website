@@ -415,7 +415,7 @@ test('trusted Git changed paths enforce expected and forbidden scope with segmen
 
 test('renames and deletes validate every actual old and new path', () => {
   const fixture = websiteFixture();
-  expectCode('scope_violation', () => validateChangedPaths([{ status: 'R', oldPath: 'outside/a.ts', path: 'src/a.ts', kind: 'file' }], fixture.mission, fixture.review));
+  expectCode('scope_violation', () => validateChangedPaths([{ status: 'R', oldPath: 'outside/a.ts', path: 'src/a.ts', oldKind: 'file', kind: 'file' }], fixture.mission, fixture.review));
   expectCode('scope_violation', () => validateChangedPaths([{ status: 'D', path: 'outside/deleted.ts', kind: 'file' }], fixture.mission, fixture.review));
 });
 
@@ -518,4 +518,36 @@ test('Git derivation inspects both modes for type changes and classifies gitlink
   } finally {
     await rm(cwd, { recursive: true, force: true });
   }
+});
+
+test('trusted change records require status-specific kind and old endpoint fields', () => {
+  const fixture = websiteFixture();
+  for (const change of [
+    { status: 'A', path: 'src/a.ts' },
+    { status: 'T', path: 'src/a.ts', kind: 'file' },
+    { status: 'R', oldPath: 'src/old.ts', path: 'src/new.ts', kind: 'file' },
+    { status: 'C', oldKind: 'file', path: 'src/new.ts', kind: 'file' },
+  ]) expectCode('invalid_change_shape', () => validateChangedPaths([change], fixture.mission, fixture.review));
+});
+
+test('trusted change records reject status-inapplicable old endpoint fields', () => {
+  const fixture = websiteFixture();
+  for (const change of [
+    { status: 'A', path: 'src/a.ts', kind: 'file', oldKind: 'file' },
+    { status: 'M', path: 'src/a.ts', oldPath: 'src/old.ts', kind: 'file' },
+    { status: 'D', path: 'src/a.ts', kind: 'file', oldKind: 'file' },
+    { status: 'T', path: 'src/a.ts', oldPath: 'src/old.ts', oldKind: 'file', kind: 'file' },
+  ]) expectCode('invalid_change_shape', () => validateChangedPaths([change], fixture.mission, fixture.review));
+});
+
+test('deletion kind is mandatory base-tree evidence', () => {
+  const fixture = websiteFixture();
+  assert.doesNotThrow(() => validateChangedPaths([{ status: 'D', path: 'src/deleted.ts', kind: 'file' }], fixture.mission, fixture.review));
+  expectCode('invalid_change_shape', () => validateChangedPaths([{ status: 'D', path: 'src/deleted.ts' }], fixture.mission, fixture.review));
+});
+
+test('certificate rejects trusted changed-path records with omitted kind evidence', () => {
+  const fixture = websiteFixture();
+  const changedPaths = WEBSITE_CHANGES.map(({ kind, ...change }) => change);
+  expectCode('invalid_change_shape', () => validateCertificate(fixture.certificate, { mission: fixture.mission, review: fixture.review, policy: fixture.policy, headSha: HEAD_SHA, baseSha: BASE_SHA, now: NOW, uiChanges: true, changedPaths }));
 });

@@ -4,6 +4,16 @@ function matchesScope(path, scope) {
   return scope.endsWith('/') ? path.startsWith(scope) : path === scope;
 }
 
+function validateChangeShape(change, path) {
+  if (change.kind === undefined) fail('invalid_change_shape', `${path}.kind`, 'every change requires trusted object-kind evidence');
+  const hasOldKind = change.oldKind !== undefined;
+  const hasOldPath = change.oldPath !== undefined;
+  const requiresOldKind = ['T', 'R', 'C'].includes(change.status);
+  const requiresOldPath = ['R', 'C'].includes(change.status);
+  if (hasOldKind !== requiresOldKind) fail('invalid_change_shape', `${path}.oldKind`, requiresOldKind ? `${change.status} requires base-side kind evidence` : `${change.status} forbids oldKind`);
+  if (hasOldPath !== requiresOldPath) fail('invalid_change_shape', `${path}.oldPath`, requiresOldPath ? `${change.status} requires an old path` : `${change.status} forbids oldPath`);
+}
+
 export function validateChangedPaths(changes, mission, review) {
   if (!Array.isArray(changes)) fail('missing_changed_paths', '$.changedPaths', 'trusted Git-derived changes are required');
   const exceptions = validateScopeExceptions(review.scope_exceptions);
@@ -12,6 +22,7 @@ export function validateChangedPaths(changes, mission, review) {
     requireObject(change, path);
     rejectUnknownFields(change, ['status', 'path', 'oldPath', 'kind', 'oldKind'], path);
     if (!['A', 'M', 'D', 'R', 'C', 'T'].includes(change.status)) fail('invalid_change_status', `${path}.status`, 'is not a supported Git change status');
+    validateChangeShape(change, path);
     for (const [field, kind] of [['kind', change.kind], ['oldKind', change.oldKind]]) {
       if (kind === undefined) continue;
       if (!['file', 'directory', 'symlink', 'gitlink', 'nonregular', 'missing'].includes(kind)) fail('invalid_type', `${path}.${field}`, 'is not a recognized Git object kind');
@@ -19,7 +30,6 @@ export function validateChangedPaths(changes, mission, review) {
       if (kind !== 'file') fail('unsupported_object_kind', `${path}.${field}`, `schema v1 rejects ${kind} changes`);
     }
     const actualPaths = change.oldPath ? [change.oldPath, change.path] : [change.path];
-    if (change.status === 'R' && !change.oldPath) fail('invalid_change_status', path, 'renames require oldPath');
     for (const actualPath of actualPaths) {
       requireSafePath(actualPath, `${path}.path`);
       if (mission.forbidden_paths.some((scope) => matchesScope(actualPath, scope))) fail('forbidden_path', `${path}.path`, `${actualPath} is forbidden`);
